@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Morning Memo — The World's Most Curated Newsletter</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111827;
+      --bg-card: #1a2535;
+      --bg-elevated: #1f2d40;
+      --ink: #dde2ed;
+      --ink-light: #a8b8cc;
+      --ink-faint: #6b7fa0;
+      --accent: #00d4ff;
+      --accent-dark: #00b8de;
+      --border: rgba(255,255,255,0.08);
+      --error: #ff5c5c;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 60px;
+      background: rgba(17,24,39,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.45rem;
+      letter-spacing: 0.05em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #111827;
+      padding: 10px 22px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--accent-dark); }
+
+    /* CENTERED CONTAINER */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 60px;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; right: -200px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.1s;
+    }
+
+    .hero-content { max-width: 700px; }
+
+    .hero h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.4rem, 5vw, 4.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--ink-light);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 48px;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.35s;
+    }
+
+    .hero-btn-wrap {
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.5s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #111827;
+      padding: 20px 48px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+    /* HERO STAT BLURB */
+    .hero-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 60px;
+      width: 100%;
+    }
+
+    .stat-blurb {
+      flex-shrink: 0;
+      width: 260px;
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: 4px;
+      padding: 28px 24px;
+      background: rgba(0,212,255,0.04);
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    .stat-blurb .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-blurb .stat-unit {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .stat-blurb .stat-desc {
+      font-size: 0.88rem;
+      color: var(--ink-light);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .stat-blurb .stat-source {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    @media (max-width: 900px) {
+      .stat-blurb { display: none; }
+    }
+
+    /* TICKER */
+    .ticker {
+      background: #0d1524;
+      color: var(--ink);
+      padding: 14px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      animation: ticker 30s linear infinite;
+    }
+
+    .ticker-item {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0 40px;
+      color: var(--ink-faint);
+    }
+
+    .ticker-item span { color: var(--accent); margin-right: 8px; }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* SECTIONS */
+    .section { padding: 120px 0; }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 64px;
+      max-width: 500px;
+    }
+
+    /* HOW IT WORKS */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 48px;
+    }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3.5rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .step h3 { font-size: 1rem; font-weight: 500; margin-bottom: 10px; color: var(--ink); }
+    .step p { font-size: 0.9rem; color: var(--ink-light); line-height: 1.7; font-weight: 300; }
+
+    /* PREVIEW */
+    .preview-section { background: #0d1524; padding: 120px 0; }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .preview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 40px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    }
+
+    .preview-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-card-logo { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--ink); }
+    .preview-card-logo span { color: var(--accent); }
+    .preview-date { font-size: 0.75rem; color: var(--ink-faint); letter-spacing: 0.05em; }
+
+    .preview-greeting {
+      font-size: 0.95rem;
+      color: var(--ink-light);
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .preview-story {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-story:last-of-type { border-bottom: none; }
+
+    .preview-story-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .preview-story h4 { font-size: 0.88rem; font-weight: 500; margin-bottom: 6px; line-height: 1.4; color: var(--ink); }
+    .preview-story p { font-size: 0.82rem; color: var(--ink-light); line-height: 1.6; font-weight: 300; }
+    .preview-sign { font-size: 0.78rem; color: var(--ink-faint); margin-top: 20px; font-style: italic; }
+    .preview-text p { font-size: 1rem; color: var(--ink-light); line-height: 1.8; font-weight: 300; margin-bottom: 16px; }
+    .preview-text .section-title { margin-bottom: 24px; }
+
+    /* TOPICS DISPLAY */
+    .topics-section { padding: 120px 0; }
+
+    .topics-grid-display {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .topic-pill {
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      padding: 18px 20px;
+      border-radius: 2px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .topic-pill:hover { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+    .topic-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .topic-name { font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; color: var(--ink); }
+
+    /* TESTIMONIALS */
+    .testimonials { padding: 120px 0; background: #0d1524; }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-top: 64px;
+    }
+
+    .testimonial {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 36px;
+      border-radius: 2px;
+    }
+
+    .testimonial-stars { color: var(--accent); font-size: 0.9rem; margin-bottom: 16px; letter-spacing: 3px; }
+    .testimonial-text { font-style: italic; font-size: 1rem; line-height: 1.7; margin-bottom: 24px; color: var(--ink); }
+    .testimonial-author { font-size: 0.8rem; color: var(--ink-faint); font-weight: 500; letter-spacing: 0.05em; }
+
+    /* ===================== SURVEY SECTION ===================== */
+    .survey-section {
+      padding: 40px 0 120px;
+      background: var(--bg);
+    }
+
+    .survey-section .section-title { margin-bottom: 16px; }
+
+    .survey-section .section-sub {
+      font-size: 1rem;
+      color: var(--ink-light);
+      font-weight: 300;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .survey-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 56px 64px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Progress */
+    .progress-wrap { margin-bottom: 48px; }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .s-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 500;
+      color: var(--ink-faint);
+      transition: all 0.3s;
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+
+    .s-dot.active { border-color: var(--accent); background: var(--accent); color: #111827; }
+    .s-dot.done { border-color: var(--accent); background: var(--accent); color: #111827; }
+
+    .s-line {
+      flex: 1;
+      height: 1.5px;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+
+    .s-line.done { background: var(--accent); }
+
+    .progress-label {
+      font-size: 0.72rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .progress-label strong { color: var(--accent); font-weight: 500; }
+
+    /* Step panels */
+    .s-panel { display: none; }
+    .s-panel.active { display: block; animation: fadeIn 0.35s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-eyebrow {
+      font-size: 0.72rem; font-weight: 500;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 10px;
+    }
+
+    .step-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.6rem; line-height: 1.2;
+      margin-bottom: 8px; letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    .step-sub {
+      font-size: 0.9rem; color: var(--ink-light);
+      font-weight: 300; margin-bottom: 36px; line-height: 1.6;
+    }
+
+    /* Fields */
+    .field { margin-bottom: 24px; }
+
+    .s-label {
+      display: block;
+      font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 0.04em; margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .s-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      font-family: 'Space Grotesk', sans-serif;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      outline: none;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+      color: var(--ink);
+    }
+
+    .s-input:focus { border-color: var(--accent); }
+    .s-input::placeholder { color: var(--ink-faint); }
+    .s-input.error { border-color: var(--error); }
+
+    .err { font-size: 0.75rem; color: var(--error); margin-top: 5px; display: none; }
+    .err.show { display: block; }
+
+    /* Topic checkboxes */
+    .topics-check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .t-check { position: relative; }
+
+    .t-check input[type="checkbox"] {
+      position: absolute; opacity: 0; width: 0; height: 0;
+    }
+
+    .t-check label {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.86rem; font-weight: 400;
+      color: var(--ink); background: var(--bg);
+      user-select: none;
+    }
+
+    .t-check label:hover { border-color: var(--accent); }
+
+    .t-check input:checked + label {
+      border-color: var(--accent);
+      background: rgba(0,212,255,0.07);
+    }
+
+    .t-icon { font-size: 1rem; }
+
+    .chk-box {
+      width: 16px; height: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 2px; margin-left: auto;
+      flex-shrink: 0; display: flex;
+      align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .t-check input:checked + label .chk-box {
+      background: var(--accent); border-color: var(--accent);
+    }
+
+    .t-check input:checked + label .chk-box::after {
+      content: '✓'; color: #111827; font-size: 0.62rem; font-weight: 700;
+    }
+
+    .topics-note { font-size: 0.78rem; color: var(--ink-faint); margin-top: 6px; }
+
+    /* City field */
+    .city-wrap {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+      opacity: 0; margin-bottom: 0;
+    }
+
+    .city-wrap.show { max-height: 120px; opacity: 1; margin-bottom: 24px; }
+
+    /* Radio */
+    .radio-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+    .r-opt { position: relative; }
+
+    .r-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    .r-opt label {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border); border-radius: 2px;
+      cursor: pointer; font-size: 0.88rem; font-weight: 400;
+      color: var(--ink); background: var(--bg);
+      transition: all 0.2s; user-select: none;
+    }
+
+    .r-opt label:hover { border-color: var(--accent); }
+
+    .r-opt input:checked + label {
+      border-color: var(--accent);
+      background: rgba(0,212,255,0.07);
+    }
+
+    .r-dot {
+      width: 16px; height: 16px;
+      border: 1.5px solid var(--border); border-radius: 50%;
+      flex-shrink: 0; display: flex;
+      align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .r-opt input:checked + label .r-dot {
+      border-color: var(--accent); background: var(--accent);
+    }
+
+    .r-opt input:checked + label .r-dot::after {
+      content: ''; width: 6px; height: 6px;
+      background: #111827; border-radius: 50%;
+    }
+
+    /* Textarea */
+    .s-textarea {
+      width: 100%; padding: 14px 16px;
+      font-size: 0.93rem; font-family: 'Space Grotesk', sans-serif;
+      border: 1.5px solid var(--border);
+      background: var(--bg); outline: none;
+      border-radius: 2px; resize: vertical; min-height: 100px;
+      transition: border-color 0.2s; color: var(--ink); font-weight: 300;
+    }
+
+    .s-textarea:focus { border-color: var(--accent); }
+    .s-textarea::placeholder { color: var(--ink-faint); }
+
+    /* Buttons */
+    .btn-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-top: 40px; gap: 12px;
+    }
+
+    .btn-back {
+      background: none; border: none;
+      font-size: 0.82rem; color: var(--ink-faint);
+      cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: 0.05em; padding: 0; transition: color 0.2s;
+    }
+
+    .btn-back:hover { color: var(--ink); }
+
+    .btn-next {
+      background: var(--accent); color: #111827;
+      padding: 14px 36px; font-size: 0.83rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border: none; border-radius: 2px; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-next:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+    .btn-submit {
+      background: var(--accent); color: #111827;
+      padding: 16px 40px; font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border: none; border-radius: 2px; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-submit:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+    /* Confirmation */
+    .confirmation { text-align: center; padding: 20px 0; }
+    .confirmation-icon { font-size: 3rem; margin-bottom: 24px; }
+
+    .confirmation h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem; margin-bottom: 16px; letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .confirmation p {
+      font-size: 0.95rem; color: var(--ink-light);
+      line-height: 1.7; font-weight: 300;
+      max-width: 400px; margin: 0 auto 12px;
+    }
+
+    .confirmation .accent-line {
+      color: var(--accent); font-weight: 500;
+      font-size: 0.85rem; margin-top: 24px; letter-spacing: 0.05em;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 60px;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+
+    .footer-logo { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--ink); }
+    .footer-logo span { color: var(--accent); }
+    footer p { font-size: 0.78rem; color: var(--ink-faint); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .container { padding: 0 24px; }
+      .footer-inner { padding: 0 24px; flex-direction: column; text-align: center; }
+      .hero, .section, .preview-section, .topics-section, .testimonials, .survey-section { padding: 80px 0; }
+      .hero { padding-top: 100px; }
+      .preview-grid { grid-template-columns: 1fr; gap: 40px; }
+      .survey-card { padding: 36px 28px; }
+      .topics-check-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Morning<span>Memo</span></a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <p class="hero-eyebrow">✦ The #1 Most Curated Newsletter</p>
+        <h1>Your morning,<br /><em>perfectly</em><br />informed.</h1>
+        <p class="hero-sub">One email. Every morning. Built entirely around you. Morning Memo delivers a hand-curated briefing on exactly what you care about — nothing more, nothing less.</p>
+        <div class="hero-btn-wrap">
+          <button class="btn-primary" onclick="scrollToSignup()">Get My Morning Memo</button>
+        </div>
+      </div>
+      <div class="stat-blurb">
+        <div class="stat-number">68%</div>
+        <div class="stat-unit">Stress reduction</div>
+        <p class="stat-desc">Just 6 minutes of reading per day reduces stress by 68% — more than music, tea, or a walk.</p>
+        <p class="stat-source">— University of Sussex</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item"><span>✦</span> Sports</span>
+      <span class="ticker-item"><span>✦</span> World News</span>
+      <span class="ticker-item"><span>✦</span> History</span>
+      <span class="ticker-item"><span>✦</span> Arts & Culture</span>
+      <span class="ticker-item"><span>✦</span> Science</span>
+      <span class="ticker-item"><span>✦</span> Local Weather</span>
+      <span class="ticker-item"><span>✦</span> Finance</span>
+      <span class="ticker-item"><span>✦</span> Politics</span>
+      <span class="ticker-item"><span>✦</span> Health</span>
+      <span class="ticker-item"><span>✦</span> Technology</span>
+      <span class="ticker-item"><span>✦</span> Sports</span>
+      <span class="ticker-item"><span>✦</span> World News</span>
+      <span class="ticker-item"><span>✦</span> History</span>
+      <span class="ticker-item"><span>✦</span> Arts & Culture</span>
+      <span class="ticker-item"><span>✦</span> Science</span>
+      <span class="ticker-item"><span>✦</span> Local Weather</span>
+      <span class="ticker-item"><span>✦</span> Finance</span>
+      <span class="ticker-item"><span>✦</span> Politics</span>
+      <span class="ticker-item"><span>✦</span> Health</span>
+      <span class="ticker-item"><span>✦</span> Technology</span>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="container">
+    <div class="reveal">
+      <p class="section-label">How it works</p>
+      <h2 class="section-title">Three steps to your perfect morning read.</h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Tell Us About You</h3>
+        <p>Fill out a short survey about your interests and the topics that matter most to you. Takes less than two minutes.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>We Build Your Briefing</h3>
+        <p>Each night, our system scours hundreds of sources and assembles a newsletter tailored specifically to your profile.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Wake Up Informed</h3>
+        <p>Your Morning Memo arrives in your inbox at the time you choose — concise, relevant, and ready to read with your first coffee.</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- PREVIEW -->
+  <section class="preview-section">
+    <div class="container">
+    <div class="preview-grid">
+      <div class="preview-card reveal">
+        <div class="preview-card-header">
+          <div class="preview-card-logo">Morning<span>Memo</span></div>
+          <div class="preview-date">Friday, Feb 27</div>
+        </div>
+        <p class="preview-greeting">"Good morning, Richard. Here's what the world has for you today."</p>
+        <div class="preview-story">
+          <div class="preview-story-tag">⚾ Sports</div>
+          <h4>Spring Training Opens With Surprising Roster Moves</h4>
+          <p>Several contenders made unexpected cuts yesterday as pitchers and catchers reported. The early buzz is already pointing to a competitive AL East this season.</p>
+        </div>
+        <div class="preview-story">
+          <div class="preview-story-tag">🌍 World News</div>
+          <h4>Trade Talks Resume Between Major Economies</h4>
+          <p>Negotiators returned to the table this week after a two-month pause, with analysts cautiously optimistic about progress on tariff disputes.</p>
+        </div>
+        <div class="preview-story">
+          <div class="preview-story-tag">🌤 Weather — Phoenix, AZ</div>
+          <h4>Warm and Clear Through the Weekend</h4>
+          <p>Expect highs near 74°F with low humidity. A perfect stretch to get outside before temperatures climb next week.</p>
+        </div>
+        <p class="preview-sign">— Have a wonderful Friday. You've earned it.</p>
+      </div>
+      <div class="preview-text reveal">
+        <p class="section-label">A real example</p>
+        <h2 class="section-title">This is what your inbox looks like.</h2>
+        <p>No clickbait. No filler. No 47 bullet points you'll never read. Just the stories that matter to you, written clearly and delivered before your day begins.</p>
+        <p>Every Morning Memo is different — because every reader is different.</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- TOPICS DISPLAY -->
+  <section class="topics-section">
+    <div class="container">
+    <div class="reveal">
+      <p class="section-label">Personalized to you</p>
+      <h2 class="section-title">Pick what matters. We handle the rest.</h2>
+    </div>
+    <div class="topics-grid-display reveal">
+      <div class="topic-pill"><div class="topic-icon">⚽</div><div class="topic-name">Sports</div></div>
+      <div class="topic-pill"><div class="topic-icon">🌍</div><div class="topic-name">World News</div></div>
+      <div class="topic-pill"><div class="topic-icon">📈</div><div class="topic-name">Finance</div></div>
+      <div class="topic-pill"><div class="topic-icon">🎨</div><div class="topic-name">Arts & Culture</div></div>
+      <div class="topic-pill"><div class="topic-icon">🏛</div><div class="topic-name">History</div></div>
+      <div class="topic-pill"><div class="topic-icon">🔬</div><div class="topic-name">Science</div></div>
+      <div class="topic-pill"><div class="topic-icon">💻</div><div class="topic-name">Technology</div></div>
+      <div class="topic-pill"><div class="topic-icon">🏛️</div><div class="topic-name">Politics</div></div>
+      <div class="topic-pill"><div class="topic-icon">🍽</div><div class="topic-name">Food & Travel</div></div>
+      <div class="topic-pill"><div class="topic-icon">🌤</div><div class="topic-name">Local Weather</div></div>
+      <div class="topic-pill"><div class="topic-icon">❤️</div><div class="topic-name">Health</div></div>
+      <div class="topic-pill"><div class="topic-icon">📚</div><div class="topic-name">Books & Ideas</div></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="container">
+    <div class="reveal">
+      <p class="section-label">What readers say</p>
+      <h2 class="section-title">The first thing they read every morning.</h2>
+    </div>
+    <div class="testimonials-grid reveal">
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"I've tried every newsletter out there. Morning Memo is the only one I actually read cover to cover. It knows exactly what I care about."</p>
+        <p class="testimonial-author">— Robert D., 64, Phoenix AZ</p>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"My husband and I both subscribe. Our newsletters are completely different even though we share the same house. That's impressive."</p>
+        <p class="testimonial-author">— Linda M., 61, Nashville TN</p>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"I used to spend an hour on the news every morning and still feel behind. Now I spend ten minutes on Morning Memo and feel completely caught up."</p>
+        <p class="testimonial-author">— James T., 58, Denver CO</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- SURVEY / SIGNUP -->
+  <section class="survey-section" id="signup">
+    <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <p class="section-label" style="display:inline-block;">✦ Get Started</p>
+      <h2 class="section-title" style="max-width:100%; text-align:center;">Build your personal Morning Memo.</h2>
+      <p class="section-sub">Tell us what you care about and we'll take it from there.</p>
+    </div>
+
+    <div class="survey-card reveal">
+
+      <!-- Progress -->
+      <div class="progress-wrap">
+        <div class="progress-steps">
+          <div class="s-dot active" id="d1">1</div>
+          <div class="s-line" id="l1"></div>
+          <div class="s-dot" id="d2">2</div>
+          <div class="s-line" id="l2"></div>
+          <div class="s-dot" id="d3">3</div>
+          <div class="s-line" id="l3"></div>
+          <div class="s-dot" id="d4">4</div>
+          <div class="s-line" id="l4"></div>
+          <div class="s-dot" id="d5">5</div>
+        </div>
+        <p class="progress-label" id="prog-label"><strong>Step 1 of 4</strong> — About You</p>
+      </div>
+
+      <!-- Step 1: Basic Info -->
+      <div class="s-panel active" id="sp1">
+        <p class="step-eyebrow">✦ Let's get started</p>
+        <h3 class="step-title">Tell us a little about yourself.</h3>
+        <p class="step-sub">This is how we'll address your newsletter and where we'll send it.</p>
+        <div class="field">
+          <label class="s-label" for="s-name">First Name</label>
+          <input class="s-input" type="text" id="s-name" placeholder="e.g. Richard" />
+          <p class="err" id="e-name">Please enter your first name.</p>
+        </div>
+        <div class="field">
+          <label class="s-label" for="s-email">Email Address</label>
+          <input class="s-input" type="email" id="s-email" placeholder="you@example.com" />
+          <p class="err" id="e-email">Please enter a valid email address.</p>
+        </div>
+        <div class="btn-row">
+          <span></span>
+          <button class="btn-next" onclick="goStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Topics -->
+      <div class="s-panel" id="sp2">
+        <p class="step-eyebrow">✦ Personalize your memo</p>
+        <h3 class="step-title">What do you want to wake up to?</h3>
+        <p class="step-sub">Pick as many as you'd like — we'll ask for more detail on each one next.</p>
+        <div class="topics-check-grid">
+          <div class="t-check"><input type="checkbox" id="tc-sports" value="Sports" /><label for="tc-sports"><span class="t-icon">⚽</span> Sports <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-news" value="World News" /><label for="tc-news"><span class="t-icon">🌍</span> World News <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-finance" value="Finance" /><label for="tc-finance"><span class="t-icon">📈</span> Finance <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-arts" value="Arts & Culture" /><label for="tc-arts"><span class="t-icon">🎨</span> Arts & Culture <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-history" value="History" /><label for="tc-history"><span class="t-icon">🏛</span> History <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-science" value="Science" /><label for="tc-science"><span class="t-icon">🔬</span> Science <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-tech" value="Technology" /><label for="tc-tech"><span class="t-icon">💻</span> Technology <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-politics" value="Politics" /><label for="tc-politics"><span class="t-icon">🏛️</span> Politics <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-food" value="Food & Travel" /><label for="tc-food"><span class="t-icon">🍽</span> Food & Travel <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-health" value="Health" /><label for="tc-health"><span class="t-icon">❤️</span> Health <span class="chk-box"></span></label></div>
+          <div class="t-check"><input type="checkbox" id="tc-books" value="Books & Ideas" /><label for="tc-books"><span class="t-icon">📚</span> Books & Ideas <span class="chk-box"></span></label></div>
+          <!-- Local Weather checkbox -->
+          <div class="t-check">
+            <input type="checkbox" id="tc-weather" value="Local Weather" onchange="toggleCity()" />
+            <label for="tc-weather"><span class="t-icon">🌤</span> Local Weather <span class="chk-box"></span></label>
+          </div>
+
+          <!-- City autocomplete — spans full width, shown when weather checked -->
+          <div id="city-wrap" style="display:none; grid-column: 1 / -1; margin-top:4px; padding:14px 16px; background:rgba(0,212,255,0.04); border:1.5px solid rgba(0,212,255,0.25); border-radius:2px;">
+            <label class="s-label" style="margin-bottom:8px; display:block; color:var(--accent);">🌤 Which city?</label>
+            <div style="position:relative;">
+              <input class="s-input" type="text" id="s-city" placeholder="Type a city name..." autocomplete="off"
+                oninput="citySearch(this.value)" onkeydown="cityKeyNav(event)" />
+              <p class="err" id="e-city" style="margin-top:5px;">Please select a city from the list.</p>
+              <div id="city-dropdown"></div>
+            </div>
+            <input type="hidden" id="s-city-confirmed" />
+          </div>
+        </div>
+        <p class="topics-note">Select at least one topic to continue.</p>
+        <p class="err" id="e-topics" style="margin-top:4px;">Please select at least one topic.</p>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(1)">← Back</button>
+          <button class="btn-next" onclick="goNextFromStep2()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Deep Dives (dynamic) -->
+      <div class="s-panel" id="sp3">
+        <p class="step-eyebrow">✦ Let's go deeper</p>
+        <h3 class="step-title">Tell us exactly what you like.</h3>
+        <p class="step-sub">The more specific you are, the more curated your memo will feel.</p>
+        <div id="deepdive-container"></div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(2)">← Back</button>
+          <button class="btn-next" onclick="goStep(4)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Delivery Preferences -->
+      <div class="s-panel" id="sp4">
+        <p class="step-eyebrow">✦ Final touches</p>
+        <h3 class="step-title">How do you like your mornings?</h3>
+        <p class="step-sub">A couple of quick questions to make your memo feel exactly right.</p>
+        <div class="field">
+          <label class="s-label">What time do you want it delivered? <span style="color:var(--ink-faint); font-weight:300;">(Eastern Standard Time)</span></label>
+          <div class="radio-group">
+            <div class="r-opt"><input type="radio" name="time" id="r-6" value="6:00am" /><label for="r-6"><span class="r-dot"></span> 6:00 AM</label></div>
+            <div class="r-opt"><input type="radio" name="time" id="r-630" value="6:30am" /><label for="r-630"><span class="r-dot"></span> 6:30 AM</label></div>
+            <div class="r-opt"><input type="radio" name="time" id="r-7" value="7:00am" checked /><label for="r-7"><span class="r-dot"></span> 7:00 AM</label></div>
+            <div class="r-opt"><input type="radio" name="time" id="r-730" value="7:30am" /><label for="r-730"><span class="r-dot"></span> 7:30 AM</label></div>
+            <div class="r-opt"><input type="radio" name="time" id="r-8" value="8:00am" /><label for="r-8"><span class="r-dot"></span> 8:00 AM</label></div>
+            <div class="r-opt"><input type="radio" name="time" id="r-830" value="8:30am" /><label for="r-830"><span class="r-dot"></span> 8:30 AM</label></div>
+            <div class="r-opt"><input type="radio" name="time" id="r-9" value="9:00am" /><label for="r-9"><span class="r-dot"></span> 9:00 AM</label></div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="s-label">How would you like to end your Morning Memo?</label>
+          <p style="font-size:0.82rem; color:var(--ink-faint); margin-bottom:12px; font-weight:300;">Each edition closes with a carefully chosen quote. Pick your style.</p>
+          <div class="tag-grid" id="quote-style-tags">
+            <span class="tag" data-group="quote-style" data-value="Inspirational" onclick="selectQuoteStyle(this)">✨ Inspirational</span>
+            <span class="tag" data-group="quote-style" data-value="Philosophical" onclick="selectQuoteStyle(this)">🧠 Philosophical</span>
+            <span class="tag" data-group="quote-style" data-value="Stoic" onclick="selectQuoteStyle(this)">⚖️ Stoic</span>
+            <span class="tag" data-group="quote-style" data-value="Humor & Wit" onclick="selectQuoteStyle(this)">😄 Humor & Wit</span>
+            <span class="tag" data-group="quote-style" data-value="Historical" onclick="selectQuoteStyle(this)">🏛 Historical</span>
+            <span class="tag" data-group="quote-style" data-value="Literary" onclick="selectQuoteStyle(this)">📖 Literary</span>
+            <span class="tag" data-group="quote-style" data-value="Science & Discovery" onclick="selectQuoteStyle(this)">🔭 Science & Discovery</span>
+            <span class="tag" data-group="quote-style" data-value="Surprise Me" onclick="selectQuoteStyle(this)" style="border-color:var(--accent); color:var(--accent-dark);">✦ Surprise me each day</span>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBackFromStep4()">← Back</button>
+          <button class="btn-submit" onclick="submitForm()">Complete My Setup ✦</button>
+        </div>
+      </div>
+
+      <!-- Step 5: Confirmation -->
+      <div class="s-panel" id="sp5">
+        <div class="confirmation">
+          <div class="confirmation-icon">✦</div>
+          <h2>You're all set, <span id="c-name">friend</span>.</h2>
+          <p>Your personalized Morning Memo is on its way. Expect your first edition in your inbox tomorrow morning.</p>
+          <p>We'll send it to <strong id="c-email"></strong> at the time you selected.</p>
+          <p class="accent-line">The #1 most curated newsletter — built just for you.</p>
+        </div>
+      </div>
+
+    </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">Morning<span>Memo</span></div>
+      <p>© 2025 Morning Memo. All rights reserved.</p>
+      <p>Unsubscribe anytime · Privacy Policy</p>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => observer.observe(r));
+
+    // ── Tag selector CSS injected dynamically ────────────────────────────────
+    const tagStyle = document.createElement('style');
+    tagStyle.textContent = `
+      .tag-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+      .tag {
+        padding: 7px 14px; border: 1.5px solid var(--border);
+        border-radius: 20px; font-size: 0.8rem; font-weight: 500;
+        cursor: pointer; transition: all 0.18s; background: var(--bg);
+        color: var(--ink); user-select: none; white-space: nowrap;
+      }
+      .tag:hover { border-color: var(--accent); color: var(--accent); }
+      .tag.selected { background: var(--accent); border-color: var(--accent); color: #111827; }
+      .sub-tags-wrap {
+        max-height: 0; overflow: hidden; opacity: 0;
+        transition: max-height 0.4s ease, opacity 0.35s ease, margin 0.35s ease;
+        margin-top: 0;
+      }
+      .sub-tags-wrap.open { max-height: 600px; opacity: 1; margin-top: 12px; overflow: visible; }
+      .sub-tags-label { font-size: 0.75rem; color: var(--ink-faint); margin-bottom: 8px; letter-spacing: 0.04em; }
+    `;
+    document.head.appendChild(tagStyle);
+
+    // ── Team / sub-option data ────────────────────────────────────────────────
+    const subTags = {
+      // Sports leagues → teams
+      'NFL':  ['Bills','Patriots','Dolphins','Jets','Ravens','Bengals','Browns','Steelers','Texans','Colts','Jaguars','Titans','Broncos','Chiefs','Raiders','Chargers','Cowboys','Giants','Eagles','Commanders','Bears','Lions','Packers','Vikings','Falcons','Panthers','Saints','Buccaneers','Cardinals','Rams','49ers','Seahawks'],
+      'NBA':  ['Celtics','Nets','Knicks','76ers','Raptors','Bulls','Cavaliers','Pistons','Pacers','Bucks','Hawks','Hornets','Heat','Magic','Wizards','Nuggets','Timberwolves','Thunder','Trail Blazers','Jazz','Warriors','Clippers','Lakers','Suns','Kings','Mavericks','Rockets','Grizzlies','Pelicans','Spurs'],
+      'MLB':  ['Yankees','Red Sox','Blue Jays','Rays','Orioles','White Sox','Guardians','Tigers','Royals','Twins','Astros','Angels','Athletics','Mariners','Rangers','Braves','Marlins','Mets','Phillies','Nationals','Cubs','Reds','Brewers','Pirates','Cardinals','Diamondbacks','Rockies','Dodgers','Padres','Giants'],
+      'NHL':  ['Bruins','Sabres','Red Wings','Panthers','Canadiens','Senators','Lightning','Maple Leafs','Hurricanes','Blue Jackets','Devils','Islanders','Rangers','Flyers','Penguins','Capitals','Blackhawks','Avalanche','Stars','Wild','Predators','Blues','Jets','Ducks','Flames','Oilers','Kings','Sharks','Canucks','Golden Knights','Kraken'],
+      'College Football': ['Alabama','Ohio State','Georgia','Michigan','Texas','USC','Notre Dame','Clemson','Penn State','Oklahoma','LSU','Florida State','Tennessee','Oregon','Washington','Miami','Auburn','Florida','Wisconsin','Iowa','Other...'],
+      'College Basketball': ['Duke','Kentucky','Kansas','UNC','Gonzaga','Connecticut','Houston','Arizona','Purdue','Michigan State','Villanova','Syracuse','Louisville','UCLA','Indiana','Ohio State','Wisconsin','Texas','Baylor','Florida','Other...'],
+      'Soccer / MLS': ['LAFC','LA Galaxy','Inter Miami','Atlanta United','Seattle Sounders','Portland Timbers','NYCFC','Red Bulls','Toronto FC','Montreal','Chicago Fire','Columbus Crew','FC Cincinnati','Nashville SC','Austin FC','Real Salt Lake','Colorado Rapids','Sporting KC','Other...'],
+      // Finance areas → specific picks
+      'Stock Market': ['S&P 500','Dow Jones','Nasdaq','Russell 2000','Apple (AAPL)','Microsoft (MSFT)','Amazon (AMZN)','Nvidia (NVDA)','Tesla (TSLA)','Berkshire Hathaway','JPMorgan','Google (GOOGL)','Meta (META)','Exxon Mobil'],
+      'Crypto & Digital Assets': ['Bitcoin','Ethereum','Solana','XRP','Cardano','Polygon','Chainlink','Dogecoin','BNB','Avalanche','Polkadot','Litecoin'],
+      'Startups & Venture Capital': ['OpenAI','Anthropic','SpaceX','Stripe','Databricks','Canva','Figma','Notion','Mistral','Perplexity','xAI','Cohere'],
+      // Tech companies
+      'Startups & Big Tech': ['Apple','Google','Microsoft','Amazon','Meta','Tesla','Nvidia','OpenAI','Anthropic','SpaceX','Uber','Airbnb','Salesforce','Oracle','Intel','AMD'],
+      'Artificial Intelligence': ['OpenAI','Anthropic','Google DeepMind','Meta AI','Mistral','Cohere','Stability AI','Midjourney','Perplexity','xAI'],
+      'Electric Vehicles & Energy': ['Tesla','Rivian','Lucid','Ford EV','GM EV','BYD','NIO','ChargePoint','Enphase','SolarEdge'],
+    };
+
+    // ── Deep-dive config ─────────────────────────────────────────────────────
+    const deepDives = {
+      'Sports': {
+        icon: '⚽',
+        questions: [
+          { id: 'sports-leagues', label: 'Which sports do you follow?', type: 'tags-with-sub',
+            options: ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR'],
+            subLabel: 'Pick your teams:' },
+        ]
+      },
+      'World News': {
+        icon: '🌍',
+        questions: [
+          { id: 'news-regions', label: 'Which regions matter most to you?', type: 'tags',
+            options: ['United States','Europe','Middle East','Asia & Pacific','Latin America','Africa','Russia & Eastern Europe'] },
+          { id: 'news-topics', label: 'Any specific angles?', type: 'tags',
+            options: ['Geopolitics & Diplomacy','War & Conflict','Trade & Economics','Climate & Environment','Human Rights','Immigration'] }
+        ]
+      },
+      'Finance': {
+        icon: '📈',
+        questions: [
+          { id: 'finance-areas', label: 'What financial areas interest you?', type: 'tags-with-sub',
+            options: ['Stock Market','Crypto & Digital Assets','Real Estate','Personal Finance','Corporate News','Federal Reserve & Monetary Policy','Startups & Venture Capital','Commodities & Futures','ETFs & Index Funds','Options & Derivatives','Private Equity & Hedge Funds','International Markets','Earnings & Company Results','Mergers & Acquisitions'],
+            subLabel: 'Pick specific ones you follow:' },
+        ]
+      },
+      'Arts & Culture': {
+        icon: '🎨',
+        questions: [
+          { id: 'arts-areas', label: 'Which areas do you enjoy?', type: 'tags',
+            options: ['Film & Cinema','Music','Theater & Broadway','Visual Art & Museums','Literature','Architecture & Design','Fashion','Photography','Dance & Performance','Podcasts & Audio','Television & Streaming','Culinary Arts','Video Games & Interactive Media','Collectibles & Antiques','Cultural Heritage & Traditions'] }
+        ]
+      },
+      'History': {
+        icon: '🏛',
+        questions: [
+          { id: 'history-eras', label: 'Which eras interest you most?', type: 'tags',
+            options: ['Ancient Civilizations','Medieval','Renaissance','American History','World War I & II','Cold War','Modern History (1980s–present)'] },
+          { id: 'history-regions', label: 'Any specific regions?', type: 'tags',
+            options: ['United States','Europe','Ancient Rome & Greece','Asia','Middle East','Africa','Latin America'] }
+        ]
+      },
+      'Science': {
+        icon: '🔬',
+        questions: [
+          { id: 'science-fields', label: 'Which fields fascinate you?', type: 'tags',
+            options: ['Space & Astronomy','Biology & Life Sciences','Climate & Environment','Physics','Medicine & Health Research','AI & Computer Science','Archaeology & Paleontology','Neuroscience & Brain Science','Genetics & Biotechnology','Ocean & Marine Science','Mathematics & Statistics','Energy & Clean Technology'] }
+        ]
+      },
+      'Technology': {
+        icon: '💻',
+        questions: [
+          { id: 'tech-areas', label: 'What tech topics do you care about?', type: 'tags-with-sub',
+            options: ['Artificial Intelligence','Consumer Gadgets','Startups & Big Tech','Cybersecurity','Social Media','Electric Vehicles & Energy','Robotics','Space Technology','Blockchain & Web3','Cloud Computing','Semiconductors & Chips','Biotech & Health Tech','Fintech','Augmented & Virtual Reality','Autonomous Vehicles','Quantum Computing','Software & Apps','Gaming Technology'],
+            subLabel: 'Pick specific companies:' },
+        ]
+      },
+      'Politics': {
+        icon: '🏛️',
+        questions: [
+          { id: 'politics-scope', label: 'What political coverage do you want?', type: 'tags',
+            options: ['US Federal Politics','US State & Local Politics','International Politics','Elections & Voting','Policy & Legislation','Supreme Court','White House & Executive Branch','Congress & Senate','Foreign Policy & Diplomacy','Immigration Policy','Economic Policy','Healthcare Policy','Climate & Energy Policy','Defense & National Security','Political Analysis & Opinion'] }
+        ]
+      },
+      'Food & Travel': {
+        icon: '🍽',
+        questions: [
+          { id: 'food-cuisine', label: 'What cuisines do you love?', type: 'tags',
+            options: ['Italian','Asian','Mexican & Latin American','Mediterranean','American','French','Indian','Middle Eastern'] },
+          { id: 'food-interests', label: 'What food topics interest you?', type: 'tags',
+            options: ['Restaurants & Reviews','Home Cooking & Recipes','Wine & Spirits','Food Culture & Trends','Healthy Eating'] },
+          { id: 'travel-regions', label: 'Which travel regions excite you?', type: 'tags',
+            options: ['Europe','Asia & Pacific','Latin America','Middle East & Africa','Caribbean','North America','Cruises'] }
+        ]
+      },
+      'Health': {
+        icon: '❤️',
+        questions: [
+          { id: 'health-areas', label: 'Which health topics matter to you?', type: 'tags',
+            options: ['Fitness & Exercise','Nutrition & Diet','Mental Health & Wellness','Medical News & Research','Longevity & Aging','Sleep & Recovery','Heart Health & Cardiology','Cancer Research & Treatment','Gut Health & Digestion','Alternative & Holistic Medicine'] }
+        ]
+      },
+      'Books & Ideas': {
+        icon: '📚',
+        questions: [
+          { id: 'books-type', label: 'What do you like to read?', type: 'tags',
+            options: ['Nonfiction','Fiction','Biography & Memoir','History','Philosophy & Ideas','Business & Self-Improvement','Science & Nature','Mystery & Thriller','Politics & Current Affairs','Psychology & Human Behavior','Spirituality & Religion','True Crime'] }
+        ]
+      }
+    };
+
+    // ── Scroll to signup — offset 80px into the section padding so
+    //    "Get Started" lands near the top of the viewport
+    function scrollToSignup() {
+      const el = document.getElementById('signup')
+      const top = el.getBoundingClientRect().top + window.pageYOffset - 37
+      window.scrollTo({ top, behavior: 'smooth' })
+    }
+
+    function scrollToCard() {
+      const card = document.querySelector('.survey-card')
+      const top = card.getBoundingClientRect().top + window.pageYOffset - 16
+      window.scrollTo({ top, behavior: 'smooth' })
+    }
+
+    // ── Progress bar ──────────────────────────────────────────────────────────
+    function updateProgress(step) {
+      const total = 5;
+      const labels = ['', 'About You', 'Your Topics', 'Deep Dive', 'Preferences', 'Done'];
+      for (let i = 1; i <= total; i++) {
+        const dot = document.getElementById('d' + i);
+        dot.classList.remove('active', 'done');
+        if (i < step) dot.classList.add('done');
+        else if (i === step) dot.classList.add('active');
+      }
+      for (let i = 1; i <= total - 1; i++) {
+        document.getElementById('l' + i).classList.toggle('done', i < step);
+      }
+      document.getElementById('prog-label').innerHTML = step < total
+        ? `<strong>Step ${step} of ${total - 1}</strong> — ${labels[step]}`
+        : `<strong>All done!</strong> — Welcome to Morning Memo`;
+    }
+
+    // ── Render tag group ──────────────────────────────────────────────────────
+    function renderTagGroup(q) {
+      const withSub = q.type === 'tags-with-sub';
+      let html = `<div class="field">
+        <label class="s-label">${q.label}</label>
+        <div class="tag-grid" id="tags-${q.id}">`;
+
+      q.options.forEach(opt => {
+        html += `<span class="tag" data-group="${q.id}" data-value="${opt}" data-hassub="${withSub && !!subTags[opt]}"
+          onclick="toggleTag(this)">${opt}</span>`;
+      });
+
+      html += `</div>`;
+
+      if (withSub) {
+        q.options.forEach(opt => {
+          if (!subTags[opt]) return;
+          const safeId = opt.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+
+          // Build team tags, separating "Other..." to always be last with special styling
+          const teams = subTags[opt].filter(t => t !== 'Other...');
+          const hasOther = subTags[opt].includes('Other...');
+
+          const subLabel = ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS'].includes(opt) ? 'teams' : 'picks';
+          html += `<div class="sub-tags-wrap" id="sub-${q.id}-${safeId}">
+            <p class="sub-tags-label">Your ${opt} ${subLabel}:</p>
+            <div class="tag-grid">`;
+
+          teams.forEach(sub => {
+            html += `<span class="tag" data-group="sub-${q.id}-${safeId}" data-value="${sub}" onclick="toggleTag(this)">${sub}</span>`;
+          });
+
+          if (hasOther) {
+            const otherId = `other-input-${q.id}-${safeId}`;
+            const isCollege = opt.startsWith('College');
+            const searchType = isCollege ? (opt.includes('Football') ? 'cfb' : 'cbb') : 'generic';
+            html += `<span class="tag tag-other" data-group="sub-${q.id}-${safeId}" data-value="Other..." data-otherid="${otherId}"
+              onclick="toggleOther(this)" style="border-style:dashed; color:var(--ink-faint);">+ Other</span>`;
+            html += `</div>
+              <div id="${otherId}" style="display:none; margin-top:10px; position:relative; overflow:visible;">
+                <input class="s-input" type="text" placeholder="Search for a team..."
+                  style="font-size:0.85rem; padding:10px 14px; background:var(--white);"
+                  data-other-group="sub-${q.id}-${safeId}"
+                  data-search-type="${searchType}"
+                  oninput="collegeTeamSearch(this)"
+                  onkeydown="collegeTeamKeyNav(event, this)"
+                  autocomplete="off" />
+                <div class="college-dropdown" style="display:none;"></div>
+              </div>
+              <div id="${otherId}-selected" class="tag-grid" style="margin-top:8px;"></div>`;
+          } else {
+            html += `</div>`;
+          }
+
+          html += `</div>`;
+        });
+      }
+
+      html += `</div>`;
+      return html;
+    }
+
+    // ── Toggle tag selected state ─────────────────────────────────────────────
+    function toggleTag(el) {
+      el.classList.toggle('selected');
+      // If this tag triggers a sub-team panel, show/hide it
+      if (el.dataset.hassub === 'true') {
+        const group = el.dataset.group;
+        const val = el.dataset.value.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+        const subWrap = document.getElementById(`sub-${group}-${val}`);
+        if (subWrap) subWrap.classList.toggle('open', el.classList.contains('selected'));
+      }
+    }
+
+    // ── Toggle "Other" bubble and show search field ───────────────────────────
+    function toggleOther(el) {
+      el.classList.toggle('selected');
+      el.style.borderStyle = el.classList.contains('selected') ? 'solid' : 'dashed';
+      el.style.color = el.classList.contains('selected') ? '' : 'var(--ink-faint)';
+      const inputWrap = document.getElementById(el.dataset.otherid);
+      if (inputWrap) {
+        inputWrap.style.display = el.classList.contains('selected') ? 'block' : 'none';
+        if (el.classList.contains('selected')) {
+          inputWrap.querySelector('input').focus();
+        } else {
+          inputWrap.querySelector('input').value = '';
+          inputWrap.querySelector('.college-dropdown').style.display = 'none';
+          // Clear selected tags too
+          const selectedWrap = document.getElementById(el.dataset.otherid + '-selected');
+          if (selectedWrap) selectedWrap.innerHTML = '';
+        }
+      }
+    }
+
+    // ── College team data ─────────────────────────────────────────────────────
+    const CFB_TEAMS = [
+      'Air Force Falcons','Akron Zips','Alabama Crimson Tide','Appalachian State Mountaineers',
+      'Arizona Wildcats','Arizona State Sun Devils','Arkansas Razorbacks','Arkansas State Red Wolves',
+      'Army Black Knights','Auburn Tigers','Ball State Cardinals','Baylor Bears',
+      'Boise State Broncos','Boston College Eagles','Bowling Green Falcons','Buffalo Bulls',
+      'BYU Cougars','California Golden Bears','Central Michigan Chippewas','Charlotte 49ers',
+      'Cincinnati Bearcats','Clemson Tigers','Coastal Carolina Chanticleers','Colorado Buffaloes',
+      'Colorado State Rams','Connecticut Huskies','Duke Blue Devils','East Carolina Pirates',
+      'Eastern Michigan Eagles','FIU Panthers','Florida Gators','Florida Atlantic Owls',
+      'Florida State Seminoles','Fresno State Bulldogs','Georgia Bulldogs','Georgia Southern Eagles',
+      'Georgia State Panthers','Georgia Tech Yellow Jackets','Hawaii Rainbow Warriors',
+      'Houston Cougars','Illinois Fighting Illini','Indiana Hoosiers','Iowa Hawkeyes',
+      'Iowa State Cyclones','Jacksonville State Gamecocks','James Madison Dukes',
+      'Kansas Jayhawks','Kansas State Wildcats','Kennesaw State Owls','Kent State Golden Flashes',
+      'Kentucky Wildcats','Liberty Flames','Louisiana Ragin Cajuns','Louisiana Monroe Warhawks',
+      'Louisiana Tech Bulldogs','Louisville Cardinals','LSU Tigers','Marshall Thundering Herd',
+      'Maryland Terrapins','Memphis Tigers','Miami Hurricanes','Miami Ohio RedHawks',
+      'Michigan Wolverines','Michigan State Spartans','Middle Tennessee Blue Raiders',
+      'Minnesota Golden Gophers','Mississippi State Bulldogs','Missouri Tigers',
+      'Navy Midshipmen','NC State Wolfpack','Nebraska Cornhuskers','Nevada Wolf Pack',
+      'Nevada Las Vegas Rebels','New Mexico Lobos','New Mexico State Aggies',
+      'North Carolina Tar Heels','North Texas Mean Green','Northern Illinois Huskies',
+      'Northwestern Wildcats','Notre Dame Fighting Irish','Ohio Bobcats','Ohio State Buckeyes',
+      'Oklahoma Sooners','Oklahoma State Cowboys','Old Dominion Monarchs','Ole Miss Rebels',
+      'Oregon Ducks','Oregon State Beavers','Penn State Nittany Lions','Pittsburgh Panthers',
+      'Purdue Boilermakers','Rice Owls','Rutgers Scarlet Knights','Sam Houston Bearkats',
+      'San Diego State Aztecs','San Jose State Spartans','SMU Mustangs','South Alabama Jaguars',
+      'South Carolina Gamecocks','South Florida Bulls','Southern Miss Golden Eagles',
+      'Stanford Cardinal','Syracuse Orange','TCU Horned Frogs','Temple Owls',
+      'Tennessee Volunteers','Texas Longhorns','Texas AM Aggies','Texas State Bobcats',
+      'Texas Tech Red Raiders','Toledo Rockets','Troy Trojans','Tulane Green Wave',
+      'Tulsa Golden Hurricane','UAB Blazers','UCF Knights','UCLA Bruins','UNLV Rebels',
+      'USC Trojans','UTEP Miners','UTSA Roadrunners','Vanderbilt Commodores',
+      'Virginia Cavaliers','Virginia Tech Hokies','Wake Forest Demon Deacons',
+      'Washington Huskies','Washington State Cougars','West Virginia Mountaineers',
+      'Western Kentucky Hilltoppers','Western Michigan Broncos','Wisconsin Badgers',
+      'Wyoming Cowboys'
+    ];
+
+    const CBB_TEAMS = [
+      'Abilene Christian Wildcats','Air Force Falcons','Akron Zips','Alabama Crimson Tide',
+      'Alabama AM Bulldogs','Alabama State Hornets','Albany Great Danes','Alcorn State Braves',
+      'American Eagles','Appalachian State Mountaineers','Arizona Wildcats','Arizona State Sun Devils',
+      'Arkansas Razorbacks','Arkansas Pine Bluff Golden Lions','Arkansas State Red Wolves',
+      'Army Black Knights','Auburn Tigers','Austin Peay Governors','Ball State Cardinals',
+      'Baylor Bears','Bellarmine Knights','Belmont Bruins','Bethune-Cookman Wildcats',
+      'Binghamton Bearcats','Boise State Broncos','Boston College Eagles','Boston University Terriers',
+      'Bradley Braves','Brown Bears','Bryant Bulldogs','Bucknell Bison','Buffalo Bulls',
+      'Butler Bulldogs','BYU Cougars','Cal Baptist Lancers','Cal Poly Mustangs',
+      'Cal State Bakersfield Roadrunners','Cal State Fullerton Titans','Cal State Northridge Matadors',
+      'California Golden Bears','Campbell Fighting Camels','Canisius Golden Griffins',
+      'Central Arkansas Bears','Central Connecticut Blue Devils','Central Michigan Chippewas',
+      'Charleston Cougars','Charlotte 49ers','Chicago State Cougars','Cincinnati Bearcats',
+      'Clemson Tigers','Cleveland State Vikings','Coastal Carolina Chanticleers',
+      'Colgate Raiders','Colorado Buffaloes','Colorado State Rams','Columbia Lions',
+      'Connecticut Huskies','Coppin State Eagles','Cornell Big Red','Creighton Bluejays',
+      'Dartmouth Big Green','Davidson Wildcats','Dayton Flyers','Delaware Blue Hens',
+      'Delaware State Hornets','Denver Pioneers','DePaul Blue Demons','Detroit Mercy Titans',
+      'Drake Bulldogs','Drexel Dragons','Duke Blue Devils','Duquesne Dukes',
+      'East Carolina Pirates','East Tennessee State Buccaneers','Eastern Illinois Panthers',
+      'Eastern Kentucky Colonels','Eastern Michigan Eagles','Eastern Washington Eagles',
+      'Elon Phoenix','Evansville Purple Aces','Fairfield Stags','Fairleigh Dickinson Knights',
+      'FIU Panthers','Florida Gators','Florida AM Rattlers','Florida Atlantic Owls',
+      'Florida Gulf Coast Eagles','Florida State Seminoles','Fordham Rams','Fresno State Bulldogs',
+      'Furman Paladins','Gardner-Webb Bulldogs','George Mason Patriots','George Washington Revolutionaries',
+      'Georgetown Hoyas','Georgia Bulldogs','Georgia Southern Eagles','Georgia State Panthers',
+      'Georgia Tech Yellow Jackets','Gonzaga Bulldogs','Grambling State Tigers',
+      'Grand Canyon Antelopes','Green Bay Phoenix','Hampton Pirates','Hartford Hawks',
+      'Harvard Crimson','Hawaii Rainbow Warriors','High Point Panthers','Hofstra Pride',
+      'Holy Cross Crusaders','Houston Cougars','Houston Baptist Huskies','Howard Bison',
+      'Idaho Vandals','Idaho State Bengals','Illinois Fighting Illini','Illinois State Redbirds',
+      'Incarnate Word Cardinals','Indiana Hoosiers','Indiana State Sycamores','Iona Gaels',
+      'Iowa Hawkeyes','Iowa State Cyclones','IUPUI Jaguars','Jackson State Tigers',
+      'Jacksonville Dolphins','Jacksonville State Gamecocks','James Madison Dukes',
+      'Kansas Jayhawks','Kansas State Wildcats','Kennesaw State Owls','Kent State Golden Flashes',
+      'Kentucky Wildcats','La Salle Explorers','Lafayette Leopards','Lamar Cardinals',
+      'Lehigh Mountain Hawks','Liberty Flames','Lindenwood Lions','Lipscomb Bisons',
+      'Little Rock Trojans','Long Beach State 49ers','Long Island Sharks','Longwood Lancers',
+      'Louisiana Ragin Cajuns','Louisiana Monroe Warhawks','Louisiana Tech Bulldogs',
+      'Louisville Cardinals','Loyola Chicago Ramblers','Loyola Maryland Greyhounds',
+      'Loyola Marymount Lions','LSU Tigers','Maine Black Bears','Manhattan Jaspers',
+      'Marist Red Foxes','Marquette Golden Eagles','Marshall Thundering Herd',
+      'Maryland Terrapins','Massachusetts Minutemen','McNeese Cowboys','Memphis Tigers',
+      'Mercer Bears','Miami Hurricanes','Miami Ohio RedHawks','Michigan Wolverines',
+      'Michigan State Spartans','Middle Tennessee Blue Raiders','Milwaukee Panthers',
+      'Minnesota Golden Gophers','Mississippi State Bulldogs','Mississippi Valley State Delta Devils',
+      'Missouri Tigers','Missouri State Bears','Monmouth Hawks','Montana Grizzlies',
+      'Montana State Bobcats','Morehead State Eagles','Morgan State Bears','Mount St. Marys Mountaineers',
+      'Murray State Racers','Navy Midshipmen','NC State Wolfpack','Nebraska Cornhuskers',
+      'Nevada Wolf Pack','Nevada Las Vegas Rebels','New Hampshire Wildcats','New Mexico Lobos',
+      'New Mexico State Aggies','New Orleans Privateers','Niagara Purple Eagles',
+      'Nicholls Colonels','Norfolk State Spartans','North Alabama Lions','North Carolina Tar Heels',
+      'North Carolina AT Aggies','North Carolina Central Eagles','North Dakota Fighting Hawks',
+      'North Dakota State Bison','North Florida Ospreys','North Texas Mean Green',
+      'Northeastern Huskies','Northern Arizona Lumberjacks','Northern Colorado Bears',
+      'Northern Illinois Huskies','Northern Iowa Panthers','Northern Kentucky Norse',
+      'Northwestern Wildcats','Northwestern State Demons','Notre Dame Fighting Irish',
+      'Oakland Golden Grizzlies','Ohio Bobcats','Ohio State Buckeyes','Oklahoma Sooners',
+      'Oklahoma State Cowboys','Old Dominion Monarchs','Ole Miss Rebels','Oral Roberts Golden Eagles',
+      'Oregon Ducks','Oregon State Beavers','Pacific Tigers','Penn State Nittany Lions',
+      'Pennsylvania Quakers','Pepperdine Waves','Pittsburgh Panthers','Portland Pilots',
+      'Portland State Vikings','Prairie View AM Panthers','Presbyterian Blue Hose',
+      'Princeton Tigers','Providence Friars','Purdue Boilermakers','Purdue Fort Wayne Mastodons',
+      'Queens Royals','Quinnipiac Bobcats','Radford Highlanders','Rhode Island Rams',
+      'Rice Owls','Richmond Spiders','Rider Broncs','Robert Morris Colonials',
+      'Rutgers Scarlet Knights','Sacramento State Hornets','Sacred Heart Pioneers',
+      'Saint Francis Red Flash','Saint Josephs Hawks','Saint Marys Gaels','Saint Peters Peacocks',
+      'Sam Houston Bearkats','Samford Bulldogs','San Diego Toreros','San Diego State Aztecs',
+      'San Francisco Dons','San Jose State Spartans','Santa Clara Broncos','Seattle Redhawks',
+      'Seton Hall Pirates','Siena Saints','SMU Mustangs','South Alabama Jaguars',
+      'South Carolina Gamecocks','South Carolina State Bulldogs','South Dakota Coyotes',
+      'South Dakota State Jackrabbits','South Florida Bulls','Southeast Missouri State Redhawks',
+      'Southeastern Louisiana Lions','Southern Jaguars','Southern Illinois Salukis',
+      'Southern Illinois Edwardsville Cougars','Southern Mississippi Golden Eagles',
+      'Southern Utah Thunderbirds','St. Bonaventure Bonnies','St. Johns Red Storm',
+      'Stanford Cardinal','Stephen F. Austin Lumberjacks','Stetson Hatters','Stony Brook Seawolves',
+      'Syracuse Orange','TCU Horned Frogs','Temple Owls','Tennessee Volunteers',
+      'Tennessee State Tigers','Tennessee Tech Golden Eagles','Texas Longhorns','Texas AM Aggies',
+      'Texas AM Corpus Christi Islanders','Texas Southern Tigers','Texas State Bobcats',
+      'Texas Tech Red Raiders','The Citadel Bulldogs','Toledo Rockets','Towson Tigers',
+      'Troy Trojans','Tulane Green Wave','Tulsa Golden Hurricane','UAB Blazers',
+      'UC Davis Aggies','UC Irvine Anteaters','UC Riverside Highlanders','UC San Diego Tritons',
+      'UC Santa Barbara Gauchos','UCF Knights','UCLA Bruins','UIC Flames',
+      'UMass Lowell River Hawks','UNC Asheville Bulldogs','UNC Greensboro Spartans',
+      'UNC Wilmington Seahawks','UNLV Rebels','USC Trojans','UT Arlington Mavericks',
+      'UT Martin Skyhawks','UTEP Miners','UTSA Roadrunners','Utah Utes',
+      'Utah State Aggies','Utah Valley Wolverines','Valparaiso Beacons','Vanderbilt Commodores',
+      'Vermont Catamounts','Villanova Wildcats','Virginia Cavaliers','Virginia Tech Hokies',
+      'Virginia Military Institute Keydets','VCU Rams','Wagner Seahawks','Wake Forest Demon Deacons',
+      'Washington Huskies','Washington State Cougars','Weber State Wildcats',
+      'West Virginia Mountaineers','Western Carolina Catamounts','Western Illinois Leathernecks',
+      'Western Kentucky Hilltoppers','Western Michigan Broncos','Wichita State Shockers',
+      'William Mary Tribe','Winthrop Eagles','Wisconsin Badgers','Wisconsin-Milwaukee Panthers',
+      'Wofford Terriers','Wright State Raiders','Wyoming Cowboys','Xavier Musketeers',
+      'Yale Bulldogs','Youngstown State Penguins'
+    ];
+
+    let collegeMatches = [];
+    let collegeFocusIdx = -1;
+
+    function collegeTeamSearch(input) {
+      const q = input.value.trim().toLowerCase();
+      const dd = input.nextElementSibling; // .college-dropdown
+      const searchType = input.dataset.searchType;
+      const list = searchType === 'cfb' ? CFB_TEAMS : CBB_TEAMS;
+
+      if (q.length === 0) { dd.style.display = 'none'; return; }
+
+      collegeMatches = list.filter(t => t.toLowerCase().startsWith(q));
+      if (collegeMatches.length < 8) {
+        const extra = list.filter(t => !t.toLowerCase().startsWith(q) && t.toLowerCase().includes(q));
+        collegeMatches = [...collegeMatches, ...extra];
+      }
+      collegeMatches = collegeMatches.slice(0, 8);
+      collegeFocusIdx = -1;
+
+      if (!collegeMatches.length) { dd.style.display = 'none'; return; }
+
+      // Ensure parent has position:relative for absolute dropdown
+      input.parentElement.style.position = 'relative';
+
+      dd.style.display = 'block';
+      dd.style.position = 'absolute';
+      dd.style.top = (input.offsetHeight) + 'px';
+      dd.style.left = '0';
+      dd.style.right = '0';
+      dd.style.background = '#ffffff';
+      dd.style.border = '1.5px solid #c8a96e';
+      dd.style.borderTop = 'none';
+      dd.style.borderRadius = '0 0 4px 4px';
+      dd.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+      dd.style.zIndex = '500';
+      dd.style.maxHeight = '220px';
+      dd.style.overflowY = 'auto';
+
+      dd.innerHTML = collegeMatches.map((team, i) => `
+        <div style="padding:10px 14px; font-size:0.86rem; cursor:pointer;
+          border-bottom:1px solid #e8e4df; color:#111111; font-weight:500; background:#ffffff;"
+          onmouseenter="this.style.background='rgba(200,169,110,0.12)'"
+          onmouseleave="this.style.background='#ffffff'"
+          onmousedown="selectCollegeTeam(${i}, this)">
+          ${team}
+        </div>`).join('');
+    }
+
+    function selectCollegeTeam(idx, el) {
+      const team = collegeMatches[idx];
+      if (!team) return;
+
+      const dd = el.parentElement;
+      const input = dd.previousElementSibling;
+      const group = input.dataset.otherGroup;
+
+      // The selected-tags wrapper is the next sibling of the input's parent div
+      const selWrap = input.parentElement.nextElementSibling;
+      if (selWrap) {
+        const existing = Array.from(selWrap.querySelectorAll('.tag')).map(t => t.dataset.value);
+        if (!existing.includes(team)) {
+          const tag = document.createElement('span');
+          tag.className = 'tag selected';
+          tag.dataset.group = group;
+          tag.dataset.value = team;
+          tag.dataset.otherGroup = group;
+          tag.innerHTML = `${team} <span style="margin-left:6px; opacity:0.7; font-size:0.72rem; cursor:pointer;" onclick="removeCollegeTag(this)">✕</span>`;
+          selWrap.appendChild(tag);
+        }
+      }
+
+      input.value = '';
+      dd.style.display = 'none';
+      collegeMatches = [];
+      input.focus();
+    }
+
+    function removeCollegeTag(x) {
+      x.parentElement.remove();
+    }
+
+    function collegeTeamKeyNav(e, input) {
+      const dd = input.nextElementSibling;
+      const options = dd.querySelectorAll('div');
+      if (!options.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        collegeFocusIdx = Math.min(collegeFocusIdx + 1, options.length - 1);
+        options.forEach((o, i) => o.style.background = i === collegeFocusIdx ? 'rgba(200,169,110,0.1)' : '');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        collegeFocusIdx = Math.max(collegeFocusIdx - 1, 0);
+        options.forEach((o, i) => o.style.background = i === collegeFocusIdx ? 'rgba(200,169,110,0.1)' : '');
+      } else if (e.key === 'Enter' && collegeFocusIdx >= 0) {
+        e.preventDefault();
+        selectCollegeTeam(collegeFocusIdx, options[collegeFocusIdx]);
+      } else if (e.key === 'Escape') {
+        dd.style.display = 'none';
+      }
+    }
+
+    // ── Quote style selector (single-select) ─────────────────────────────────
+    function selectQuoteStyle(el) {
+      document.querySelectorAll('#quote-style-tags .tag').forEach(t => {
+        t.classList.remove('selected');
+        if (t.dataset.value === 'Surprise Me') {
+          t.style.borderColor = 'var(--accent)';
+          t.style.color = 'var(--accent-dark)';
+        } else {
+          t.style.borderColor = '';
+          t.style.color = '';
+        }
+      });
+      el.classList.add('selected');
+      el.style.borderColor = '';
+      el.style.color = '';
+    }
+    function buildDeepDives() {
+      const selected = Array.from(document.querySelectorAll('.topics-check-grid input:checked'))
+        .map(i => i.value).filter(v => v !== 'Local Weather');
+
+      const container = document.getElementById('deepdive-container');
+      container.innerHTML = '';
+
+      selected.forEach((topic, idx) => {
+        const config = deepDives[topic];
+        if (!config) return;
+
+        const block = document.createElement('div');
+        block.style.cssText = `margin-bottom:36px; padding-bottom:36px; border-bottom:1px solid var(--border);`;
+        if (idx === selected.length - 1) block.style.borderBottom = 'none';
+
+        let html = `<div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+          <span style="font-size:1.4rem;">${config.icon}</span>
+          <span style="font-family:'Playfair Display',serif; font-size:1.15rem;">${topic}</span>
+        </div>`;
+
+        config.questions.forEach(q => {
+          if (q.type === 'tags' || q.type === 'tags-with-sub') {
+            html += renderTagGroup(q);
+          } else if (q.type === 'text') {
+            html += `<div class="field">
+              <label class="s-label">${q.label}</label>
+              <input class="s-input" type="text" id="dd-${q.id}" placeholder="${q.placeholder}" style="margin-top:4px;" />
+            </div>`;
+          }
+        });
+
+        block.innerHTML = html;
+        container.appendChild(block);
+      });
+    }
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+    function needsDeepDive() {
+      const selected = Array.from(document.querySelectorAll('.topics-check-grid input:checked'))
+        .map(i => i.value).filter(v => v !== 'Local Weather');
+      return selected.some(topic => !!deepDives[topic]);
+    }
+
+    function goNextFromStep2() {
+      if (!validateStep2()) return;
+      const target = needsDeepDive() ? 3 : 4;
+      if (target === 3) buildDeepDives();
+      showStep(target);
+    }
+
+    function goBackFromStep4() {
+      showStep(needsDeepDive() ? 3 : 2);
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.s-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('sp' + step).classList.add('active');
+      updateProgress(step);
+      scrollToCard();
+    }
+
+    function goStep(step) {
+      if (step === 2 && !validateStep1()) return;
+      if (step === 3 && !validateStep2()) return;
+      if (step === 3) buildDeepDives();
+      showStep(step);
+    }
+
+    // ── Validation ────────────────────────────────────────────────────────────
+    function validateStep1() {
+      let ok = true;
+      const name = document.getElementById('s-name').value.trim();
+      const email = document.getElementById('s-email').value.trim();
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      document.getElementById('s-name').classList.remove('error');
+      document.getElementById('s-email').classList.remove('error');
+      document.getElementById('e-name').classList.remove('show');
+      document.getElementById('e-email').classList.remove('show');
+      if (!name) { document.getElementById('s-name').classList.add('error'); document.getElementById('e-name').classList.add('show'); ok = false; }
+      if (!emailRe.test(email)) { document.getElementById('s-email').classList.add('error'); document.getElementById('e-email').classList.add('show'); ok = false; }
+      return ok;
+    }
+
+    function validateStep2() {
+      // Count all checked topics (weather counts as a topic too)
+      const allChecked = document.querySelectorAll('.topics-check-grid input:checked');
+      document.getElementById('e-topics').classList.remove('show');
+      if (allChecked.length === 0) {
+        document.getElementById('e-topics').classList.add('show');
+        return false;
+      }
+      // If weather is checked, require a confirmed city
+      if (document.getElementById('tc-weather').checked) {
+        const city = document.getElementById('s-city-confirmed').value.trim();
+        document.getElementById('s-city').classList.remove('error');
+        document.getElementById('e-city').classList.remove('show');
+        if (!city) {
+          document.getElementById('s-city').classList.add('error');
+          document.getElementById('e-city').classList.add('show');
+          document.getElementById('s-city').focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function toggleCity() {
+      const show = document.getElementById('tc-weather').checked;
+      const wrap = document.getElementById('city-wrap');
+      wrap.style.display = show ? 'block' : 'none';
+      if (!show) {
+        document.getElementById('s-city').value = '';
+        document.getElementById('s-city').classList.remove('error');
+        document.getElementById('e-city').classList.remove('show');
+        document.getElementById('s-city-confirmed').value = '';
+        closeCityDropdown();
+      } else {
+        setTimeout(() => document.getElementById('s-city').focus(), 50);
+      }
+    }
+
+    let cityFocusIdx = -1;
+    let cityMatches = [];
+    let cityDebounceTimer = null;
+
+    function citySearch(val) {
+      document.getElementById('s-city-confirmed').value = '';
+      const q = val.trim();
+      if (q.length < 2) { closeCityDropdown(); return; }
+      clearTimeout(cityDebounceTimer);
+      cityDebounceTimer = setTimeout(() => fetchCities(q), 300);
+    }
+
+    async function fetchCities(q) {
+      try {
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`;
+        const res = await fetch(url);
+        const data = await res.json();
+        cityMatches = (data.results || []).map(r => ({
+          display: [r.name, r.admin1, r.country].filter(Boolean).join(', '),
+          name: r.name,
+          region: [r.admin1, r.country].filter(Boolean).join(', ')
+        }));
+        renderCityDropdown(cityMatches);
+      } catch (e) {
+        closeCityDropdown();
+      }
+    }
+
+    function renderCityDropdown(results) {
+      const dd = document.getElementById('city-dropdown');
+      cityFocusIdx = -1;
+      if (!results.length) { dd.style.display = 'none'; return; }
+      dd.style.cssText = `
+        display:block; position:absolute; top:100%; left:0; right:0;
+        background:#1a2535; border:1.5px solid rgba(0,212,255,0.3);
+        border-top:none; border-radius:0 0 4px 4px;
+        box-shadow:0 8px 24px rgba(0,0,0,0.4);
+        z-index:200; max-height:220px; overflow-y:auto;
+        margin-top:-1px;
+      `;
+      dd.innerHTML = results.map((city, i) => `
+        <div class="city-option" data-idx="${i}" style="
+          padding:10px 14px; font-size:0.86rem; cursor:pointer;
+          border-bottom:1px solid rgba(255,255,255,0.06); color:#dde2ed;
+          display:flex; justify-content:space-between; align-items:center;
+        " onmouseenter="highlightCity(${i})"
+           onmouseleave="unhighlightCity(${i})"
+           onmousedown="selectCity(${i})">
+          <span style="font-weight:500;">${city.name}</span>
+          <span style="font-size:0.75rem; color:#6b7fa0;">${city.region}</span>
+        </div>`).join('');
+      dd.style.display = 'block';
+    }
+
+    function highlightCity(idx) {
+      cityFocusIdx = idx;
+      document.querySelectorAll('.city-option').forEach((o, i) => {
+        o.style.background = i === idx ? 'rgba(0,212,255,0.08)' : '';
+      });
+    }
+
+    function unhighlightCity(idx) {
+      document.querySelectorAll('.city-option')[idx].style.background = '';
+    }
+
+    function selectCity(idx) {
+      const city = cityMatches[idx];
+      if (!city) return;
+      document.getElementById('s-city').value = city.display;
+      document.getElementById('s-city-confirmed').value = city.display;
+      document.getElementById('s-city').classList.remove('error');
+      document.getElementById('e-city').classList.remove('show');
+      closeCityDropdown();
+    }
+
+    function closeCityDropdown() {
+      const dd = document.getElementById('city-dropdown');
+      if (dd) dd.style.display = 'none';
+      cityFocusIdx = -1;
+    }
+
+    function cityKeyNav(e) {
+      const options = document.querySelectorAll('.city-option');
+      if (!options.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        cityFocusIdx = Math.min(cityFocusIdx + 1, options.length - 1);
+        options.forEach((o, i) => o.style.background = i === cityFocusIdx ? 'rgba(0,212,255,0.08)' : '');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        cityFocusIdx = Math.max(cityFocusIdx - 1, 0);
+        options.forEach((o, i) => o.style.background = i === cityFocusIdx ? 'rgba(0,212,255,0.08)' : '');
+      } else if (e.key === 'Enter' && cityFocusIdx >= 0) {
+        e.preventDefault();
+        selectCity(cityFocusIdx);
+      } else if (e.key === 'Escape') {
+        closeCityDropdown();
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#city-wrap')) closeCityDropdown();
+    });
+
+    // ── Submit ────────────────────────────────────────────────────────────────
+    async function submitForm() {
+      const name = document.getElementById('s-name').value.trim();
+      const email = document.getElementById('s-email').value.trim();
+      const topics = Array.from(document.querySelectorAll('.topics-check-grid input:checked')).map(i => i.value);
+      const city = document.getElementById('s-city-confirmed').value.trim();
+
+      // Build a map of question ID → topic name so we can key tagAnswers by topic
+      const questionTopicMap = {};
+      for (const [topic, config] of Object.entries(deepDives)) {
+        for (const q of config.questions) questionTopicMap[q.id] = topic;
+      }
+
+      // Collect tag selections — keyed by topic name, all sub-questions flattened together
+      const tagAnswers = {};
+      document.querySelectorAll('#deepdive-container .tag.selected').forEach(el => {
+        const questionId = el.dataset.group || el.dataset.otherGroup;
+        if (!questionId) return;
+        if (el.dataset.value === 'Other...') return;
+        const topic = questionTopicMap[questionId] || questionId;
+        if (!tagAnswers[topic]) tagAnswers[topic] = [];
+        if (!tagAnswers[topic].includes(el.dataset.value)) tagAnswers[topic].push(el.dataset.value);
+      });
+      // Collect text fields
+      document.querySelectorAll('#deepdive-container input[type="text"]').forEach(el => {
+        if (el.value.trim() && !el.dataset.searchType) tagAnswers[el.id] = el.value.trim();
+      });
+
+      const quoteStyle = document.querySelector('#quote-style-tags .tag.selected')?.dataset.value || 'Surprise Me';
+      const time = document.querySelector('input[name="time"]:checked').value;
+      const extra = document.getElementById('s-extra').value.trim();
+
+      try {
+        const res = await fetch('http://localhost:3001/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, topics, city, tagAnswers, time, quoteStyle, extra })
+        });
+        if (!res.ok) throw new Error('Subscription failed');
+      } catch (err) {
+        alert('Something went wrong — please try again in a moment.');
+        return;
+      }
+
+      document.getElementById('c-name').textContent = name;
+      document.getElementById('c-email').textContent = email;
+      document.querySelectorAll('.s-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('sp5').classList.add('active');
+      updateProgress(5);
+      scrollToSignup();
+    }
+  </script>
+
+</body>
+</html>

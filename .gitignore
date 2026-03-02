@@ -1,0 +1,12 @@
+CLAUDE.local.md
+.workspace/
+*.tmp
+.env
+.env.local
+.env.*.local
+node_modules/
+dist/
+build/
+.DS_Store
+*.log
+coverage/

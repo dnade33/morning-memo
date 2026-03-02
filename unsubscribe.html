@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unsubscribe — Morning Memo</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d1524;
+      color: #dde2ed;
+      font-family: 'Space Grotesk', 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .card {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.07);
+      max-width: 480px;
+      width: 100%;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 32px;
+    }
+    .logo span { color: #00d4ff; }
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin-bottom: 32px;
+    }
+    .icon { font-size: 36px; margin-bottom: 20px; }
+    .title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #dde2ed;
+      margin-bottom: 12px;
+    }
+    .message {
+      font-size: 14px;
+      line-height: 1.75;
+      color: #a8b8cc;
+      font-weight: 300;
+      margin-bottom: 28px;
+    }
+    .confirm-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1.5px solid rgba(248,113,113,0.4);
+      color: #f87171;
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .confirm-btn:hover { border-color: #f87171; background: rgba(248,113,113,0.06); }
+    .confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .cancel-link {
+      display: block;
+      margin-top: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #6b7fa0;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .cancel-link:hover { color: #a8b8cc; }
+    .cta-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #00d4ff;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .cta-link:hover { text-decoration: underline; }
+    .error-title { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Morning<span>Memo</span></div>
+    <div class="divider"></div>
+
+    <!-- Confirmation step -->
+    <div id="confirm">
+      <div class="icon">✋</div>
+      <p class="title">Are you sure?</p>
+      <p class="message">You'll stop receiving your personalized Morning Memo. You can always re-subscribe from the homepage.</p>
+      <button class="confirm-btn" id="confirm-btn" onclick="doUnsubscribe()">Yes, unsubscribe me</button>
+      <a href="#" id="cancel-link" class="cancel-link">Never mind, keep my subscription</a>
+    </div>
+
+    <!-- Success state -->
+    <div id="success" style="display:none;">
+      <div class="icon">👋</div>
+      <p class="title">You've been unsubscribed</p>
+      <p class="message">Sorry to see you go. You won't receive any more Morning Memo emails.</p>
+      <a id="prefs-link" href="#" class="cta-link" style="display:none;">Changed your mind? Update preferences &rarr;</a>
+    </div>
+
+    <!-- Error state -->
+    <div id="error" style="display:none;">
+      <div class="icon">⚠️</div>
+      <p class="title error-title">Something went wrong</p>
+      <p class="message">We couldn't process your unsubscribe request. Please use the link from your latest Morning Memo email.</p>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search)
+    const token = params.get('token')
+
+    // No token = direct page visit with no context
+    if (!token) {
+      document.getElementById('confirm').style.display = 'none'
+      document.getElementById('error').style.display = 'block'
+    } else {
+      // Wire up cancel link to go back to preferences
+      document.getElementById('cancel-link').href = '/preferences.html?token=' + encodeURIComponent(token)
+    }
+
+    async function doUnsubscribe() {
+      const btn = document.getElementById('confirm-btn')
+      btn.disabled = true
+      btn.textContent = 'Unsubscribing...'
+
+      try {
+        const res = await fetch('/api/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        })
+
+        if (!res.ok) throw new Error('Failed')
+
+        document.getElementById('confirm').style.display = 'none'
+        document.getElementById('success').style.display = 'block'
+
+        const prefsLink = document.getElementById('prefs-link')
+        prefsLink.href = '/preferences.html?token=' + encodeURIComponent(token)
+        prefsLink.style.display = 'inline'
+
+      } catch {
+        document.getElementById('confirm').style.display = 'none'
+        document.getElementById('error').style.display = 'block'
+      }
+    }
+  </script>
+</body>
+</html>

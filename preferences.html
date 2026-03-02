@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Your Morning Memo Preferences</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #111827;
+      color: #a8b8cc;
+      font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 1px solid #00d4ff;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .header-label {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: #00d4ff;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .header-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #dde2ed;
+    }
+
+    /* Loading / error / success states */
+    .state {
+      text-align: center;
+      padding: 40px 0;
+      font-size: 13px;
+      color: #4a5a6e;
+      letter-spacing: 1px;
+    }
+    .state.error { color: #ff4444; }
+    .state.success { color: #00ff88; }
+
+    /* Form sections */
+    .section {
+      border: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 12px;
+    }
+    .section-label {
+      background: rgba(0,212,255,0.06);
+      border-bottom: 1px solid rgba(0,212,255,0.18);
+      padding: 7px 16px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: #00d4ff;
+      text-transform: uppercase;
+    }
+    .section-body { padding: 16px; }
+
+    /* Subsection headers (Sports, Other Topics dividers) */
+    .subsection-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #2e3d50;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .subsection-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.05);
+      margin: 16px 0;
+    }
+
+    /* Topic checkboxes */
+    .topic-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #a8b8cc;
+      cursor: pointer;
+    }
+    .topic-item input[type="checkbox"] {
+      accent-color: #00d4ff;
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* Other topics — single column, each with expandable subtopics */
+    .other-topics-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .topic-with-subs { }
+
+    /* Subtopics panel — expands under each topic when checked */
+    .subtopics-panel {
+      display: none;
+      margin: 8px 0 10px 22px;
+      padding: 10px 12px;
+      background: rgba(0,212,255,0.02);
+      border-left: 2px solid rgba(0,212,255,0.15);
+    }
+    .subtopics-panel.open { display: block; }
+    .subtopics-hint {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: #4a5a6e;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .subtopics-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .subtopic-chip {
+      padding: 4px 10px;
+      font-size: 10px;
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #4a5a6e;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      user-select: none;
+    }
+    .subtopic-chip.selected {
+      border-color: rgba(0,212,255,0.4);
+      color: #00d4ff;
+      background: rgba(0,212,255,0.05);
+    }
+
+    /* City field */
+    .city-row {
+      margin-top: 12px;
+      display: none;
+    }
+    .city-row.visible { display: block; }
+    .field-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #4a5a6e;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    input[type="text"], textarea, select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #dde2ed;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 8px 10px;
+      outline: none;
+    }
+    input[type="text"]:focus, textarea:focus {
+      border-color: rgba(0,212,255,0.4);
+    }
+    textarea { resize: vertical; min-height: 70px; }
+
+    /* Time slots */
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .time-option { display: none; }
+    .time-option + label {
+      display: block;
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 11px;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #4a5a6e;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+    .time-option:checked + label {
+      border-color: #00d4ff;
+      color: #00d4ff;
+      background: rgba(0,212,255,0.06);
+    }
+
+    /* Quote styles */
+    .quote-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .quote-chip {
+      padding: 6px 12px;
+      font-size: 11px;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #4a5a6e;
+      cursor: pointer;
+      letter-spacing: 1px;
+      user-select: none;
+    }
+    .quote-chip.selected {
+      border-color: #00d4ff;
+      color: #00d4ff;
+      background: rgba(0,212,255,0.06);
+    }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      margin-top: 16px;
+      padding: 14px;
+      background: #00d4ff;
+      color: #0a0e1a;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+    }
+    .submit-btn:hover { background: #00b8dd; }
+    .submit-btn:disabled { background: #1e2a38; color: #3a4a5c; cursor: default; }
+
+    /* City autocomplete dropdown */
+    #city-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      background: #0d1521;
+      border: 1px solid rgba(0,212,255,0.3);
+      border-top: none;
+      z-index: 200;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .city-option {
+      padding: 8px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: #a8b8cc;
+    }
+    .city-option:hover, .city-option.active {
+      background: rgba(0,212,255,0.08);
+      color: #dde2ed;
+    }
+    .city-option-name { font-weight: 700; color: #dde2ed; }
+    .city-option-region { font-size: 10px; color: #4a5a6e; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <p class="header-label">Morning Memo</p>
+      <h1 class="header-title">Update Your Preferences</h1>
+    </div>
+
+    <div id="loading" class="state">LOADING YOUR PREFERENCES...</div>
+    <div id="error" class="state error" style="display:none;">Invalid or expired link. Please use the link from your latest Morning Memo email.</div>
+    <div id="success" class="state success" style="display:none;">PREFERENCES UPDATED. Your next Morning Memo will reflect your changes.</div>
+
+    <form id="prefs-form" style="display:none;" onsubmit="savePrefs(event)">
+
+      <!-- TOPICS -->
+      <div class="section">
+        <div class="section-label">// Topics</div>
+        <div class="section-body">
+
+          <!-- All topics with expandable subtopics (Sports + others) -->
+          <div class="other-topics-list" id="other-topics-list">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Local Weather -->
+          <label class="topic-item" id="weather-label">
+            <input type="checkbox" id="weather-check" value="Local Weather" onchange="onWeatherChange()">
+            🌤 Local Weather
+          </label>
+          <div class="city-row" id="city-row">
+            <div class="field-label" style="margin-top:0;">Your City</div>
+            <div style="position:relative;" id="city-wrap">
+              <input type="text" id="city-input" placeholder="e.g. Newark, NJ"
+                autocomplete="off"
+                oninput="citySearch(this.value)"
+                onkeydown="cityKeyNav(event)">
+              <div id="city-dropdown"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DELIVERY TIME -->
+      <div class="section">
+        <div class="section-label">// Delivery Time</div>
+        <div class="section-body">
+          <div class="time-grid" id="time-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- QUOTE STYLE -->
+      <div class="section">
+        <div class="section-label">// Quote Style</div>
+        <div class="section-body">
+          <div class="quote-grid" id="quote-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- EXTRA NOTES -->
+      <div class="section">
+        <div class="section-label">// Personal Note</div>
+        <div class="section-body">
+          <textarea id="extra-input" placeholder="Anything you want your editor to know..."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">Save Preferences</button>
+    </form>
+
+  </div>
+
+  <script>
+    // ── All topics with expandable subtopics ─────────────────────────────────
+    // type: 'leagues' → subs go directly into topics array (each has its own RSS feed)
+    // type: 'chips'   → subs go into tagAnswers / preferences jsonb
+    const OTHER_TOPICS = [
+      {
+        value: 'Sports', label: '⚽ Sports',
+        type: 'leagues',
+        subs: ['NFL', 'NBA', 'MLB', 'NHL', 'College Football', 'College Basketball', 'Soccer / MLS', 'Golf']
+      },
+      {
+        value: 'World News', label: '🌍 World News',
+        subKey: 'news-regions',
+        subs: ['U.S. News', 'International', 'Conflict & Security', 'Diplomacy', 'Immigration', 'Climate Policy']
+      },
+      {
+        value: 'Politics', label: '🏛️ Politics',
+        subKey: 'politics-scope',
+        subs: ['U.S. Federal', 'State & Local', 'Elections', 'Policy & Legislation', 'International Politics', 'Supreme Court']
+      },
+      {
+        value: 'Finance', label: '📈 Finance',
+        subKey: 'finance-areas',
+        subs: ['Stock Market', 'Crypto & Digital Assets', 'Real Estate', 'Personal Finance', 'Corporate News', 'Federal Reserve', 'Startups & Venture Capital', 'Earnings & Results']
+      },
+      {
+        value: 'Technology', label: '💻 Technology',
+        subKey: 'tech-areas',
+        subs: ['Artificial Intelligence', 'Consumer Gadgets', 'Cybersecurity', 'Social Media', 'EVs & Energy', 'Startups & Big Tech', 'Blockchain & Web3', 'Semiconductors']
+      },
+      {
+        value: 'Science', label: '🔬 Science',
+        subKey: 'science-fields',
+        subs: ['Space & Astronomy', 'Biology & Life Sciences', 'Climate & Environment', 'Physics', 'Medicine & Health Research', 'Genetics & Biotechnology', 'Neuroscience']
+      },
+      {
+        value: 'Health', label: '❤️ Health',
+        subKey: 'health-areas',
+        subs: ['Fitness & Exercise', 'Nutrition & Diet', 'Mental Health', 'Medical Research', 'Wellness & Longevity', 'Public Health']
+      },
+      {
+        value: 'Arts & Culture', label: '🎨 Arts & Culture',
+        subKey: 'arts-areas',
+        subs: ['Film & Cinema', 'Music', 'Theater & Broadway', 'Visual Art & Museums', 'Television & Streaming', 'Video Games', 'Photography', 'Fashion']
+      },
+      {
+        value: 'Food & Travel', label: '🍽 Food & Travel',
+        subKey: 'food-travel',
+        subs: ['Restaurant & Food News', 'Recipes & Cooking', 'Travel Destinations', 'Food & Drink Culture', 'Wine & Spirits']
+      },
+      {
+        value: 'History', label: '🏺 History',
+        subKey: 'history-eras',
+        subs: ['Ancient History', 'Medieval', 'Modern Era', 'American History', 'World Wars', 'Cold War Era', 'Archaeology']
+      },
+      {
+        value: 'Books & Ideas', label: '📚 Books & Ideas',
+        subKey: 'books-type',
+        subs: ['Nonfiction', 'Fiction', 'Biography & Memoir', 'Philosophy & Ideas', 'Business & Self-Improvement', 'Science & Nature', 'History']
+      }
+    ]
+
+    const TIME_SLOTS = ['6:00am','6:30am','7:00am','7:30am','8:00am','8:30am','9:00am']
+
+    const QUOTE_STYLES = [
+      'Inspirational','Philosophical','Stoic','Humor & Wit',
+      'Historical','Literary','Science & Discovery','Surprise Me'
+    ]
+
+    // Get token from URL
+    const params = new URLSearchParams(window.location.search)
+    const token = params.get('token')
+
+    let currentData = {}
+
+    async function loadPreferences() {
+      if (!token) {
+        document.getElementById('loading').style.display = 'none'
+        document.getElementById('error').style.display = 'block'
+        return
+      }
+
+      try {
+        const res = await fetch(`http://localhost:3001/api/preferences?token=${encodeURIComponent(token)}`)
+        if (!res.ok) throw new Error('Not found')
+        currentData = await res.json()
+        renderForm(currentData)
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none'
+        document.getElementById('error').style.display = 'block'
+      }
+    }
+
+    function safeId(str) {
+      return str.replace(/[^a-zA-Z0-9]/g, '_')
+    }
+
+    function renderForm(data) {
+      const prefs = data.preferences || {}
+
+      // ── All topics (Sports first, then others) ─────────────────────
+      const otherList = document.getElementById('other-topics-list')
+      otherList.innerHTML = OTHER_TOPICS.map(t => {
+        const sid = safeId(t.value)
+        let isChecked, selectedSubs
+
+        if (t.type === 'leagues') {
+          // Sports: parent is checked if any league is already in topics
+          selectedSubs = t.subs.filter(s => data.topics?.includes(s))
+          isChecked = selectedSubs.length > 0
+        } else {
+          isChecked = data.topics?.includes(t.value)
+          selectedSubs = Array.isArray(prefs[t.subKey]) ? prefs[t.subKey] : []
+        }
+
+        const hint = t.type === 'leagues'
+          ? 'Select the leagues you follow'
+          : 'Focus areas'
+
+        const chipsHtml = t.subs.map(s => `
+          <div class="subtopic-chip ${selectedSubs.includes(s) ? 'selected' : ''}"
+            data-subkey="${t.value || ''}"
+            data-type="${t.type || 'chips'}"
+            onclick="toggleSubtopic(this)">${s}</div>
+        `).join('')
+
+        return `
+          <div class="topic-with-subs">
+            <label class="topic-item">
+              <input type="checkbox" name="other-topic" value="${t.value}"
+                ${isChecked ? 'checked' : ''}
+                onchange="onOtherTopicChange('${sid}', this.checked)">
+              ${t.label}
+            </label>
+            <div class="subtopics-panel ${isChecked ? 'open' : ''}" id="sub-${sid}">
+              <div class="subtopics-hint">${hint}</div>
+              <div class="subtopics-chips">${chipsHtml}</div>
+            </div>
+          </div>
+        `
+      }).join('')
+
+      // ── Local Weather ──────────────────────────────────────────────
+      document.getElementById('city-input').value = data.city || ''
+      if (data.topics?.includes('Local Weather')) {
+        document.getElementById('weather-check').checked = true
+        document.getElementById('city-row').classList.add('visible')
+      }
+
+      // ── Delivery time ──────────────────────────────────────────────
+      const timeGrid = document.getElementById('time-grid')
+      timeGrid.innerHTML = TIME_SLOTS.map(t => `
+        <div>
+          <input type="radio" name="time" id="time-${safeId(t)}" class="time-option"
+            value="${t}" ${data.delivery_time === t ? 'checked' : ''}>
+          <label for="time-${safeId(t)}">${t}</label>
+        </div>
+      `).join('')
+
+      // ── Quote style ────────────────────────────────────────────────
+      const quoteGrid = document.getElementById('quote-grid')
+      quoteGrid.innerHTML = QUOTE_STYLES.map(s => `
+        <div class="quote-chip ${data.quote_style === s ? 'selected' : ''}"
+          onclick="selectQuote(this)">${s}</div>
+      `).join('')
+
+      // ── Extra notes ────────────────────────────────────────────────
+      document.getElementById('extra-input').value = data.extra_notes || ''
+
+      document.getElementById('loading').style.display = 'none'
+      document.getElementById('prefs-form').style.display = 'block'
+    }
+
+    function onOtherTopicChange(sid, checked) {
+      const panel = document.getElementById('sub-' + sid)
+      if (panel) panel.classList.toggle('open', checked)
+    }
+
+    function onWeatherChange() {
+      const checked = document.getElementById('weather-check').checked
+      document.getElementById('city-row').classList.toggle('visible', checked)
+    }
+
+    function toggleSubtopic(el) {
+      el.classList.toggle('selected')
+    }
+
+    function selectQuote(el) {
+      document.querySelectorAll('.quote-chip').forEach(c => c.classList.remove('selected'))
+      el.classList.add('selected')
+    }
+
+    async function savePrefs(e) {
+      e.preventDefault()
+
+      // Leagues go directly into topics (each has its own RSS feed)
+      const sportsChecked = document.querySelector('input[name="other-topic"][value="Sports"]:checked')
+      const leagues = sportsChecked
+        ? [...document.querySelectorAll('.subtopic-chip[data-type="leagues"].selected')].map(el => el.textContent.trim())
+        : []
+
+      // Other topic parent values go into topics
+      const others = [...document.querySelectorAll('input[name="other-topic"]:checked')]
+        .filter(i => i.value !== 'Sports')
+        .map(i => i.value)
+
+      const hasWeather = document.getElementById('weather-check').checked
+      const topics = [...leagues, ...others, ...(hasWeather ? ['Local Weather'] : [])]
+
+      const city = document.getElementById('city-input').value.trim()
+      const time = document.querySelector('input[name="time"]:checked')?.value
+      const quoteStyle = document.querySelector('.quote-chip.selected')?.textContent?.trim()
+      const extra = document.getElementById('extra-input').value.trim()
+
+      // Subtopic chip selections → tagAnswers (only non-leagues)
+      const tagAnswers = {}
+      document.querySelectorAll('.subtopic-chip[data-type="chips"].selected').forEach(chip => {
+        const key = chip.dataset.subkey
+        if (!tagAnswers[key]) tagAnswers[key] = []
+        tagAnswers[key].push(chip.textContent.trim())
+      })
+
+      // Validate
+      if (topics.length === 0) return alert('Please select at least one topic.')
+      if (hasWeather && !city) return alert('Please enter your city for Local Weather.')
+      if (!time) return alert('Please select a delivery time.')
+      if (!quoteStyle) return alert('Please select a quote style.')
+
+      const btn = document.getElementById('submit-btn')
+      btn.disabled = true
+      btn.textContent = 'SAVING...'
+
+      try {
+        const res = await fetch('http://localhost:3001/api/preferences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, topics, city, tagAnswers, time, quoteStyle, extra })
+        })
+        if (!res.ok) throw new Error('Failed')
+
+        document.getElementById('prefs-form').style.display = 'none'
+        document.getElementById('success').style.display = 'block'
+      } catch (err) {
+        btn.disabled = false
+        btn.textContent = 'SAVE PREFERENCES'
+        alert('Something went wrong. Please try again.')
+      }
+    }
+
+    // ── City autocomplete (live geocoding — covers every US city & township) ───
+    let cityFocusIdx = -1
+    let cityMatches = []
+    let cityDebounceTimer = null
+
+    function citySearch(val) {
+      const q = val.trim()
+      if (q.length < 2) { closeCityDropdown(); return }
+      clearTimeout(cityDebounceTimer)
+      cityDebounceTimer = setTimeout(() => fetchCities(q), 300)
+    }
+
+    async function fetchCities(q) {
+      try {
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`
+        const res = await fetch(url)
+        const data = await res.json()
+        cityMatches = (data.results || []).map(r => ({
+          display: [r.name, r.admin1, r.country].filter(Boolean).join(', '),
+          name: r.name,
+          region: [r.admin1, r.country].filter(Boolean).join(', ')
+        }))
+        renderCityDropdown(cityMatches)
+      } catch (e) {
+        closeCityDropdown()
+      }
+    }
+
+    function renderCityDropdown(results) {
+      const dd = document.getElementById('city-dropdown')
+      cityFocusIdx = -1
+      if (!results.length) { dd.style.display = 'none'; return }
+      dd.innerHTML = results.map((city, i) => `
+        <div class="city-option" data-idx="${i}"
+          onmousedown="selectCity(${i})"
+          onmouseenter="highlightCity(${i})">
+          <span class="city-option-name">${city.name}</span>
+          <span class="city-option-region">${city.region}</span>
+        </div>
+      `).join('')
+      dd.style.display = 'block'
+    }
+
+    function highlightCity(idx) {
+      cityFocusIdx = idx
+      document.querySelectorAll('.city-option').forEach((o, i) => {
+        o.classList.toggle('active', i === idx)
+      })
+    }
+
+    function selectCity(idx) {
+      const city = cityMatches[idx]
+      if (!city) return
+      document.getElementById('city-input').value = city.display
+      closeCityDropdown()
+    }
+
+    function closeCityDropdown() {
+      document.getElementById('city-dropdown').style.display = 'none'
+      cityFocusIdx = -1
+    }
+
+    function cityKeyNav(e) {
+      const options = document.querySelectorAll('.city-option')
+      if (!options.length) return
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        cityFocusIdx = Math.min(cityFocusIdx + 1, options.length - 1)
+        options.forEach((o, i) => o.classList.toggle('active', i === cityFocusIdx))
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        cityFocusIdx = Math.max(cityFocusIdx - 1, 0)
+        options.forEach((o, i) => o.classList.toggle('active', i === cityFocusIdx))
+      } else if (e.key === 'Enter' && cityFocusIdx >= 0) {
+        e.preventDefault()
+        selectCity(cityFocusIdx)
+      } else if (e.key === 'Escape') {
+        closeCityDropdown()
+      }
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#city-wrap')) closeCityDropdown()
+    })
+
+    loadPreferences()
+  </script>
+</body>
+</html>
