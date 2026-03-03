@@ -98,9 +98,9 @@ function parseNewsletterContent(text) {
     while ((storyMatch = storyRegex.exec(topicContent)) !== null) {
       const rawBody = storyMatch[2].trim()
       if (rawBody) {
-        const linkMatch = rawBody.match(/\[LINK\]([\s\S]*?)\[\/LINK\]/)
+        const linkMatch = rawBody.match(/\[LINK\](https?:\/\/[^\s\[\]]+)/)
         const link = linkMatch ? linkMatch[1].trim() : ''
-        const body = rawBody.replace(/\[LINK\][\s\S]*?\[\/LINK\]/, '').trim()
+        const body = rawBody.replace(/\[LINK\][\s\S]*?(?:\[\/LINK\]|$)/, '').trim()
         stories.push({ headline: storyMatch[1].trim(), body, link })
       }
     }
