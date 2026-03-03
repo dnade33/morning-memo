@@ -1845,8 +1845,8 @@
       });
 
       const quoteStyle = document.querySelector('#quote-style-tags .tag.selected')?.dataset.value || 'Surprise Me';
-      const time = document.querySelector('input[name="time"]:checked').value;
-      const extra = document.getElementById('s-extra').value.trim();
+      const time = document.querySelector('input[name="time"]:checked')?.value || '7:00am';
+      const extra = document.getElementById('s-extra')?.value?.trim() || null;
 
       try {
         const res = await fetch('/api/subscribe', {
