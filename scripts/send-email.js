@@ -108,7 +108,7 @@ function buildWelcomeEmail(subscriber) {
             <td style="border-top:1px solid rgba(255,255,255,0.06);padding:20px;text-align:center;">
               <p style="margin:0 0 8px;font-family:${mono};font-size:11px;font-weight:700;color:#dde2ed;letter-spacing:0.05em;">Morning<span style="color:#00d4ff;">Memo</span></p>
               <p style="margin:0 0 12px;font-family:${sans};font-size:12px;color:#6b7fa0;line-height:1.6;">
-                You signed up at morningmemo.com. You can update your preferences or unsubscribe at any time.
+                You signed up at morningmemo.live. You can update your preferences or unsubscribe at any time.
               </p>
               ${prefToken ? `
               <a href="http://localhost:3001/preferences.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#00d4ff;text-decoration:none;text-transform:uppercase;">Update Preferences &rarr;</a>
