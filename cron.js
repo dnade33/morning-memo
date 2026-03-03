@@ -140,9 +140,29 @@ async function processSlot(slot) {
         .gte('sent_at', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
       const seenLinks = new Set((recentRows || []).map(r => r.story_link))
 
+      // Merge generic 2-level subtopic results back into one pool per parent topic.
+      // e.g. "World News::United States" + "World News::Climate" → one "World News" panel.
+      // Sports teams (leagueFallback = league name, NOT in subscriber.topics) stay separate.
+      const mergedGroups = {}   // parentTopic → stories[]
+      const standaloneEntries = []
+
+      for (const entry of rawTopicStories) {
+        const { leagueFallback, stories } = entry
+        if (leagueFallback && subscriber.topics.includes(leagueFallback)) {
+          // Generic 2-level expansion — merge back into parent
+          if (!mergedGroups[leagueFallback]) mergedGroups[leagueFallback] = []
+          mergedGroups[leagueFallback].push(...stories)
+        } else {
+          standaloneEntries.push(entry)
+        }
+      }
+      for (const [parentTopic, stories] of Object.entries(mergedGroups)) {
+        standaloneEntries.push({ topic: parentTopic, leagueFallback: null, stories })
+      }
+
       // Filter out already-seen stories; fall back to league feed for stale team panels
       const topicStories = []
-      for (const { topic, leagueFallback, stories } of rawTopicStories) {
+      for (const { topic, leagueFallback, stories } of standaloneEntries) {
         const freshStories = stories.filter(s => !s.link || !seenLinks.has(s.link))
 
         if (freshStories.length > 0) {

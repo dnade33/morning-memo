@@ -299,7 +299,7 @@ async function generateNewsletter(subscriber, topicStories) {
   const rawText = await fetchWithRetry(async () => {
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
+      max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }]
     })
     return message.content[0].text
