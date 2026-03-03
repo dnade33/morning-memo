@@ -67,9 +67,10 @@ One or two sharp, warm sentences greeting ${subscriber.first_name} by name. Keep
 
 Rules:
 - Use the exact markers: [GREETING], [TOPIC: X], [HEADLINE], [/HEADLINE], [LINK], [/LINK], [QUOTE]
+- For [TOPIC: X], X must be the exact topic name given in the prompt (e.g. "World News", "Finance", "Sports"). Never use a subtopic or story subject as the topic name.
 - After each story summary, copy the original Link URL into a [LINK]...[/LINK] marker. If no link was provided, omit the marker.
 - When a topic lists the subscriber's specific interests, prioritize stories that touch those subtopics and explicitly weave those angles into your summaries — make the subscriber feel the newsletter was written just for them.
-- Write 2-3 stories per topic
+- Write 2-3 stories per topic. All stories for a topic go under a single [TOPIC: X] block — do not split a topic into multiple blocks.
 - Tone: sharp, intelligent, like a briefing document
 - Quote style: ${quoteStyle}
 - Plain text only inside the markers — no markdown asterisks, no bullet points`
