@@ -111,9 +111,9 @@ function buildWelcomeEmail(subscriber) {
                 You signed up at morningmemo.live. You can update your preferences or unsubscribe at any time.
               </p>
               ${prefToken ? `
-              <a href="${process.env.APP_URL || 'http://localhost:3001'}/preferences.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#00d4ff;text-decoration:none;text-transform:uppercase;">Update Preferences &rarr;</a>
+              <a href="${process.env.APP_URL || 'http://localhost:3001'}/preferences.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#00d4ff;text-decoration:underline;text-transform:uppercase;"><span style="color:#00d4ff;">Update Preferences &rarr;</span></a>
               &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <a href="${process.env.APP_URL || 'http://localhost:3001'}/unsubscribe.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#6b7fa0;text-decoration:none;text-transform:uppercase;">Unsubscribe</a>
+              <a href="${process.env.APP_URL || 'http://localhost:3001'}/unsubscribe.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#a8b8cc;text-decoration:underline;text-transform:uppercase;"><span style="color:#a8b8cc;">Unsubscribe</span></a>
               ` : ''}
             </td>
           </tr>
