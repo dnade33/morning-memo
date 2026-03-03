@@ -30,6 +30,7 @@ function buildPrompt(subscriber, topicStories, quoteStyle) {
       ? `  Subscriber's specific interests within ${topic}: ${subtopics.join(', ')}`
       : ''
     const storyList = stories
+      .slice(0, 6)
       .map((s, i) => `  Story ${i + 1}:\n  Title: ${s.title}\n  Summary: ${s.summary}${s.link ? `\n  Link: ${s.link}` : ''}`)
       .join('\n\n')
     return `TOPIC: ${topic}${subtopicLine ? `\n${subtopicLine}` : ''}\n${storyList}`
