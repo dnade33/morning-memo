@@ -81,26 +81,43 @@ async function processSlot(slot) {
 
   for (const subscriber of subscribers) {
     try {
-      // Expand "Sports" into team-specific or league-level topics
-      // Team prefs are stored as preferences["sub-sports-leagues-{safeLeagueId}"] = ["Devils", ...]
+      // Expand topics into sub-topic or specific-pick level using :: notation
+      // "Parent::Term" topics use Google News search; fallback is Parent's RSS feed
       const expandedTopics = subscriber.topics.flatMap(topic => {
+
+        // ── Sports: league → team ──────────────────────────────────────────────
         if (topic === 'Sports') {
           const leagues = subscriber.preferences?.['Sports']
           if (!leagues || leagues.length === 0) return ['Sports']
-
           return leagues.flatMap(league => {
             const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
-            const teamKey = `sub-sports-leagues-${safeId}`
-            const teams = subscriber.preferences?.[teamKey]
-
-            if (teams && teams.length > 0) {
-              // Use team-specific Google News feeds
-              return teams.map(team => `${league}::${team}`)
-            }
-            // No teams selected — use the league RSS feed
-            return [league]
+            const teams = subscriber.preferences?.[`sub-sports-leagues-${safeId}`]
+            return (teams && teams.length > 0) ? teams.map(t => `${league}::${t}`) : [league]
           })
         }
+
+        // ── Finance: area → specific pick ─────────────────────────────────────
+        if (topic === 'Finance') {
+          const areas = subscriber.preferences?.['Finance']
+          if (!areas || areas.length === 0) return ['Finance']
+          return areas.flatMap(area => {
+            const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+            const picks = subscriber.preferences?.[`sub-finance-areas-${safeId}`]
+            return (picks && picks.length > 0) ? picks.map(p => `Finance::${p}`) : [`Finance::${area}`]
+          })
+        }
+
+        // ── Technology: area → specific company ───────────────────────────────
+        if (topic === 'Technology') {
+          const areas = subscriber.preferences?.['Technology']
+          if (!areas || areas.length === 0) return ['Technology']
+          return areas.flatMap(area => {
+            const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+            const companies = subscriber.preferences?.[`sub-tech-areas-${safeId}`]
+            return (companies && companies.length > 0) ? companies.map(c => `Technology::${c}`) : [`Technology::${area}`]
+          })
+        }
+
         return [topic]
       })
 
