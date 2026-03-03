@@ -251,9 +251,9 @@ function buildMissionControlEmail(parsed, subscriberName, formattedDate, prefTok
                 You're receiving this because you subscribed to Morning Memo.
               </p>
               ${prefToken ? `
-              <a href="http://localhost:3001/preferences.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#00d4ff;text-decoration:none;text-transform:uppercase;">Update Preferences &rarr;</a>
+              <a href="${process.env.APP_URL || 'http://localhost:3001'}/preferences.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#00d4ff;text-decoration:none;text-transform:uppercase;">Update Preferences &rarr;</a>
               &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <a href="http://localhost:3001/unsubscribe.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#6b7fa0;text-decoration:none;text-transform:uppercase;">Unsubscribe</a>
+              <a href="${process.env.APP_URL || 'http://localhost:3001'}/unsubscribe.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#6b7fa0;text-decoration:none;text-transform:uppercase;">Unsubscribe</a>
               ` : ''}
             </td>
           </tr>

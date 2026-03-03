@@ -118,6 +118,14 @@ async function processSlot(slot) {
           })
         }
 
+        // ── Generic two-level expansion (Science, Health, History, etc.) ──
+        // Any topic where the subscriber picked subtopics gets targeted
+        // Google News searches instead of a broad RSS feed.
+        const subtopics = subscriber.preferences?.[topic]
+        if (subtopics && subtopics.length > 0) {
+          return subtopics.map(s => `${topic}::${s}`)
+        }
+
         return [topic]
       })
 

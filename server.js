@@ -15,8 +15,8 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Serve preferences.html at /preferences.html
-app.use(express.static(path.join(__dirname)))
+// Serve static files; use morning-memo-combined.html as the default root page
+app.use(express.static(path.join(__dirname), { index: 'morning-memo-combined.html' }))
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
