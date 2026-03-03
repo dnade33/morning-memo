@@ -148,7 +148,7 @@ const TOPIC_EMOJIS = {
   'History': '🏛', 'Books & Ideas': '📚', 'Local Weather': '🌤️'
 }
 
-function buildMissionControlEmail(parsed, subscriberName, formattedDate, prefToken = null) {
+function buildMissionControlEmail(parsed, formattedDate, prefToken = null) {
   const mono = `'JetBrains Mono','IBM Plex Mono','Courier New',monospace`
   const sans = `'Space Grotesk','Segoe UI',Arial,sans-serif`
 
@@ -200,6 +200,12 @@ function buildMissionControlEmail(parsed, subscriberName, formattedDate, prefTok
       </td>
     </tr>` : ''
 
+  // Split "Good morning, Name." from the rest so we can color it separately
+  const greetingRaw = parsed.greeting
+  const greetingMatch = greetingRaw.match(/^(Good\s+morning[,\s]+[^.!?]+[.!?]?\s*)/i)
+  const greetingBlue = greetingMatch ? greetingMatch[1].trimEnd() : ''
+  const greetingRest = greetingMatch ? greetingRaw.slice(greetingBlue.length) : greetingRaw
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -225,8 +231,7 @@ function buildMissionControlEmail(parsed, subscriberName, formattedDate, prefTok
           <!-- ── GREETING ── -->
           <tr>
             <td style="padding:20px 20px 12px;">
-              <p style="margin:0 0 4px;font-family:${mono};font-size:10px;letter-spacing:3px;color:#00d4ff;text-transform:uppercase;">Good Morning, ${esc(subscriberName)}</p>
-              <p style="margin:10px 0 0;font-family:${sans};font-size:14px;line-height:1.75;color:#a8b8cc;font-weight:300;">${esc(parsed.greeting)}</p>
+              <p style="margin:0;font-family:${sans};font-size:14px;line-height:1.75;color:#a8b8cc;font-weight:300;"><span style="color:#00d4ff;">${esc(greetingBlue)}</span>${esc(greetingRest)}</p>
             </td>
           </tr>
 
@@ -319,7 +324,7 @@ async function generateNewsletter(subscriber, topicStories) {
   })
 
   const subject = `Your Morning Memo — ${formattedDate}`
-  const body_html = buildMissionControlEmail(parsed, subscriber.first_name, formattedDate, subscriber.pref_token)
+  const body_html = buildMissionControlEmail(parsed, formattedDate, subscriber.pref_token)
 
   // Collect all story links included in this newsletter for deduplication tracking
   const sentLinks = parsed.topics
