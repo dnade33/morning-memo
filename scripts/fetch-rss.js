@@ -156,7 +156,7 @@ async function getCachedStories(topics, city) {
       const url = getTeamFeedUrl(team, league)
       try {
         const stories = await getCachedFeed(url)
-        results.push({ topic: team, stories })
+        results.push({ topic: team, leagueFallback: league, stories })
       } catch (err) {
         logger.warn(`Team feed fetch failed for ${team} (${league})`, err.message)
       }

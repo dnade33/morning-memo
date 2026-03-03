@@ -115,19 +115,29 @@ async function processSlot(slot) {
         .gte('sent_at', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
       const seenLinks = new Set((recentRows || []).map(r => r.story_link))
 
-      // Filter out already-seen stories; drop topics that have nothing new
-      const topicStories = rawTopicStories
-        .map(({ topic, stories }) => ({
-          topic,
-          stories: stories.filter(s => !s.link || !seenLinks.has(s.link))
-        }))
-        .filter(({ topic, stories }) => {
-          if (stories.length === 0) {
-            logger.cron(`No new stories for topic "${topic}" for ${subscriber.email} — skipping panel`)
-            return false
+      // Filter out already-seen stories; fall back to league feed for stale team panels
+      const topicStories = []
+      for (const { topic, leagueFallback, stories } of rawTopicStories) {
+        const freshStories = stories.filter(s => !s.link || !seenLinks.has(s.link))
+
+        if (freshStories.length > 0) {
+          topicStories.push({ topic, stories: freshStories })
+          continue
+        }
+
+        // Team panel is stale — try the league feed as fallback
+        if (leagueFallback) {
+          const fallbackResults = await getCachedStories([leagueFallback], null)
+          const fallbackStories = (fallbackResults[0]?.stories || []).filter(s => !s.link || !seenLinks.has(s.link))
+          if (fallbackStories.length > 0) {
+            logger.cron(`No new ${topic} stories — falling back to ${leagueFallback} feed for ${subscriber.email}`)
+            topicStories.push({ topic: leagueFallback, stories: fallbackStories })
+            continue
           }
-          return true
-        })
+        }
+
+        logger.cron(`No new stories for topic "${topic}" for ${subscriber.email} — skipping panel`)
+      }
 
       if (topicStories.length === 0) {
         logger.cron(`All topics stale for ${subscriber.email} — skipping today`)
