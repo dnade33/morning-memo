@@ -425,7 +425,7 @@
       }
 
       try {
-        const res = await fetch(`http://localhost:3001/api/preferences?token=${encodeURIComponent(token)}`)
+        const res = await fetch(`/api/preferences?token=${encodeURIComponent(token)}`)
         if (!res.ok) throw new Error('Not found')
         currentData = await res.json()
         renderForm(currentData)
@@ -575,7 +575,7 @@
       btn.textContent = 'SAVING...'
 
       try {
-        const res = await fetch('http://localhost:3001/api/preferences', {
+        const res = await fetch('/api/preferences', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token, topics, city, tagAnswers, time, quoteStyle, extra })
