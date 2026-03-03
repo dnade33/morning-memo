@@ -117,6 +117,15 @@ async function getWeatherStory(city) {
 }
 
 // ----------------------------------------------------------------
+// Team-specific Google News RSS feed
+// Topic format from cron: "League::Team" (e.g. "NHL::Devils")
+// ----------------------------------------------------------------
+function getTeamFeedUrl(teamName, leagueName) {
+  const query = `${teamName} ${leagueName}`
+  return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`
+}
+
+// ----------------------------------------------------------------
 // Main export: get all stories for a subscriber's topics
 //
 // Returns: { topic: string, stories: Story[] }[]
@@ -137,6 +146,19 @@ async function getCachedStories(topics, city) {
         results.push({ topic, stories: [story] })
       } catch (err) {
         logger.warn(`Weather fetch failed for city: ${city}`, err.message)
+      }
+      continue
+    }
+
+    // Team-specific topic: "League::Team" (e.g. "NHL::Devils")
+    if (topic.includes('::')) {
+      const [league, team] = topic.split('::')
+      const url = getTeamFeedUrl(team, league)
+      try {
+        const stories = await getCachedFeed(url)
+        results.push({ topic: team, stories })
+      } catch (err) {
+        logger.warn(`Team feed fetch failed for ${team} (${league})`, err.message)
       }
       continue
     }

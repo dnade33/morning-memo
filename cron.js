@@ -81,11 +81,25 @@ async function processSlot(slot) {
 
   for (const subscriber of subscribers) {
     try {
-      // Expand "Sports" into specific league topics from preferences, or fall back to generic Sports feed
+      // Expand "Sports" into team-specific or league-level topics
+      // Team prefs are stored as preferences["sub-sports-leagues-{safeLeagueId}"] = ["Devils", ...]
       const expandedTopics = subscriber.topics.flatMap(topic => {
         if (topic === 'Sports') {
           const leagues = subscriber.preferences?.['Sports']
-          return (leagues && leagues.length > 0) ? leagues : ['Sports']
+          if (!leagues || leagues.length === 0) return ['Sports']
+
+          return leagues.flatMap(league => {
+            const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+            const teamKey = `sub-sports-leagues-${safeId}`
+            const teams = subscriber.preferences?.[teamKey]
+
+            if (teams && teams.length > 0) {
+              // Use team-specific Google News feeds
+              return teams.map(team => `${league}::${team}`)
+            }
+            // No teams selected — use the league RSS feed
+            return [league]
+          })
         }
         return [topic]
       })
