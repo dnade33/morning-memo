@@ -314,6 +314,25 @@ async function generateNewsletter(subscriber, topicStories) {
 
   const parsed = parseNewsletterContent(rawText)
 
+  // Re-merge any panels Claude incorrectly named after a subtopic instead of the parent topic.
+  // Build subtopic → parent lookup from subscriber preferences, then remap parsed topic names.
+  const validTopicNames = new Set(topicStories.map(t => t.topic))
+  const subtopicToParent = {}
+  for (const { topic } of topicStories) {
+    for (const sub of (subscriber.preferences?.[topic] || [])) {
+      subtopicToParent[sub.toLowerCase()] = topic
+    }
+  }
+  const mergedTopicMap = {}
+  for (const parsedTopic of parsed.topics) {
+    const parent = validTopicNames.has(parsedTopic.name)
+      ? parsedTopic.name
+      : (subtopicToParent[parsedTopic.name.toLowerCase()] || parsedTopic.name)
+    if (!mergedTopicMap[parent]) mergedTopicMap[parent] = { name: parent, stories: [] }
+    mergedTopicMap[parent].stories.push(...parsedTopic.stories)
+  }
+  parsed.topics = Object.values(mergedTopicMap)
+
   // Fallback: if parsing found no topics, log and use raw text in a single panel
   if (parsed.topics.length === 0) {
     logger.warn(`Newsletter parsing found no topic sections for ${subscriber.email} — using raw fallback`)
