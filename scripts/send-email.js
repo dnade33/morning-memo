@@ -42,7 +42,7 @@ function buildWelcomeEmail(subscriber) {
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0d1524;padding:32px 12px;">
     <tr>
       <td align="center">
-        <table width="680" cellpadding="0" cellspacing="0" style="max-width:680px;width:100%;background:#111827;border:1px solid rgba(255,255,255,0.07);">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;width:100%;background:#111827;border:1px solid rgba(255,255,255,0.07);">
 
           <!-- ── MASTHEAD ── -->
           <tr>
