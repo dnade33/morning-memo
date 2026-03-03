@@ -498,11 +498,8 @@
       const quoteGrid = document.getElementById('quote-grid')
       quoteGrid.innerHTML = QUOTE_STYLES.map(s => `
         <div class="quote-chip ${data.quote_style === s ? 'selected' : ''}"
-          onclick="selectQuote(this)">${s}</div>
+          onclick="selectQuote(this)">${s === 'Surprise Me' ? '✦ ' : ''}${s}</div>
       `).join('')
-
-      // ── Extra notes ────────────────────────────────────────────────
-      document.getElementById('extra-input').value = data.extra_notes || ''
 
       document.getElementById('loading').style.display = 'none'
       document.getElementById('prefs-form').style.display = 'block'
