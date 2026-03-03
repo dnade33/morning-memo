@@ -194,24 +194,28 @@ async function runCron() {
 }
 
 // ----------------------------------------------------------------
-// Entry point
+// Entry point (only runs when executed directly, not when imported)
 // ----------------------------------------------------------------
-if (process.env.RUN_NOW === 'true') {
-  // Manual trigger for testing — run immediately without waiting for schedule
-  logger.cron('RUN_NOW=true — executing immediately')
-  runCron().catch(err => {
-    logger.error('Cron run failed', err)
-    process.exit(1)
-  })
-} else {
-  // Production schedule: 2:00am every day, Eastern Time
-  cron.schedule('0 2 * * *', () => {
+if (require.main === module) {
+  if (process.env.RUN_NOW === 'true') {
+    // Manual trigger for testing — run immediately without waiting for schedule
+    logger.cron('RUN_NOW=true — executing immediately')
     runCron().catch(err => {
       logger.error('Cron run failed', err)
+      process.exit(1)
     })
-  }, {
-    timezone: 'America/New_York'
-  })
+  } else {
+    // Production schedule: 2:00am every day, Eastern Time
+    cron.schedule('0 2 * * *', () => {
+      runCron().catch(err => {
+        logger.error('Cron run failed', err)
+      })
+    }, {
+      timezone: 'America/New_York'
+    })
 
-  logger.cron(`Cron scheduled — runs at 2:00am ET daily${DRY_RUN ? ' [DRY RUN mode]' : ''}`)
+    logger.cron(`Cron scheduled — runs at 2:00am ET daily${DRY_RUN ? ' [DRY RUN mode]' : ''}`)
+  }
 }
+
+module.exports = { runCron }

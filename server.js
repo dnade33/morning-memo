@@ -7,6 +7,7 @@ const cors = require('cors')
 const { createClient } = require('@supabase/supabase-js')
 const { logger } = require('./logger')
 const { sendWelcomeEmail } = require('./scripts/send-email')
+const { runCron } = require('./cron')
 
 const path = require('path')
 
@@ -191,6 +192,20 @@ app.post('/api/unsubscribe', async (req, res) => {
 
   logger.info(`Subscriber unsubscribed via token ${token.slice(0, 8)}...`)
   res.status(200).json({ success: true })
+})
+
+// ----------------------------------------------------------------
+// POST /api/run-cron
+// Triggered by external cron service (cron-job.org) — protected by secret
+// ----------------------------------------------------------------
+app.post('/api/run-cron', (req, res) => {
+  const auth = req.headers['authorization']
+  if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+  // Fire and forget — cron can take several minutes, don't block the response
+  runCron().catch(err => logger.error('Cron run failed via HTTP trigger', err))
+  res.json({ started: true })
 })
 
 // ----------------------------------------------------------------
