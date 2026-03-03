@@ -81,40 +81,74 @@ async function processSlot(slot) {
 
   for (const subscriber of subscribers) {
     try {
-      // Expand topics into sub-topic or specific-pick level using :: notation
-      // "Parent::Term" topics use Google News search; fallback is Parent's RSS feed
+      // Expand topics into sub-topic or specific-pick level using :: notation.
+      // "Parent::Term" topics use Google News search; fallback is Parent's RSS feed.
+      // topicOriginMap tracks every fetched key → subscriber's top-level topic so
+      // we can merge all results back under one panel per top-level topic afterwards.
+      const topicOriginMap = {}
+
       const expandedTopics = subscriber.topics.flatMap(topic => {
 
         // ── Sports: league → team ──────────────────────────────────────────────
         if (topic === 'Sports') {
           const leagues = subscriber.preferences?.['Sports']
-          if (!leagues || leagues.length === 0) return ['Sports']
+          if (!leagues || leagues.length === 0) {
+            topicOriginMap['Sports'] = 'Sports'
+            return ['Sports']
+          }
           return leagues.flatMap(league => {
             const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
             const teams = subscriber.preferences?.[`sub-sports-leagues-${safeId}`]
-            return (teams && teams.length > 0) ? teams.map(t => `${league}::${t}`) : [league]
+            if (teams && teams.length > 0) {
+              return teams.map(t => {
+                topicOriginMap[`${league}::${t}`] = 'Sports'
+                return `${league}::${t}`
+              })
+            }
+            topicOriginMap[league] = 'Sports'
+            return [league]
           })
         }
 
         // ── Finance: area → specific pick ─────────────────────────────────────
         if (topic === 'Finance') {
           const areas = subscriber.preferences?.['Finance']
-          if (!areas || areas.length === 0) return ['Finance']
+          if (!areas || areas.length === 0) {
+            topicOriginMap['Finance'] = 'Finance'
+            return ['Finance']
+          }
           return areas.flatMap(area => {
             const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
             const picks = subscriber.preferences?.[`sub-finance-areas-${safeId}`]
-            return (picks && picks.length > 0) ? picks.map(p => `Finance::${p}`) : [`Finance::${area}`]
+            if (picks && picks.length > 0) {
+              return picks.map(p => {
+                topicOriginMap[`Finance::${p}`] = 'Finance'
+                return `Finance::${p}`
+              })
+            }
+            topicOriginMap[`Finance::${area}`] = 'Finance'
+            return [`Finance::${area}`]
           })
         }
 
         // ── Technology: area → specific company ───────────────────────────────
         if (topic === 'Technology') {
           const areas = subscriber.preferences?.['Technology']
-          if (!areas || areas.length === 0) return ['Technology']
+          if (!areas || areas.length === 0) {
+            topicOriginMap['Technology'] = 'Technology'
+            return ['Technology']
+          }
           return areas.flatMap(area => {
             const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
             const companies = subscriber.preferences?.[`sub-tech-areas-${safeId}`]
-            return (companies && companies.length > 0) ? companies.map(c => `Technology::${c}`) : [`Technology::${area}`]
+            if (companies && companies.length > 0) {
+              return companies.map(c => {
+                topicOriginMap[`Technology::${c}`] = 'Technology'
+                return `Technology::${c}`
+              })
+            }
+            topicOriginMap[`Technology::${area}`] = 'Technology'
+            return [`Technology::${area}`]
           })
         }
 
@@ -123,9 +157,13 @@ async function processSlot(slot) {
         // Google News searches instead of a broad RSS feed.
         const subtopics = subscriber.preferences?.[topic]
         if (subtopics && subtopics.length > 0) {
-          return subtopics.map(s => `${topic}::${s}`)
+          return subtopics.map(s => {
+            topicOriginMap[`${topic}::${s}`] = topic
+            return `${topic}::${s}`
+          })
         }
 
+        topicOriginMap[topic] = topic
         return [topic]
       })
 
@@ -140,48 +178,26 @@ async function processSlot(slot) {
         .gte('sent_at', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
       const seenLinks = new Set((recentRows || []).map(r => r.story_link))
 
-      // Merge generic 2-level subtopic results back into one pool per parent topic.
-      // e.g. "World News::United States" + "World News::Climate" → one "World News" panel.
-      // Sports teams (leagueFallback = league name, NOT in subscriber.topics) stay separate.
-      const mergedGroups = {}   // parentTopic → stories[]
-      const standaloneEntries = []
-
-      for (const entry of rawTopicStories) {
-        const { leagueFallback, stories } = entry
-        if (leagueFallback && subscriber.topics.includes(leagueFallback)) {
-          // Generic 2-level expansion — merge back into parent
-          if (!mergedGroups[leagueFallback]) mergedGroups[leagueFallback] = []
-          mergedGroups[leagueFallback].push(...stories)
-        } else {
-          standaloneEntries.push(entry)
-        }
-      }
-      for (const [parentTopic, stories] of Object.entries(mergedGroups)) {
-        standaloneEntries.push({ topic: parentTopic, leagueFallback: null, stories })
+      // Merge all fetched results into one pool per subscriber top-level topic.
+      // topicOriginMap resolves any expanded key back to its origin:
+      //   NFL::Cowboys → Sports,  Finance::Real Estate → Finance,  World News::US → World News
+      // The email will show exactly one panel per top-level topic.
+      const mergedGroups = {}  // originalTopic → stories[]
+      for (const { topic, stories } of rawTopicStories) {
+        const originalTopic = topicOriginMap[topic] || topic
+        if (!mergedGroups[originalTopic]) mergedGroups[originalTopic] = []
+        mergedGroups[originalTopic].push(...stories)
       }
 
-      // Filter out already-seen stories; fall back to league feed for stale team panels
+      // Filter out already-seen stories
       const topicStories = []
-      for (const { topic, leagueFallback, stories } of standaloneEntries) {
+      for (const [topic, stories] of Object.entries(mergedGroups)) {
         const freshStories = stories.filter(s => !s.link || !seenLinks.has(s.link))
-
         if (freshStories.length > 0) {
           topicStories.push({ topic, stories: freshStories })
-          continue
+        } else {
+          logger.cron(`No new stories for topic "${topic}" for ${subscriber.email} — skipping panel`)
         }
-
-        // Team panel is stale — try the league feed as fallback
-        if (leagueFallback) {
-          const fallbackResults = await getCachedStories([leagueFallback], null)
-          const fallbackStories = (fallbackResults[0]?.stories || []).filter(s => !s.link || !seenLinks.has(s.link))
-          if (fallbackStories.length > 0) {
-            logger.cron(`No new ${topic} stories — falling back to ${leagueFallback} feed for ${subscriber.email}`)
-            topicStories.push({ topic: leagueFallback, stories: fallbackStories })
-            continue
-          }
-        }
-
-        logger.cron(`No new stories for topic "${topic}" for ${subscriber.email} — skipping panel`)
       }
 
       if (topicStories.length === 0) {
