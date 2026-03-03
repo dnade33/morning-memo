@@ -111,9 +111,9 @@ function buildWelcomeEmail(subscriber) {
                 You signed up at morningmemo.live. You can update your preferences or unsubscribe at any time.
               </p>
               ${prefToken ? `
-              <a href="http://localhost:3001/preferences.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#00d4ff;text-decoration:none;text-transform:uppercase;">Update Preferences &rarr;</a>
+              <a href="${process.env.APP_URL || 'http://localhost:3001'}/preferences.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#00d4ff;text-decoration:none;text-transform:uppercase;">Update Preferences &rarr;</a>
               &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <a href="http://localhost:3001/unsubscribe.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#6b7fa0;text-decoration:none;text-transform:uppercase;">Unsubscribe</a>
+              <a href="${process.env.APP_URL || 'http://localhost:3001'}/unsubscribe.html?token=${prefToken}" style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#6b7fa0;text-decoration:none;text-transform:uppercase;">Unsubscribe</a>
               ` : ''}
             </td>
           </tr>
@@ -138,7 +138,7 @@ async function sendWelcomeEmail(subscriber) {
 
   try {
     const { error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL,
+      from: `Morning Memo <${process.env.RESEND_FROM_EMAIL}>`,
       to: subscriber.email,
       subject,
       html: body_html
@@ -173,7 +173,7 @@ async function sendAndLog(subscriber, subject, body_html, supabase, dryRun = fal
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
       const { error } = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL,
+        from: `Morning Memo <${process.env.RESEND_FROM_EMAIL}>`,
         to: subscriber.email,
         subject,
         html: body_html
