@@ -71,6 +71,7 @@ Rules:
 - After each story summary, copy the original Link URL into a [LINK]...[/LINK] marker. If no link was provided, omit the marker.
 - When a topic lists the subscriber's specific interests, prioritize stories that touch those subtopics and explicitly weave those angles into your summaries — make the subscriber feel the newsletter was written just for them.
 - Write 2-3 stories per topic. All stories for a topic go under a single [TOPIC: X] block — do not split a topic into multiple blocks.
+- The [QUOTE] section is mandatory and must ALWAYS appear at the end of every newsletter. If you are running short on space, write fewer stories per topic — but never skip the [QUOTE].
 - Tone: sharp, intelligent, like a briefing document
 - For each story summary, do NOT simply restate or paraphrase the headline. Actually explain the topic in 2-3 sentences of real substance. Write as if the reader will never click the link — the summary itself should leave them genuinely more informed. Bad: "A primer on how derivatives work and their role in modern markets." Good: "Derivatives are financial contracts whose value is tied to an underlying asset like a stock or commodity. They're used to hedge risk — an airline locking in fuel prices, for example — but also speculatively, which is what made them infamous in the 2008 financial crisis."
 - Quote style: ${quoteStyle} — this is a strict requirement. The closing quote MUST match this style regardless of the newsletter topics. Do not let the newsletter content influence the quote style.
