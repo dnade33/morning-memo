@@ -72,7 +72,8 @@ Rules:
 - When a topic lists the subscriber's specific interests, prioritize stories that touch those subtopics and explicitly weave those angles into your summaries — make the subscriber feel the newsletter was written just for them.
 - Write 2-3 stories per topic. All stories for a topic go under a single [TOPIC: X] block — do not split a topic into multiple blocks.
 - Tone: sharp, intelligent, like a briefing document
-- Quote style: ${quoteStyle}
+- Quote style: ${quoteStyle} — this is a strict requirement. The closing quote MUST match this style regardless of the newsletter topics. Do not let the newsletter content influence the quote style.
+- The quote must be a real, well-known quote from a real, named person (no made-up attributions, no "Observer" or publication names). If the style is "Humor & Wit", use a genuinely funny quote from a comedian, author, or public figure known for wit.
 - Plain text only inside the markers — no markdown asterisks, no bullet points`
 }
 
