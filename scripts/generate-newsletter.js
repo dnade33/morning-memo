@@ -9,7 +9,7 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 // ----------------------------------------------------------------
 const QUOTE_STYLES = [
   'Inspirational', 'Philosophical', 'Stoic', 'Humor & Wit',
-  'Historical', 'Literary', 'Science & Discovery'
+  'Historical', 'Literary', 'Science & Discovery', 'Dad Jokes'
 ]
 
 function resolveQuoteStyle(style) {
