@@ -337,6 +337,9 @@ async function generateNewsletter(subscriber, topicStories) {
   }
   parsed.topics = Object.values(mergedTopicMap)
 
+  // Hard-cap every topic at 3 stories regardless of what Claude wrote
+  parsed.topics = parsed.topics.map(t => ({ ...t, stories: t.stories.slice(0, 3) }))
+
   // Fallback: if parsing found no topics, log and use raw text in a single panel
   if (parsed.topics.length === 0) {
     logger.warn(`Newsletter parsing found no topic sections for ${subscriber.email} — using raw fallback`)
