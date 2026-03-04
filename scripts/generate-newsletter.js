@@ -23,8 +23,36 @@ function resolveQuoteStyle(style) {
 // Prompt builder — passes stories grouped by topic
 // Uses custom markers so the response is reliably parseable
 // ----------------------------------------------------------------
-function buildPrompt(subscriber, topicStories, quoteStyle) {
+// ----------------------------------------------------------------
+// Story allocation: min 6 total, max 10.
+// ≥6 topics → 1 per topic. <6 topics → fill to 6 by giving extra
+// stories to topics with the most subtopics selected.
+// ----------------------------------------------------------------
+function calculateStoryAllocation(subscriber, topicStories) {
+  const n = topicStories.length
+  const allocation = {}
+  for (const { topic } of topicStories) allocation[topic] = 1
+
+  if (n < 6) {
+    let remaining = 6 - n
+    const sorted = [...topicStories].sort((a, b) =>
+      (subscriber.preferences?.[b.topic] || []).length -
+      (subscriber.preferences?.[a.topic] || []).length
+    )
+    let i = 0
+    while (remaining > 0) {
+      allocation[sorted[i % sorted.length].topic]++
+      remaining--
+      i++
+    }
+  }
+
+  return allocation
+}
+
+function buildPrompt(subscriber, topicStories, quoteStyle, allocation) {
   const topicBlocks = topicStories.map(({ topic, stories }) => {
+    const count = allocation[topic] || 1
     const subtopics = subscriber.preferences?.[topic]
     const subtopicLine = subtopics && subtopics.length > 0
       ? `  Subscriber's specific interests within ${topic}: ${subtopics.join(', ')}`
@@ -33,7 +61,7 @@ function buildPrompt(subscriber, topicStories, quoteStyle) {
       .slice(0, 6)
       .map((s, i) => `  Story ${i + 1}:\n  Title: ${s.title}\n  Summary: ${s.summary}${s.link ? `\n  Link: ${s.link}` : ''}`)
       .join('\n\n')
-    return `TOPIC: ${topic}${subtopicLine ? `\n${subtopicLine}` : ''}\n${storyList}`
+    return `TOPIC: ${topic} [Write exactly ${count} ${count === 1 ? 'story' : 'stories'}]${subtopicLine ? `\n${subtopicLine}` : ''}\n${storyList}`
   }).join('\n\n---\n\n')
 
   return `You are the editor of Morning Memo, a sharp, intelligent daily briefing.
@@ -70,9 +98,9 @@ Rules:
 - For [TOPIC: X], X must be the exact topic name given in the prompt (e.g. "World News", "Finance", "Sports"). Never use a subtopic or story subject as the topic name.
 - After each story summary, copy the original Link URL into a [LINK]...[/LINK] marker. If no link was provided, omit the marker.
 - When a topic lists the subscriber's specific interests, prioritize stories that touch those subtopics and explicitly weave those angles into your summaries — make the subscriber feel the newsletter was written just for them.
-- Write a maximum of 3 stories per topic total, no matter how many subtopics the subscriber selected. No single subtopic may account for more than 2 of those stories. Pick the best 2-3 stories from across all subtopics combined — do not give each subtopic its own separate story budget.
+- Each topic block is labeled [Write exactly N stories]. You must write exactly that many stories for that topic — no more, no fewer. No single subtopic may account for more than 2 of those stories. Pick the best stories from across all subtopics combined — do not give each subtopic its own separate story budget.
 - All stories for a topic go under a single [TOPIC: X] block — do not split a topic into multiple blocks.
-- The [QUOTE] section is mandatory and must ALWAYS appear at the end of every newsletter. If you are running short on space, write fewer stories per topic — but never skip the [QUOTE].
+- The [QUOTE] section is mandatory and must ALWAYS appear at the end of every newsletter — no exceptions.
 - Tone: sharp, intelligent, like a briefing document
 - For each story summary, do NOT simply restate or paraphrase the headline. Actually explain the topic in 2-3 sentences of real substance. Write as if the reader will never click the link — the summary itself should leave them genuinely more informed. Bad: "A primer on how derivatives work and their role in modern markets." Good: "Derivatives are financial contracts whose value is tied to an underlying asset like a stock or commodity. They're used to hedge risk — an airline locking in fuel prices, for example — but also speculatively, which is what made them infamous in the 2008 financial crisis."
 - Quote style: ${quoteStyle} — this is a strict requirement. The closing quote MUST match this style regardless of the newsletter topics. Do not let the newsletter content influence the quote style.
@@ -305,7 +333,8 @@ async function generateNewsletter(subscriber, topicStories) {
   }
 
   const quoteStyle = resolveQuoteStyle(subscriber.quote_style)
-  const prompt = buildPrompt(subscriber, topicStories, quoteStyle)
+  const allocation = calculateStoryAllocation(subscriber, topicStories)
+  const prompt = buildPrompt(subscriber, topicStories, quoteStyle, allocation)
 
   const rawText = await fetchWithRetry(async () => {
     const message = await client.messages.create({
@@ -337,8 +366,13 @@ async function generateNewsletter(subscriber, topicStories) {
   }
   parsed.topics = Object.values(mergedTopicMap)
 
-  // Hard-cap every topic at 3 stories regardless of what Claude wrote
-  parsed.topics = parsed.topics.map(t => ({ ...t, stories: t.stories.slice(0, 3) }))
+  // Hard-cap every topic to its allocated story count regardless of what Claude wrote.
+  // Use case-insensitive lookup so minor name variations (e.g. "Health" vs "Health & Wellness")
+  // don't silently fall through to the || 1 floor.
+  const allocationLower = Object.fromEntries(
+    Object.entries(allocation).map(([k, v]) => [k.toLowerCase(), v])
+  )
+  parsed.topics = parsed.topics.map(t => ({ ...t, stories: t.stories.slice(0, allocationLower[t.name.toLowerCase()] || 1) }))
 
   // Fallback quote — used if Claude ran out of tokens before writing [QUOTE]
   if (!parsed.quote) {
