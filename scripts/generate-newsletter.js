@@ -9,7 +9,7 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 // ----------------------------------------------------------------
 const QUOTE_STYLES = [
   'Inspirational', 'Philosophical', 'Stoic', 'Humor & Wit',
-  'Historical', 'Literary', 'Science & Discovery', 'Dad Jokes'
+  'Historical', 'Literary', 'Science & Discovery'
 ]
 
 function resolveQuoteStyle(style) {
@@ -73,7 +73,7 @@ Rules:
 - Write 2-3 stories per topic. All stories for a topic go under a single [TOPIC: X] block — do not split a topic into multiple blocks.
 - Tone: sharp, intelligent, like a briefing document
 - Quote style: ${quoteStyle} — this is a strict requirement. The closing quote MUST match this style regardless of the newsletter topics. Do not let the newsletter content influence the quote style.
-- The quote must be a real, well-known quote from a real, named person (no made-up attributions, no "Observer" or publication names). If the style is "Humor & Wit", use a genuinely funny quote from a comedian, author, or public figure known for wit.
+- The quote must be a real, well-known quote from a real, named person (no made-up attributions, no "Observer" or publication names). If the style is "Humor & Wit", use a genuinely funny quote — this includes witty one-liners, dry humor, absurdist observations, or a classic dad joke. Mix it up.
 - Plain text only inside the markers — no markdown asterisks, no bullet points`
 }
 
