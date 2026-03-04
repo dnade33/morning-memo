@@ -310,7 +310,7 @@ async function generateNewsletter(subscriber, topicStories) {
   const rawText = await fetchWithRetry(async () => {
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }]
     })
     return message.content[0].text
@@ -339,6 +339,21 @@ async function generateNewsletter(subscriber, topicStories) {
 
   // Hard-cap every topic at 3 stories regardless of what Claude wrote
   parsed.topics = parsed.topics.map(t => ({ ...t, stories: t.stories.slice(0, 3) }))
+
+  // Fallback quote — used if Claude ran out of tokens before writing [QUOTE]
+  if (!parsed.quote) {
+    const fallbacks = {
+      'Inspirational': { text: 'The secret of getting ahead is getting started.', attribution: 'Mark Twain' },
+      'Philosophical': { text: 'The unexamined life is not worth living.', attribution: 'Socrates' },
+      'Stoic': { text: 'You have power over your mind, not outside events. Realize this, and you will find strength.', attribution: 'Marcus Aurelius' },
+      'Humor & Wit': { text: 'I am so clever that sometimes I don\'t understand a single word of what I am saying.', attribution: 'Oscar Wilde' },
+      'Historical': { text: 'In the middle of difficulty lies opportunity.', attribution: 'Albert Einstein' },
+      'Literary': { text: 'Not all those who wander are lost.', attribution: 'J.R.R. Tolkien' },
+      'Science & Discovery': { text: 'The important thing is not to stop questioning. Curiosity has its own reason for existing.', attribution: 'Albert Einstein' },
+    }
+    parsed.quote = fallbacks[quoteStyle] || { text: 'The secret of getting ahead is getting started.', attribution: 'Mark Twain' }
+    logger.warn(`Quote missing from Claude output for ${subscriber.email} — using fallback`)
+  }
 
   // Fallback: if parsing found no topics, log and use raw text in a single panel
   if (parsed.topics.length === 0) {
