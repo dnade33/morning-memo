@@ -81,6 +81,28 @@ async function processSlot(slot) {
 
   for (const subscriber of subscribers) {
     try {
+      // Fetch subtopics covered for this subscriber in the last 36 hours
+      // so we can rotate coverage across subtopics day-to-day.
+      const { data: recentSubtopicRows } = await supabase
+        .from('sent_subtopics')
+        .select('topic, subtopic')
+        .eq('subscriber_id', subscriber.id)
+        .gte('sent_at', new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString())
+      const recentlyCoveredSubs = new Set(
+        (recentSubtopicRows || []).map(r => `${r.topic}:::${r.subtopic}`)
+      )
+
+      // Pick up to 3 subtopics for a topic, prioritising ones not covered yesterday.
+      const MAX_SUBTOPICS = 3
+      function pickSubtopics(topic, allSubs) {
+        const uncovered = allSubs.filter(s => !recentlyCoveredSubs.has(`${topic}:::${s}`))
+        const covered = allSubs.filter(s => recentlyCoveredSubs.has(`${topic}:::${s}`))
+        return [...uncovered, ...covered].slice(0, MAX_SUBTOPICS)
+      }
+
+      // Track which subtopics are selected this run so we can log them after send.
+      const selectedSubtopicsForLogging = []  // { topic, subtopic }
+
       // Expand topics into sub-topic or specific-pick level using :: notation.
       // "Parent::Term" topics use Google News search; fallback is Parent's RSS feed.
       // topicOriginMap tracks every fetched key → subscriber's top-level topic so
@@ -96,7 +118,9 @@ async function processSlot(slot) {
             topicOriginMap['Sports'] = 'Sports'
             return ['Sports']
           }
-          return leagues.flatMap(league => {
+          const selectedLeagues = pickSubtopics('Sports', leagues)
+          selectedLeagues.forEach(l => selectedSubtopicsForLogging.push({ topic: 'Sports', subtopic: l }))
+          return selectedLeagues.flatMap(league => {
             const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
             const teams = subscriber.preferences?.[`sub-sports-leagues-${safeId}`]
             if (teams && teams.length > 0) {
@@ -117,7 +141,9 @@ async function processSlot(slot) {
             topicOriginMap['Finance'] = 'Finance'
             return ['Finance']
           }
-          return areas.flatMap(area => {
+          const selectedAreas = pickSubtopics('Finance', areas)
+          selectedAreas.forEach(a => selectedSubtopicsForLogging.push({ topic: 'Finance', subtopic: a }))
+          return selectedAreas.flatMap(area => {
             const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
             const picks = subscriber.preferences?.[`sub-finance-areas-${safeId}`]
             if (picks && picks.length > 0) {
@@ -138,7 +164,9 @@ async function processSlot(slot) {
             topicOriginMap['Technology'] = 'Technology'
             return ['Technology']
           }
-          return areas.flatMap(area => {
+          const selectedAreas = pickSubtopics('Technology', areas)
+          selectedAreas.forEach(a => selectedSubtopicsForLogging.push({ topic: 'Technology', subtopic: a }))
+          return selectedAreas.flatMap(area => {
             const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
             const companies = subscriber.preferences?.[`sub-tech-areas-${safeId}`]
             if (companies && companies.length > 0) {
@@ -157,7 +185,9 @@ async function processSlot(slot) {
         // Google News searches instead of a broad RSS feed.
         const subtopics = subscriber.preferences?.[topic]
         if (subtopics && subtopics.length > 0) {
-          return subtopics.map(s => {
+          const selected = pickSubtopics(topic, subtopics)
+          selected.forEach(s => selectedSubtopicsForLogging.push({ topic, subtopic: s }))
+          return selected.map(s => {
             topicOriginMap[`${topic}::${s}`] = topic
             return `${topic}::${s}`
           })
@@ -216,6 +246,15 @@ async function processSlot(slot) {
       if (result.success && !DRY_RUN && sentLinks.length > 0) {
         await supabase.from('sent_stories').insert(
           sentLinks.map(link => ({ subscriber_id: subscriber.id, story_link: link }))
+        )
+      }
+
+      // Log covered subtopics for rotation (skip in dry run)
+      if (result.success && !DRY_RUN && selectedSubtopicsForLogging.length > 0) {
+        await supabase.from('sent_subtopics').insert(
+          selectedSubtopicsForLogging.map(({ topic, subtopic }) => ({
+            subscriber_id: subscriber.id, topic, subtopic
+          }))
         )
       }
 
