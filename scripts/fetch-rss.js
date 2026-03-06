@@ -34,6 +34,41 @@ const RSS_FEEDS = {
 }
 
 // ----------------------------------------------------------------
+// Reference article filter — blocks encyclopedia/definition content
+// that has no news value (Britannica, Wikipedia, "What is X?" etc.)
+// ----------------------------------------------------------------
+const BLOCKED_DOMAINS = [
+  'britannica.com', 'wikipedia.org', 'wikimedia.org',
+  'merriam-webster.com', 'dictionary.com', 'encyclopedia.com',
+  'thoughtco.com', 'reference.com', 'factmonster.com'
+]
+
+const REFERENCE_TITLE_PATTERNS = [
+  /\|\s*definition\b/i,
+  /\|\s*encyclopedia/i,
+  /\|\s*britannica/i,
+  /\|\s*wikipedia/i,
+  /^what is\b/i,
+  /^what are\b/i,
+  /\bdefinition of\b/i,
+  /:\s*a (complete\s+)?(guide|primer|overview|introduction|history)$/i,
+  /\|\s*definition,\s*history/i,
+  /\|\s*types,?\s*(and\s+)?facts/i,
+  /\bexplained\b.*:\s*everything you need to know/i,
+]
+
+function isReferenceArticle(title, link) {
+  if (!title) return false
+  if (link) {
+    try {
+      const hostname = new URL(link).hostname.replace(/^www\./, '')
+      if (BLOCKED_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d))) return true
+    } catch { /* ignore malformed links */ }
+  }
+  return REFERENCE_TITLE_PATTERNS.some(re => re.test(title))
+}
+
+// ----------------------------------------------------------------
 // In-memory cache — cleared between cron time slots
 // ----------------------------------------------------------------
 const feedCache = {}
@@ -69,12 +104,15 @@ async function getCachedFeed(url) {
 
   const stories = await fetchWithRetry(async () => {
     const feed = await parser.parseURL(url)
-    return feed.items.slice(0, 5).map(item => ({
-      title: item.title || '',
-      summary: item.contentSnippet || item.content || item.summary || '',
-      link: item.link || '',
-      date: item.pubDate || ''
-    }))
+    return feed.items
+      .map(item => ({
+        title: item.title || '',
+        summary: item.contentSnippet || item.content || item.summary || '',
+        link: item.link || '',
+        date: item.pubDate || ''
+      }))
+      .filter(s => !isReferenceArticle(s.title, s.link))
+      .slice(0, 5)
   })
 
   feedCache[url] = stories
