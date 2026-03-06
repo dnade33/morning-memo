@@ -447,7 +447,7 @@
           isChecked = selectedSubs.length > 0
         } else {
           isChecked = data.topics?.includes(t.value)
-          selectedSubs = Array.isArray(prefs[t.subKey]) ? prefs[t.subKey] : []
+          selectedSubs = Array.isArray(prefs[t.value]) ? prefs[t.value] : []
         }
 
         const hint = t.type === 'leagues'
