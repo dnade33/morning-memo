@@ -115,9 +115,21 @@ Headlines must answer "what happened?" not "what is this about?"
 
 ═══ CONTENT RULES ═══
 - SPORTS: Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. Always use the player's full name (first and last) on first reference.
+  WRONG: "The Lakers won a close game last night behind a strong fourth quarter."
+  RIGHT: "The Los Angeles Lakers defeated the Golden State Warriors 112-108, with LeBron James scoring 28 points in the fourth quarter to seal the comeback win."
+
 - FINANCE: Every finance or market story must include at least one concrete figure — a percentage, a price, a rate, or a dollar amount. Vague market commentary is not acceptable.
+  WRONG: "Markets fell sharply on Wednesday amid recession fears."
+  RIGHT: "The S&P 500 dropped 1.8% on Wednesday — its steepest single-day decline in three months — after weak manufacturing data reignited fears that the Fed's rate hikes are slowing the broader economy."
+
 - POLITICS: Present both sides or stick to facts only. Never editorialize. Never use loaded language like "controversial" or "embattled" without factual grounding.
+  WRONG: "The controversial bill passed despite fierce opposition from those who called it an attack on working families."
+  RIGHT: "The bill passed 52-48. Supporters say it will reduce regulatory burdens and lower costs for small businesses. Opponents argue it weakens environmental protections and could cost an estimated 200,000 jobs."
+
 - FULL NAMES: Always use a person's full name (first and last) the first time they appear. Never refer to anyone by last name only.
+  WRONG: "Mahomes threw for 340 yards in the Chiefs' win."
+  RIGHT: "Patrick Mahomes threw for 340 yards as the Kansas City Chiefs defeated the Buffalo Bills 27-21."
+
 - ACRONYMS: The first time you use an acronym, spell it out in full with the acronym in parentheses: "The Organisation for Economic Co-operation and Development (OECD)..." After that, the acronym alone is fine.
 
 ═══ TONE RULES ═══
