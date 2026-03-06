@@ -58,6 +58,28 @@ const REFERENCE_TITLE_PATTERNS = [
 ]
 
 // ----------------------------------------------------------------
+// Listicle / roundup filter — blocks "Top N…", "10 Best…", year-end
+// roundups, and other list-format articles that produce vague summaries.
+// These are structurally incapable of yielding specific news coverage.
+// ----------------------------------------------------------------
+const LISTICLE_TITLE_PATTERNS = [
+  // "Top 7 …" / "The Top 10 …"
+  /^(the\s+)?top\s+\d+\b/i,
+  // "7 Best …" / "10 Ways to …" / "5 Things You Should …"
+  /^\d+\s+(best|top|worst|ways|tips|things|reasons|facts|signs|steps|tricks|hacks|ideas|questions|examples|lessons|mistakes|myths|trends|secrets|rules|habits)\b/i,
+  // "The 10 Best …" / "The 5 Most …"
+  /^the\s+\d+\s+(best|most|worst|top)\b/i,
+  // "Best of 2025" / "Best of the Year"
+  /\bbest\s+of\s+(the\s+)?(year|\d{4})\b/i,
+  // "2025 in Review" / "Year in Review"
+  /\b(year|\d{4})\s+in\s+review\b/i,
+  // "Year-End Roundup / Recap / Wrap-Up"
+  /\byear.?end\s+(roundup|recap|list|review|guide|picks|wrap.?up)\b/i,
+  // "Stories / Moments / Highlights of the Year / 2025"
+  /\b(stories|moments|events|highlights|trends)\s+of\s+(the\s+)?(year|\d{4})\b/i,
+]
+
+// ----------------------------------------------------------------
 // Freshness filter — drops articles older than 7 days.
 // Articles with no date or an unparseable date are kept (safe default).
 // ----------------------------------------------------------------
@@ -78,7 +100,8 @@ function isReferenceArticle(title, link) {
       if (BLOCKED_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d))) return true
     } catch { /* ignore malformed links */ }
   }
-  return REFERENCE_TITLE_PATTERNS.some(re => re.test(title))
+  return REFERENCE_TITLE_PATTERNS.some(re => re.test(title)) ||
+         LISTICLE_TITLE_PATTERNS.some(re => re.test(title))
 }
 
 // ----------------------------------------------------------------
