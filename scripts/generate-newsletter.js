@@ -133,9 +133,7 @@ function parseNewsletterContent(text) {
       const rawBody = storyMatch[2].trim()
       if (rawBody) {
         const linkMatch = rawBody.match(/\[LINK\](https?:\/\/[^\s\[\]]+)/)
-        const rawLink = linkMatch ? linkMatch[1].trim().replace(/[.,;!?]+$/, '') : ''
-        let link = ''
-        try { if (rawLink) { new URL(rawLink); link = rawLink } } catch { link = '' }
+        const link = linkMatch ? linkMatch[1].trim() : ''
         const body = rawBody.replace(/\[LINK\][\s\S]*?(?:\[\/LINK\]|$)/, '').trim()
         stories.push({ headline: storyMatch[1].trim(), body, link })
       }
@@ -375,6 +373,41 @@ async function generateNewsletter(subscriber, topicStories) {
     Object.entries(allocation).map(([k, v]) => [k.toLowerCase(), v])
   )
   parsed.topics = parsed.topics.map(t => ({ ...t, stories: t.stories.slice(0, allocationLower[t.name.toLowerCase()] || 1) }))
+
+  // Recover original RSS links by matching Claude's written headlines back to source articles.
+  // Claude frequently mangles URLs when copying — source links are always valid.
+  // Each parsed story is matched to the source article with the highest headline word overlap.
+  const sourceByTopicLower = {}
+  for (const { topic, stories: srcStories } of topicStories) {
+    sourceByTopicLower[topic.toLowerCase()] = srcStories
+  }
+  const wordOverlap = (a, b) => {
+    const words = s => new Set(s.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(w => w.length > 3))
+    const wa = words(a), wb = words(b)
+    let n = 0; for (const w of wa) if (wb.has(w)) n++; return n
+  }
+  for (const parsedTopic of parsed.topics) {
+    const sources = sourceByTopicLower[parsedTopic.name.toLowerCase()] || []
+    const usedIdx = new Set()
+    for (const story of parsedTopic.stories) {
+      let bestIdx = -1, bestScore = -1
+      for (let i = 0; i < sources.length; i++) {
+        if (usedIdx.has(i)) continue
+        const score = wordOverlap(story.headline, sources[i].title || '')
+        if (score > bestScore) { bestScore = score; bestIdx = i }
+      }
+      if (bestIdx >= 0 && sources[bestIdx].link) {
+        story.link = sources[bestIdx].link
+        usedIdx.add(bestIdx)
+      }
+    }
+  }
+
+  // Drop stories with no link (every rendered story must have a working Go Deeper)
+  // and drop any topic panel that ends up empty as a result
+  parsed.topics = parsed.topics
+    .map(t => ({ ...t, stories: t.stories.filter(s => s.link) }))
+    .filter(t => t.stories.length > 0)
 
   // Fallback quote — used if Claude ran out of tokens before writing [QUOTE]
   if (!parsed.quote) {
