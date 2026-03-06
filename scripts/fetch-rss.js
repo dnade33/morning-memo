@@ -55,6 +55,11 @@ const REFERENCE_TITLE_PATTERNS = [
   /\|\s*definition,\s*history/i,
   /\|\s*types,?\s*(and\s+)?facts/i,
   /\bexplained\b.*:\s*everything you need to know/i,
+  // Investopedia-style definitional titles ("X Explained: Definition...", "X: What It Is", etc.)
+  /:\s*definition\b/i,
+  /:\s*what it is\b/i,
+  /:\s*how it works\b/i,
+  /\bdefinition,\s*(types?|examples?|how)\b/i,
 ]
 
 // ----------------------------------------------------------------
