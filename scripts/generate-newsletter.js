@@ -265,7 +265,7 @@ function buildMissionControlEmail(parsed, formattedDate, prefToken = null) {
           <!-- ── GREETING ── -->
           <tr>
             <td style="padding:20px 20px 12px;">
-              <p style="margin:0;font-family:${sans};font-size:14px;line-height:1.75;color:#a8b8cc;font-weight:300;"><span style="color:#00d4ff;">${esc(greetingBlue)}</span>${esc(greetingRest)}</p>
+              <p style="margin:0;font-family:${sans};font-size:14px;line-height:1.75;color:#a8b8cc;font-weight:300;"><font color="#00d4ff"><span style="color:#00d4ff;">${esc(greetingBlue)}</span></font>${esc(greetingRest)}</p>
             </td>
           </tr>
 
