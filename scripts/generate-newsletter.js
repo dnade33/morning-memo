@@ -107,6 +107,7 @@ Rules:
 - Quote style: ${quoteStyle} — this is a strict requirement. The closing quote MUST match this style regardless of the newsletter topics. Do not let the newsletter content influence the quote style.
 - The quote must be a real, well-known quote from a real, named person (no made-up attributions, no "Observer" or publication names). If the style is "Humor & Wit", use a genuinely funny quote — this includes witty one-liners, dry humor, absurdist observations, or a classic dad joke. Mix it up.
 - Always use a person's full name (first and last) the first time they are mentioned in a headline or summary. Never refer to someone by last name only — not everyone knows who "Joseph" or "Smith" is.
+- The first time you use an acronym in a headline or summary, spell it out in full with the acronym in parentheses immediately after. Example: "The Organisation for Economic Co-operation and Development (OECD) warned..." After the first use, the acronym alone is fine.
 - Plain text only inside the markers — no markdown asterisks, no bullet points`
 }
 
