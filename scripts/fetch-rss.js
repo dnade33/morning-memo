@@ -57,6 +57,19 @@ const REFERENCE_TITLE_PATTERNS = [
   /\bexplained\b.*:\s*everything you need to know/i,
 ]
 
+// ----------------------------------------------------------------
+// Freshness filter — drops articles older than 7 days.
+// Articles with no date or an unparseable date are kept (safe default).
+// ----------------------------------------------------------------
+const MAX_ARTICLE_AGE_MS = 7 * 24 * 60 * 60 * 1000
+
+function isFreshArticle(dateStr) {
+  if (!dateStr) return true
+  const published = new Date(dateStr)
+  if (isNaN(published.getTime())) return true
+  return (Date.now() - published.getTime()) <= MAX_ARTICLE_AGE_MS
+}
+
 function isReferenceArticle(title, link) {
   if (!title) return false
   if (link) {
@@ -111,6 +124,7 @@ async function getCachedFeed(url) {
         link: item.link || '',
         date: item.pubDate || ''
       }))
+      .filter(s => isFreshArticle(s.date))
       .filter(s => !isReferenceArticle(s.title, s.link))
       .slice(0, 5)
   })
