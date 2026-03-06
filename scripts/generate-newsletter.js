@@ -133,7 +133,9 @@ function parseNewsletterContent(text) {
       const rawBody = storyMatch[2].trim()
       if (rawBody) {
         const linkMatch = rawBody.match(/\[LINK\](https?:\/\/[^\s\[\]]+)/)
-        const link = linkMatch ? linkMatch[1].trim() : ''
+        const rawLink = linkMatch ? linkMatch[1].trim().replace(/[.,;!?]+$/, '') : ''
+        let link = ''
+        try { if (rawLink) { new URL(rawLink); link = rawLink } } catch { link = '' }
         const body = rawBody.replace(/\[LINK\][\s\S]*?(?:\[\/LINK\]|$)/, '').trim()
         stories.push({ headline: storyMatch[1].trim(), body, link })
       }
