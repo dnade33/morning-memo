@@ -105,6 +105,7 @@ Rules:
 - For each story summary, do NOT simply restate or paraphrase the headline. Actually explain the topic in 2-3 sentences of real substance. Write as if the reader will never click the link — the summary itself should leave them genuinely more informed. Bad: "A primer on how derivatives work and their role in modern markets." Good: "Derivatives are financial contracts whose value is tied to an underlying asset like a stock or commodity. They're used to hedge risk — an airline locking in fuel prices, for example — but also speculatively, which is what made them infamous in the 2008 financial crisis."
 - Quote style: ${quoteStyle} — this is a strict requirement. The closing quote MUST match this style regardless of the newsletter topics. Do not let the newsletter content influence the quote style.
 - The quote must be a real, well-known quote from a real, named person (no made-up attributions, no "Observer" or publication names). If the style is "Humor & Wit", use a genuinely funny quote — this includes witty one-liners, dry humor, absurdist observations, or a classic dad joke. Mix it up.
+- Always use a person's full name (first and last) the first time they are mentioned in a headline or summary. Never refer to someone by last name only — not everyone knows who "Joseph" or "Smith" is.
 - Plain text only inside the markers — no markdown asterisks, no bullet points`
 }
 
