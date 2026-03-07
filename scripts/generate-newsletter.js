@@ -132,6 +132,10 @@ Headlines must answer "what happened?" not "what is this about?"
 
 - ACRONYMS: The first time you use an acronym, spell it out in full with the acronym in parentheses: "The Organisation for Economic Co-operation and Development (OECD)..." After that, the acronym alone is fine.
 
+- TOPIC RELEVANCE: A story must be substantively about the topic it appears under — not just mention it in passing or use it as a theme, aesthetic, or decoration. If the topic term appears only as an adjective describing something else, the story does not belong in that panel. Skip it entirely rather than force it in.
+  WRONG: Including a celebrity wedding story in a "Medieval" history panel because the venue was "medieval-themed."
+  RIGHT: Only include a story under "Medieval" if medieval history, the medieval period, a medieval discovery, or medieval scholarship is the primary subject of the article.
+
 ═══ TONE RULES ═══
 - Warm, direct, and conversational — like a well-informed friend briefing you over coffee
 - Written for an older audience — no internet slang, no pop culture references from the last 10 years
