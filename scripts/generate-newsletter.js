@@ -220,7 +220,7 @@ const TOPIC_EMOJIS = {
   'Sports': '⚽', 'NFL': '🏈', 'NBA': '🏀', 'MLB': '⚾', 'NHL': '🏒',
   'College Football': '🏈', 'College Basketball': '🏀', 'Soccer / MLS': '⚽', 'Golf': '⛳',
   'World News': '🌍', 'Politics': '🏛️', 'Finance': '📈', 'Technology': '💻',
-  'Science': '🔬', 'Health': '❤️', 'Arts & Culture': '🎨', 'Food & Travel': '🍽️',
+  'Science': '🔬', 'Health': '🫀', 'Arts & Culture': '🎨', 'Food & Travel': '🍽️',
   'History': '🏛', 'Books & Ideas': '📚', 'Local Weather': '🌤️'
 }
 
