@@ -1561,7 +1561,7 @@
           onmouseenter="this.style.background='rgba(200,169,110,0.12)'"
           onmouseleave="this.style.background='#ffffff'"
           onmousedown="selectCollegeTeam(${i}, this)">
-          ${team}
+          ${extractSchoolName(team)}
         </div>`).join('');
     }
 
