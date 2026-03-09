@@ -300,7 +300,7 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
 // GET /health
 // ----------------------------------------------------------------
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' })
+  res.json({ status: 'ok', v: 2 })
 })
 
 // ----------------------------------------------------------------
