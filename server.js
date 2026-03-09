@@ -279,6 +279,8 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
 
   res.json({
     generated_at: now.toISOString(),
+    _debug_first_sub_keys: Object.keys(subscribers?.[0] || {}),
+    _debug_first_sub_prefs: subscribers?.[0]?.preferences,
     subscribers: {
       total: (subscribers || []).length,
       active: activeCount,

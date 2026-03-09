@@ -307,6 +307,8 @@
   // ── Render ────────────────────────────────────────────────────
   function render(d) {
     const { subscribers, newsletters } = d
+    console.log('[DEBUG] server keys:', d._debug_first_sub_keys)
+    console.log('[DEBUG] server prefs:', JSON.stringify(d._debug_first_sub_prefs))
 
     // Stat cards
     document.getElementById('stat-total').textContent  = subscribers.total
