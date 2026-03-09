@@ -166,6 +166,26 @@
       color: #00d4ff;
       background: rgba(0,212,255,0.05);
     }
+    .subtopics-chips.leagues { flex-direction: column; gap: 4px; }
+    .league-item { display: flex; flex-direction: column; }
+    .league-teams-panel {
+      display: none;
+      margin: 6px 0 2px 12px;
+      padding: 10px 12px;
+      border-left: 2px solid rgba(0,212,255,0.2);
+    }
+    .league-teams-panel.open { display: block; }
+    .teams-label {
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(0,212,255,0.5); margin-bottom: 8px;
+    }
+    .teams-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .team-chip {
+      padding: 3px 8px; font-size: 10px;
+      border: 1px solid rgba(255,255,255,0.45);
+      color: #a8b8cc; cursor: pointer; letter-spacing: 0.5px; user-select: none;
+    }
+    .team-chip.selected { border-color: rgba(0,212,255,0.4); color: #00d4ff; background: rgba(0,212,255,0.05); }
 
     /* City field */
     .city-row {
@@ -358,6 +378,16 @@
   </div>
 
   <script>
+    const LEAGUE_TEAMS = {
+      'NFL':  ['49ers','Bears','Bengals','Bills','Broncos','Browns','Buccaneers','Cardinals','Chargers','Chiefs','Colts','Commanders','Cowboys','Dolphins','Eagles','Falcons','Giants','Jaguars','Jets','Lions','Packers','Panthers','Patriots','Raiders','Rams','Ravens','Saints','Seahawks','Steelers','Texans','Titans','Vikings'],
+      'NBA':  ['76ers','Bucks','Bulls','Cavaliers','Celtics','Clippers','Grizzlies','Hawks','Heat','Hornets','Jazz','Kings','Knicks','Lakers','Magic','Mavericks','Nets','Nuggets','Pacers','Pelicans','Pistons','Raptors','Rockets','Spurs','Suns','Thunder','Timberwolves','Trail Blazers','Warriors','Wizards'],
+      'MLB':  ['Angels','Astros','Athletics','Blue Jays','Braves','Brewers','Cardinals','Cubs','Diamondbacks','Dodgers','Giants','Guardians','Mariners','Marlins','Mets','Nationals','Orioles','Padres','Phillies','Pirates','Rangers','Rays','Red Sox','Reds','Rockies','Royals','Tigers','Twins','White Sox','Yankees'],
+      'NHL':  ['Avalanche','Blackhawks','Blue Jackets','Blues','Bruins','Canadiens','Canucks','Capitals','Devils','Ducks','Flames','Flyers','Golden Knights','Hurricanes','Islanders','Jets','Kings','Kraken','Lightning','Maple Leafs','Oilers','Panthers','Penguins','Predators','Rangers','Red Wings','Sabres','Senators','Sharks','Stars','Wild'],
+      'College Football': ['Alabama','Ohio State','Georgia','Michigan','Texas','USC','Notre Dame','Clemson','Penn State','Oklahoma','LSU','Florida State','Tennessee','Oregon','Washington','Miami','Auburn','Florida','Wisconsin','Iowa'],
+      'College Basketball': ['Duke','Kentucky','Kansas','UNC','Gonzaga','Connecticut','Houston','Arizona','Purdue','Michigan State','Villanova','Syracuse','Louisville','UCLA','Indiana','Ohio State','Wisconsin','Texas','Baylor','Florida'],
+      'Soccer / MLS': ['LAFC','LA Galaxy','Inter Miami','Atlanta United','Seattle Sounders','Portland Timbers','NYCFC','Red Bulls','Toronto FC','Montreal','Chicago Fire','Columbus Crew','FC Cincinnati','Nashville SC','Austin FC']
+    }
+
     // ── All topics with expandable subtopics ─────────────────────────────────
     // type: 'leagues' → subs go directly into topics array (each has its own RSS feed)
     // type: 'chips'   → subs go into tagAnswers / preferences jsonb
@@ -476,12 +506,25 @@
           ? 'Select the leagues you follow'
           : 'Focus areas'
 
-        const chipsHtml = t.subs.map(s => `
-          <div class="subtopic-chip ${selectedSubs.includes(s) ? 'selected' : ''}"
-            data-subkey="${t.value || ''}"
-            data-type="${t.type || 'chips'}"
-            onclick="toggleSubtopic(this)">${s}</div>
-        `).join('')
+        const chipsHtml = t.subs.map(s => {
+          const isSelected = selectedSubs.includes(s)
+          if (t.type === 'leagues' && LEAGUE_TEAMS[s]) {
+            const teamKey = `sub-sports-leagues-${s.toLowerCase().replace(/[^a-z0-9]/g, '-')}`
+            const selectedTeams = Array.isArray(prefs[teamKey]) ? prefs[teamKey] : []
+            const panelId = `lp-${s.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
+            const teamChips = LEAGUE_TEAMS[s].map(team =>
+              `<div class="team-chip ${selectedTeams.includes(team) ? 'selected' : ''}" data-leaguekey="${teamKey}" onclick="this.classList.toggle('selected')">${team}</div>`
+            ).join('')
+            return `<div class="league-item">
+              <div class="subtopic-chip ${isSelected ? 'selected' : ''}" data-subkey="${t.value}" data-type="leagues" data-panelid="${panelId}" onclick="toggleSubtopic(this)">${s}</div>
+              <div class="league-teams-panel ${isSelected ? 'open' : ''}" id="${panelId}">
+                <div class="teams-label">Pick your ${s} teams:</div>
+                <div class="teams-chips">${teamChips}</div>
+              </div>
+            </div>`
+          }
+          return `<div class="subtopic-chip ${isSelected ? 'selected' : ''}" data-subkey="${t.value || ''}" data-type="${t.type || 'chips'}" onclick="toggleSubtopic(this)">${s}</div>`
+        }).join('')
 
         return `
           <div class="topic-with-subs">
@@ -493,7 +536,7 @@
             </label>
             <div class="subtopics-panel ${isChecked ? 'open' : ''}" id="sub-${sid}">
               <div class="subtopics-hint">${hint}</div>
-              <div class="subtopics-chips">${chipsHtml}</div>
+              <div class="subtopics-chips${t.type === 'leagues' ? ' leagues' : ''}">${chipsHtml}</div>
             </div>
           </div>
         `
@@ -539,6 +582,10 @@
 
     function toggleSubtopic(el) {
       el.classList.toggle('selected')
+      if (el.dataset.panelid) {
+        const panel = document.getElementById(el.dataset.panelid)
+        if (panel) panel.classList.toggle('open', el.classList.contains('selected'))
+      }
     }
 
     function selectQuote(el) {
@@ -575,6 +622,14 @@
         if (!tagAnswers[key]) tagAnswers[key] = []
         tagAnswers[key].push(chip.textContent.trim())
       })
+      // Team chip selections → tagAnswers
+      if (sportsChecked) {
+        document.querySelectorAll('.team-chip.selected').forEach(chip => {
+          const key = chip.dataset.leaguekey
+          if (!tagAnswers[key]) tagAnswers[key] = []
+          tagAnswers[key].push(chip.textContent.trim())
+        })
+      }
 
       // Validate
       if (topics.length === 0) return alert('Please select at least one topic.')
