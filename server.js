@@ -288,6 +288,12 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
 
   res.json({
     generated_at: now.toISOString(),
+    _pref_debug: (prefRows || []).slice(0, 2).map(r => ({
+      id: r.id,
+      topics: r.topics,
+      pref_type: typeof r.preferences,
+      pref_keys: Object.keys(r.preferences || {})
+    })),
     subscribers: {
       total: (subscribers || []).length,
       active: activeCount,

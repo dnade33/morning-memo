@@ -341,7 +341,7 @@
     // Topic popularity table with subtopic accordions
     const bySubtopic = subscribers.by_subtopic || {}
     console.log('by_subtopic:', JSON.stringify(bySubtopic))
-    console.log('has_sports:', !!bySubtopic['Sports'])
+    console.log('pref_debug:', JSON.stringify(d._pref_debug))
     const topicEntries = Object.entries(subscribers.by_topic)
       .sort((a, b) => {
         if (a[0] === 'Local Weather') return 1
