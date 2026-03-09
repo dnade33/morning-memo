@@ -339,18 +339,7 @@
       quoteRows.length ? quoteRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
 
     // Topic popularity table with subtopic accordions
-    // Compute client-side from list (server-side by_subtopic requires preferences field)
-    const bySubtopic = {}
-    for (const sub of (subscribers.list || [])) {
-      if (!sub.active) continue
-      for (const t of (sub.topics || [])) {
-        const subs = sub.preferences?.[t]
-        if (Array.isArray(subs) && subs.length > 0) {
-          if (!bySubtopic[t]) bySubtopic[t] = {}
-          for (const st of subs) bySubtopic[t][st] = (bySubtopic[t][st] || 0) + 1
-        }
-      }
-    }
+    const bySubtopic = subscribers.by_subtopic || {}
     const topicEntries = Object.entries(subscribers.by_topic)
       .sort((a, b) => {
         if (a[0] === 'Local Weather') return 1
