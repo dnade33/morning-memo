@@ -95,10 +95,32 @@
       cursor: pointer;
     }
     .topic-item input[type="checkbox"] {
-      accent-color: #00d4ff;
-      width: 14px;
-      height: 14px;
+      appearance: none;
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
       flex-shrink: 0;
+      border: 2px solid #4a5a72;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      top: 1px;
+    }
+    .topic-item input[type="checkbox"]:checked {
+      background: #00d4ff;
+      border-color: #00d4ff;
+    }
+    .topic-item input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: -1px;
+      width: 5px;
+      height: 9px;
+      border: 2px solid #0d1524;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
     }
 
     /* Other topics — single column, each with expandable subtopics */
