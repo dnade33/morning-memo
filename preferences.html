@@ -277,6 +277,33 @@
     .submit-btn:hover { background: #00b8dd; }
     .submit-btn:disabled { background: #1e2a38; color: #3a4a5c; cursor: default; }
 
+    /* Success screen */
+    .success-screen { display: none; }
+    .success-screen.visible { display: block; }
+    .success-greeting {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #00d4ff;
+      margin: 24px 0 10px;
+    }
+    .success-body {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      color: #dde2ed;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .success-topic-chip {
+      display: inline-block;
+      padding: 5px 12px;
+      font-size: 11px;
+      border: 1px solid rgba(0,212,255,0.35);
+      color: #00d4ff;
+      background: rgba(0,212,255,0.05);
+      letter-spacing: 0.5px;
+    }
+
     /* City autocomplete dropdown */
     #city-dropdown {
       display: none;
@@ -318,7 +345,26 @@
 
     <div id="loading" class="state">LOADING YOUR PREFERENCES...</div>
     <div id="error" class="state error" style="display:none;">Invalid or expired link. Please use the link from your latest Morning Memo email.</div>
-    <div id="success" class="state success" style="display:none;">PREFERENCES UPDATED. Your next Morning Memo will reflect your changes.</div>
+
+    <!-- Success screen -->
+    <div id="success" class="success-screen">
+      <div class="header">
+        <p class="header-label">Morning Memo</p>
+        <h1 class="header-title">Preferences Updated</h1>
+      </div>
+      <p class="success-greeting" id="success-greeting"></p>
+      <p class="success-body">Your changes are saved. Your next Morning Memo will be built around your updated selections.</p>
+      <div class="section">
+        <div class="section-label">// Your Topics</div>
+        <div class="section-body">
+          <div id="success-topics" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-label">// Next Delivery</div>
+        <div class="section-body" id="success-delivery"></div>
+      </div>
+    </div>
 
     <form id="prefs-form" style="display:none;" onsubmit="savePrefs(event)">
 
@@ -673,8 +719,26 @@
         })
         if (!res.ok) throw new Error('Failed')
 
+        const name = (currentData.first_name || 'friend').toUpperCase()
+        document.getElementById('success-greeting').textContent = `Got it, ${name}.`
+
+        const topicEmoji = {
+          'Sports':'⚽','World News':'🌍','Finance':'📈','Arts & Culture':'🎨',
+          'History':'🏺','Science':'🔬','Technology':'💻','Politics':'🏛️',
+          'Food & Travel':'🍽','Local Weather':'🌤','Health':'🫀','Books & Ideas':'📚'
+        }
+        const leagueNames = new Set(['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf'])
+        document.getElementById('success-topics').innerHTML = topics.map(t => {
+          const label = leagueNames.has(t) ? t : (topicEmoji[t] ? `${topicEmoji[t]} ${t}` : t)
+          return `<div class="success-topic-chip">${label}</div>`
+        }).join('')
+
+        document.getElementById('success-delivery').innerHTML =
+          `<span style="color:#a8b8cc;font-size:12px;">Your next Morning Memo arrives at <span style="color:#00d4ff;font-weight:700;">${time}</span>.</span>`
+
         document.getElementById('prefs-form').style.display = 'none'
-        document.getElementById('success').style.display = 'block'
+        document.getElementById('success').classList.add('visible')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       } catch (err) {
         btn.disabled = false
         btn.textContent = 'SAVE PREFERENCES'
