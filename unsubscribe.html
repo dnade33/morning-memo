@@ -111,7 +111,6 @@
       <div class="icon">👋</div>
       <p class="title">You've been unsubscribed</p>
       <p class="message">Sorry to see you go. You won't receive any more Morning Memo emails.</p>
-      <a id="prefs-link" href="#" class="cta-link" style="display:none;">Changed your mind? Update preferences &rarr;</a>
     </div>
 
     <!-- Error state -->
@@ -151,10 +150,6 @@
 
         document.getElementById('confirm').style.display = 'none'
         document.getElementById('success').style.display = 'block'
-
-        const prefsLink = document.getElementById('prefs-link')
-        prefsLink.href = '/preferences.html?token=' + encodeURIComponent(token)
-        prefsLink.style.display = 'inline'
 
       } catch {
         document.getElementById('confirm').style.display = 'none'
