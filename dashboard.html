@@ -339,6 +339,11 @@
       quoteRows.length ? quoteRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
 
     // Topic popularity table with subtopic accordions
+    const topicEmoji = {
+      'Sports': '⚽', 'World News': '🌍', 'Finance': '📈', 'Arts & Culture': '🎨',
+      'History': '🏛', 'Science': '🔬', 'Technology': '💻', 'Politics': '🏛️',
+      'Food & Travel': '🍽', 'Local Weather': '🌤', 'Health': '🫀', 'Books & Ideas': '📚'
+    }
     const bySubtopic = subscribers.by_subtopic || {}
     const topicEntries = Object.entries(subscribers.by_topic)
       .sort((a, b) => {
@@ -356,7 +361,7 @@
            </button>`
         : ''
       const topicRow = `<tr>
-        <td style="display:flex;align-items:center;gap:2px;">${esc(t)}${toggleBtn}</td>
+        <td style="display:flex;align-items:center;gap:6px;">${topicEmoji[t] || ''}${esc(t)}${toggleBtn}</td>
         <td class="mono" style="color:var(--accent);">${n}</td>
       </tr>`
       if (!hasSubtopics) return [topicRow]
