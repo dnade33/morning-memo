@@ -120,6 +120,26 @@
       text-transform: uppercase; white-space: nowrap;
     }
 
+    /* Subtopic accordion */
+    .topic-toggle {
+      background: none; border: none; cursor: pointer; padding: 0 0 0 8px;
+      color: var(--muted); line-height: 1; transition: color 0.15s;
+    }
+    .topic-toggle:hover { color: var(--accent); }
+    .topic-toggle svg { display: block; transition: transform 0.2s; }
+    .topic-toggle.open svg { transform: rotate(180deg); }
+    .subtopic-row { display: none; }
+    .subtopic-row.open { display: table-row; }
+    .subtopic-row td { padding: 0 16px 10px 32px; border-bottom: none; }
+    .subtopic-list { display: flex; flex-direction: column; gap: 4px; }
+    .subtopic-item {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .subtopic-item:last-child { border-bottom: none; }
+    .subtopic-item .st-count { color: var(--accent); min-width: 24px; text-align: right; }
+
     /* Mono text helper */
     .mono { font-family: var(--mono); }
     .dim  { color: var(--muted); }
@@ -318,13 +338,37 @@
     document.getElementById('quote-table').innerHTML =
       quoteRows.length ? quoteRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
 
-    // Topic popularity table
-    const topicRows = Object.entries(subscribers.by_topic)
-      .sort((a, b) => b[1] - a[1])
-      .map(([t, n]) => `<tr>
-        <td>${esc(t)}</td>
+    // Topic popularity table with subtopic accordions
+    const bySubtopic = subscribers.by_subtopic || {}
+    const topicEntries = Object.entries(subscribers.by_topic)
+      .sort((a, b) => {
+        if (a[0] === 'Local Weather') return 1
+        if (b[0] === 'Local Weather') return -1
+        return b[1] - a[1]
+      })
+    const topicRows = topicEntries.flatMap(([t, n], i) => {
+      const subtopics = bySubtopic[t]
+      const hasSubtopics = subtopics && Object.keys(subtopics).length > 0
+      const uid = `st-${i}`
+      const toggleBtn = hasSubtopics
+        ? `<button class="topic-toggle" id="btn-${uid}" onclick="toggleSubtopics('${uid}')" aria-label="Expand subtopics">
+             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+           </button>`
+        : ''
+      const topicRow = `<tr>
+        <td style="display:flex;align-items:center;gap:2px;">${esc(t)}${toggleBtn}</td>
         <td class="mono" style="color:var(--accent);">${n}</td>
-      </tr>`)
+      </tr>`
+      if (!hasSubtopics) return [topicRow]
+      const stItems = Object.entries(subtopics)
+        .sort((a, b) => b[1] - a[1])
+        .map(([st, cnt]) => `<div class="subtopic-item"><span>${esc(st)}</span><span class="st-count">${cnt}</span></div>`)
+        .join('')
+      const subRow = `<tr class="subtopic-row" id="${uid}">
+        <td colspan="2"><div class="subtopic-list">${stItems}</div></td>
+      </tr>`
+      return [topicRow, subRow]
+    })
     document.getElementById('topic-table').innerHTML =
       topicRows.length ? topicRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
 
@@ -356,6 +400,15 @@
     // Last updated
     document.getElementById('last-updated').textContent =
       'Updated ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' })
+  }
+
+  // ── Subtopic accordion toggle ──────────────────────────────────
+  function toggleSubtopics(uid) {
+    const row = document.getElementById(uid)
+    const btn = document.getElementById('btn-' + uid)
+    if (!row || !btn) return
+    const open = row.classList.toggle('open')
+    btn.classList.toggle('open', open)
   }
 
   // ── Helpers ───────────────────────────────────────────────────
