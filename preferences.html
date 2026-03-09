@@ -388,6 +388,15 @@
       'Soccer / MLS': ['LAFC','LA Galaxy','Inter Miami','Atlanta United','Seattle Sounders','Portland Timbers','NYCFC','Red Bulls','Toronto FC','Montreal','Chicago Fire','Columbus Crew','FC Cincinnati','Nashville SC','Austin FC']
     }
 
+    const FOCUS_PICKS = {
+      'Stock Market': ['S&P 500','Dow Jones','Nasdaq','Russell 2000','Apple (AAPL)','Microsoft (MSFT)','Amazon (AMZN)','Nvidia (NVDA)','Tesla (TSLA)','Berkshire Hathaway','JPMorgan','Google (GOOGL)','Meta (META)','Exxon Mobil'],
+      'Crypto & Digital Assets': ['Bitcoin','Ethereum','Solana','XRP','Cardano','Polygon','Chainlink','Dogecoin','BNB','Avalanche','Polkadot','Litecoin'],
+      'Startups & Venture Capital': ['OpenAI','Anthropic','SpaceX','Stripe','Databricks','Canva','Figma','Notion','Mistral','Perplexity','xAI','Cohere'],
+      'Artificial Intelligence': ['OpenAI','Anthropic','Google DeepMind','Meta AI','Mistral','Cohere','Stability AI','Midjourney','Perplexity','xAI'],
+      'Startups & Big Tech': ['Apple','Google','Microsoft','Amazon','Meta','Tesla','Nvidia','OpenAI','Anthropic','SpaceX','Uber','Airbnb','Salesforce','Oracle','Intel','AMD'],
+      'EVs & Energy': ['Tesla','Rivian','Lucid','Ford EV','GM EV','BYD','NIO','ChargePoint','Enphase','SolarEdge']
+    }
+
     // ── All topics with expandable subtopics ─────────────────────────────────
     // type: 'leagues' → subs go directly into topics array (each has its own RSS feed)
     // type: 'chips'   → subs go into tagAnswers / preferences jsonb
@@ -506,6 +515,7 @@
           ? 'Select the leagues you follow'
           : 'Focus areas'
 
+        const hasFocusPicks = t.type !== 'leagues' && t.subs.some(s => FOCUS_PICKS[s])
         const chipsHtml = t.subs.map(s => {
           const isSelected = selectedSubs.includes(s)
           if (t.type === 'leagues' && LEAGUE_TEAMS[s]) {
@@ -523,6 +533,21 @@
               </div>
             </div>`
           }
+          if (t.type !== 'leagues' && FOCUS_PICKS[s]) {
+            const focusKey = `sub-${t.subKey}-${s.toLowerCase().replace(/[^a-z0-9]/g, '-')}`
+            const selectedPicks = Array.isArray(prefs[focusKey]) ? prefs[focusKey] : []
+            const panelId = `fp-${s.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
+            const pickChips = FOCUS_PICKS[s].map(pick =>
+              `<div class="team-chip ${selectedPicks.includes(pick) ? 'selected' : ''}" data-leaguekey="${focusKey}" onclick="this.classList.toggle('selected')">${pick}</div>`
+            ).join('')
+            return `<div class="league-item">
+              <div class="subtopic-chip ${isSelected ? 'selected' : ''}" data-subkey="${t.value}" data-type="chips" data-panelid="${panelId}" onclick="toggleSubtopic(this)">${s}</div>
+              <div class="league-teams-panel ${isSelected ? 'open' : ''}" id="${panelId}">
+                <div class="teams-label">Pick specific ones you follow:</div>
+                <div class="teams-chips">${pickChips}</div>
+              </div>
+            </div>`
+          }
           return `<div class="subtopic-chip ${isSelected ? 'selected' : ''}" data-subkey="${t.value || ''}" data-type="${t.type || 'chips'}" onclick="toggleSubtopic(this)">${s}</div>`
         }).join('')
 
@@ -536,7 +561,7 @@
             </label>
             <div class="subtopics-panel ${isChecked ? 'open' : ''}" id="sub-${sid}">
               <div class="subtopics-hint">${hint}</div>
-              <div class="subtopics-chips${t.type === 'leagues' ? ' leagues' : ''}">${chipsHtml}</div>
+              <div class="subtopics-chips${t.type === 'leagues' || hasFocusPicks ? ' leagues' : ''}">${chipsHtml}</div>
             </div>
           </div>
         `
@@ -622,14 +647,13 @@
         if (!tagAnswers[key]) tagAnswers[key] = []
         tagAnswers[key].push(chip.textContent.trim())
       })
-      // Team chip selections → tagAnswers
-      if (sportsChecked) {
-        document.querySelectorAll('.team-chip.selected').forEach(chip => {
-          const key = chip.dataset.leaguekey
-          if (!tagAnswers[key]) tagAnswers[key] = []
-          tagAnswers[key].push(chip.textContent.trim())
-        })
-      }
+      // Team/focus pick chip selections → tagAnswers (only from open panels)
+      document.querySelectorAll('.league-teams-panel.open .team-chip.selected').forEach(chip => {
+        const key = chip.dataset.leaguekey
+        if (!key) return
+        if (!tagAnswers[key]) tagAnswers[key] = []
+        tagAnswers[key].push(chip.textContent.trim())
+      })
 
       // Validate
       if (topics.length === 0) return alert('Please select at least one topic.')
