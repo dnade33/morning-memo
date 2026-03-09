@@ -252,13 +252,15 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
     subscriber_email: subMap[n.subscriber_id]?.email
   }))
 
-  // Compute topic + time breakdowns (active subscribers only)
+  // Compute topic + time + quote style breakdowns (active subscribers only)
   const topicCounts = {}
   const timeCounts = {}
+  const quoteCounts = {}
   for (const sub of (subscribers || [])) {
     if (!sub.active) continue
     for (const t of (sub.topics || [])) topicCounts[t] = (topicCounts[t] || 0) + 1
     if (sub.delivery_time) timeCounts[sub.delivery_time] = (timeCounts[sub.delivery_time] || 0) + 1
+    if (sub.quote_style) quoteCounts[sub.quote_style] = (quoteCounts[sub.quote_style] || 0) + 1
   }
 
   const activeCount = (subscribers || []).filter(s => s.active).length
@@ -273,6 +275,7 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
       inactive: (subscribers || []).length - activeCount,
       by_delivery_time: timeCounts,
       by_topic: topicCounts,
+      by_quote_style: quoteCounts,
       list: subscribers || []
     },
     newsletters: {

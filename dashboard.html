@@ -186,12 +186,21 @@
         <tbody id="topic-table"></tbody>
       </table>
     </div>
-    <div class="panel">
-      <div class="panel-header">Delivery Time Breakdown</div>
-      <table>
-        <thead><tr><th>Slot</th><th>Subscribers</th></tr></thead>
-        <tbody id="time-table"></tbody>
-      </table>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-header">Delivery Time Breakdown</div>
+        <table>
+          <thead><tr><th>Slot</th><th>Subscribers</th></tr></thead>
+          <tbody id="time-table"></tbody>
+        </table>
+      </div>
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-header">Quote Style Breakdown</div>
+        <table>
+          <thead><tr><th>Style</th><th>Subscribers</th></tr></thead>
+          <tbody id="quote-table"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -298,6 +307,16 @@
       </tr>`)
     document.getElementById('time-table').innerHTML =
       timeRows.length ? timeRows.join('') : '<tr class="empty-row"><td colspan="2">No active subscribers</td></tr>'
+
+    // Quote style table
+    const quoteRows = Object.entries(subscribers.by_quote_style || {})
+      .sort((a, b) => b[1] - a[1])
+      .map(([s, n]) => `<tr>
+        <td>${esc(s)}</td>
+        <td class="mono" style="color:var(--accent);">${n}</td>
+      </tr>`)
+    document.getElementById('quote-table').innerHTML =
+      quoteRows.length ? quoteRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
 
     // Topic popularity table
     const topicRows = Object.entries(subscribers.by_topic)
