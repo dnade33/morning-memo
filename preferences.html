@@ -778,6 +778,11 @@
       const dd = document.getElementById('city-dropdown')
       cityFocusIdx = -1
       if (!results.length) { dd.style.display = 'none'; return }
+      dd.style.cssText = `
+        display:block; position:absolute; top:100%; left:0; right:0;
+        background:#0d1521; border:1px solid rgba(0,212,255,0.3);
+        border-top:none; z-index:9999; max-height:220px; overflow-y:auto;
+      `
       dd.innerHTML = results.map((city, i) => `
         <div class="city-option" data-idx="${i}"
           onmousedown="selectCity(${i})"
@@ -786,7 +791,6 @@
           <span class="city-option-region">${city.region}</span>
         </div>
       `).join('')
-      dd.style.display = 'block'
     }
 
     function highlightCity(idx) {
