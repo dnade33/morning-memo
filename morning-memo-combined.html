@@ -1473,6 +1473,50 @@
       'Yale Bulldogs','Youngstown State Penguins'
     ];
 
+    // Strip mascot from full team name — lookup covers multi-word mascot exceptions,
+    // default strips the last word (covers single-word mascots like Tigers, Bears, etc.)
+    const SCHOOL_NAME_MAP = {
+      'Air Force Falcons':'Air Force','Alabama Crimson Tide':'Alabama',
+      'Albany Great Danes':'Albany','Appalachian State Mountaineers':'Appalachian State',
+      'Arkansas Pine Bluff Golden Lions':'Arkansas Pine Bluff',
+      'Arkansas State Red Wolves':'Arkansas State','Army Black Knights':'Army',
+      'California Golden Bears':'California','Campbell Fighting Camels':'Campbell',
+      'Canisius Golden Griffins':'Canisius',
+      'Central Connecticut Blue Devils':'Central Connecticut',
+      'Cornell Big Red':'Cornell','Dartmouth Big Green':'Dartmouth',
+      'Delaware Blue Hens':'Delaware','DePaul Blue Demons':'DePaul',
+      'Duke Blue Devils':'Duke','Evansville Purple Aces':'Evansville',
+      'Georgia Tech Yellow Jackets':'Georgia Tech',
+      'Hawaii Rainbow Warriors':'Hawaii','Illinois Fighting Illini':'Illinois',
+      'Kent State Golden Flashes':'Kent State','Lehigh Mountain Hawks':'Lehigh',
+      'Louisiana Ragin Cajuns':'Louisiana','Maine Black Bears':'Maine',
+      'Marist Red Foxes':'Marist','Marquette Golden Eagles':'Marquette',
+      'Marshall Thundering Herd':'Marshall',
+      'Middle Tennessee Blue Raiders':'Middle Tennessee',
+      'Minnesota Golden Gophers':'Minnesota',
+      'Mississippi Valley State Delta Devils':'Mississippi Valley State',
+      'Nevada Wolf Pack':'Nevada','Niagara Purple Eagles':'Niagara',
+      'North Carolina Tar Heels':'North Carolina',
+      'North Dakota Fighting Hawks':'North Dakota',
+      'North Texas Mean Green':'North Texas','Notre Dame Fighting Irish':'Notre Dame',
+      'Oakland Golden Grizzlies':'Oakland','Oral Roberts Golden Eagles':'Oral Roberts',
+      'Penn State Nittany Lions':'Penn State','Presbyterian Blue Hose':'Presbyterian',
+      'Rutgers Scarlet Knights':'Rutgers',
+      'Saint Francis Red Flash':'Saint Francis',
+      'Southern Miss Golden Eagles':'Southern Miss',
+      'Southern Mississippi Golden Eagles':'Southern Mississippi',
+      'St. Johns Red Storm':'St. Johns','Syracuse Orange':'Syracuse',
+      'TCU Horned Frogs':'TCU','Tennessee Tech Golden Eagles':'Tennessee Tech',
+      'Texas Tech Red Raiders':'Texas Tech','Tulane Green Wave':'Tulane',
+      'Tulsa Golden Hurricane':'Tulsa','UMass Lowell River Hawks':'UMass Lowell',
+      'Wake Forest Demon Deacons':'Wake Forest'
+    }
+    function extractSchoolName(team) {
+      if (SCHOOL_NAME_MAP[team]) return SCHOOL_NAME_MAP[team]
+      const words = team.split(' ')
+      return words.slice(0, -1).join(' ') || team
+    }
+
     let collegeMatches = [];
     let collegeFocusIdx = -1;
 
@@ -1524,6 +1568,7 @@
     function selectCollegeTeam(idx, el) {
       const team = collegeMatches[idx];
       if (!team) return;
+      const school = extractSchoolName(team);
 
       const dd = el.parentElement;
       const input = dd.previousElementSibling;
@@ -1533,13 +1578,13 @@
       const selWrap = input.parentElement.nextElementSibling;
       if (selWrap) {
         const existing = Array.from(selWrap.querySelectorAll('.tag')).map(t => t.dataset.value);
-        if (!existing.includes(team)) {
+        if (!existing.includes(school)) {
           const tag = document.createElement('span');
           tag.className = 'tag selected';
           tag.dataset.group = group;
-          tag.dataset.value = team;
+          tag.dataset.value = school;
           tag.dataset.otherGroup = group;
-          tag.innerHTML = `${team} <span style="margin-left:6px; opacity:0.7; font-size:0.72rem; cursor:pointer;" onclick="removeCollegeTag(this)">✕</span>`;
+          tag.innerHTML = `${school} <span style="margin-left:6px; opacity:0.7; font-size:0.72rem; cursor:pointer;" onclick="removeCollegeTag(this)">✕</span>`;
           selWrap.appendChild(tag);
         }
       }
