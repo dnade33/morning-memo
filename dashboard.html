@@ -339,8 +339,19 @@
       quoteRows.length ? quoteRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
 
     // Topic popularity table with subtopic accordions
-    const bySubtopic = subscribers.by_subtopic || {}
-    console.log('[DEBUG] by_subtopic:', JSON.stringify(bySubtopic))
+    // Compute client-side from list (server-side by_subtopic requires preferences field)
+    const bySubtopic = {}
+    for (const sub of (subscribers.list || [])) {
+      if (!sub.active) continue
+      for (const t of (sub.topics || [])) {
+        const subs = sub.preferences?.[t]
+        if (Array.isArray(subs) && subs.length > 0) {
+          if (!bySubtopic[t]) bySubtopic[t] = {}
+          for (const st of subs) bySubtopic[t][st] = (bySubtopic[t][st] || 0) + 1
+        }
+      }
+    }
+    console.log('[DEBUG] by_subtopic (client):', JSON.stringify(bySubtopic))
     console.log('[DEBUG] first sub keys:', Object.keys(subscribers.list?.[0] || {}).join(', '))
     const topicEntries = Object.entries(subscribers.by_topic)
       .sort((a, b) => {
