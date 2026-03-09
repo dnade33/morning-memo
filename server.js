@@ -234,7 +234,7 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
   ] = await Promise.all([
     supabase
       .from('subscribers')
-      .select('id, first_name, email, topics, delivery_time, active, created_at')
+      .select('id, first_name, email, topics, delivery_time, active, created_at, preferences, quote_style')
       .order('created_at', { ascending: false }),
     supabase
       .from('newsletters')
