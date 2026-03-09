@@ -230,18 +230,22 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
 
   const [
     { data: subscribers },
-    { data: recentNewsletters }
+    { data: recentNewsletters },
+    { data: prefRows }
   ] = await Promise.all([
     supabase
       .from('subscribers')
-      .select('*')
+      .select('id, first_name, email, topics, delivery_time, quote_style, active, created_at')
       .order('created_at', { ascending: false }),
     supabase
       .from('newsletters')
       .select('id, subject, status, sent_at, subscriber_id')
       .gte('sent_at', weekAgo.toISOString())
       .order('sent_at', { ascending: false })
-      .limit(100)
+      .limit(100),
+    supabase
+      .from('subscribers')
+      .select('id, topics, preferences, active')
   ])
 
   // Join newsletters with subscriber info
@@ -252,15 +256,22 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
     subscriber_email: subMap[n.subscriber_id]?.email
   }))
 
-  // Compute topic + time + quote style + subtopic breakdowns (active subscribers only)
+  // Compute topic + time + quote style breakdowns (active subscribers only)
   const topicCounts = {}
   const timeCounts = {}
   const quoteCounts = {}
-  const subtopicCounts = {} // { topic: { subtopic: count } }
   for (const sub of (subscribers || [])) {
     if (!sub.active) continue
+    for (const t of (sub.topics || [])) topicCounts[t] = (topicCounts[t] || 0) + 1
+    if (sub.delivery_time) timeCounts[sub.delivery_time] = (timeCounts[sub.delivery_time] || 0) + 1
+    if (sub.quote_style) quoteCounts[sub.quote_style] = (quoteCounts[sub.quote_style] || 0) + 1
+  }
+
+  // Compute subtopic counts from dedicated preferences query
+  const subtopicCounts = {}
+  for (const sub of (prefRows || [])) {
+    if (!sub.active) continue
     for (const t of (sub.topics || [])) {
-      topicCounts[t] = (topicCounts[t] || 0) + 1
       const subtopics = sub.preferences?.[t]
       if (Array.isArray(subtopics) && subtopics.length > 0) {
         if (!subtopicCounts[t]) subtopicCounts[t] = {}
@@ -269,8 +280,6 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
         }
       }
     }
-    if (sub.delivery_time) timeCounts[sub.delivery_time] = (timeCounts[sub.delivery_time] || 0) + 1
-    if (sub.quote_style) quoteCounts[sub.quote_style] = (quoteCounts[sub.quote_style] || 0) + 1
   }
 
   const activeCount = (subscribers || []).filter(s => s.active).length
