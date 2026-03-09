@@ -329,7 +329,7 @@
       </td>
       <td style="font-size:12px;max-width:320px;">${esc(n.subject || '—')}</td>
       <td><span class="badge ${n.status === 'sent' ? 'badge-sent' : 'badge-failed'}">${esc(n.status)}</span></td>
-      <td class="mono dim" style="font-size:11px;">${fmtDateTime(n.created_at)}</td>
+      <td class="mono dim" style="font-size:11px;">${fmtDateTime(n.sent_at)}</td>
     </tr>`)
     document.getElementById('delivery-table').innerHTML =
       deliveryRows.length ? deliveryRows.join('') : '<tr class="empty-row"><td colspan="4">No deliveries in the last 7 days</td></tr>'

@@ -238,9 +238,9 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
       .order('created_at', { ascending: false }),
     supabase
       .from('newsletters')
-      .select('id, subject, status, created_at, subscriber_id')
-      .gte('created_at', weekAgo.toISOString())
-      .order('created_at', { ascending: false })
+      .select('id, subject, status, sent_at, subscriber_id')
+      .gte('sent_at', weekAgo.toISOString())
+      .order('sent_at', { ascending: false })
       .limit(100)
   ])
 
@@ -262,8 +262,8 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
   }
 
   const activeCount = (subscribers || []).filter(s => s.active).length
-  const todaySent = enriched.filter(n => n.status === 'sent' && new Date(n.created_at) >= todayStart).length
-  const todayFailed = enriched.filter(n => n.status === 'failed' && new Date(n.created_at) >= todayStart).length
+  const todaySent = enriched.filter(n => n.status === 'sent' && new Date(n.sent_at) >= todayStart).length
+  const todayFailed = enriched.filter(n => n.status === 'failed' && new Date(n.sent_at) >= todayStart).length
 
   res.json({
     generated_at: now.toISOString(),
