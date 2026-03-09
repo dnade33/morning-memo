@@ -737,6 +737,7 @@
           `<span style="color:#a8b8cc;font-size:12px;">Your next Morning Memo arrives at <span style="color:#00d4ff;font-weight:700;">${time}</span>.</span>`
 
         document.getElementById('prefs-form').style.display = 'none'
+        document.querySelector('.header').style.display = 'none'
         document.getElementById('success').classList.add('visible')
         window.scrollTo({ top: 0, behavior: 'smooth' })
       } catch (err) {
