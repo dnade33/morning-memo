@@ -1,5 +1,6 @@
 // Morning Memo — Daily newsletter cron orchestrator
-// Runs at 2:00am EST. Processes each delivery time slot in order.
+// Each delivery time slot has its own cron schedule (America/New_York).
+// Subscribers receive their email at the exact time they chose.
 // Usage:
 //   node cron.js              → runs on schedule (production)
 //   DRY_RUN=true node cron.js → generates newsletters, logs only (no emails sent)
@@ -201,13 +202,14 @@ async function processSlot(slot) {
       // Fetch stories for this subscriber's specific topics
       const rawTopicStories = await getCachedStories(expandedTopics, subscriber.city)
 
-      // Fetch story links sent to this subscriber in the last 7 days
+      // Fetch story links + titles sent to this subscriber in the last 2 days
       const { data: recentRows } = await supabase
         .from('sent_stories')
-        .select('story_link')
+        .select('story_link, title')
         .eq('subscriber_id', subscriber.id)
         .gte('sent_at', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
       const seenLinks = new Set((recentRows || []).map(r => r.story_link))
+      const recentTitles = (recentRows || []).map(r => r.title).filter(Boolean)
 
       // Merge all fetched results into one pool per subscriber top-level topic.
       // topicOriginMap resolves any expanded key back to its origin:
@@ -237,16 +239,16 @@ async function processSlot(slot) {
       }
 
       // Generate newsletter via Claude Haiku
-      const { subject, body_html, sentLinks } = await generateNewsletter(subscriber, topicStories)
+      const { subject, body_html, sentStories } = await generateNewsletter(subscriber, topicStories, recentTitles)
 
       // Send + log
       const result = await sendAndLog(subscriber, subject, body_html, supabase, DRY_RUN)
       result.success ? sent++ : failed++
 
-      // Log sent story links for future deduplication (skip in dry run)
-      if (result.success && !DRY_RUN && sentLinks.length > 0) {
+      // Log sent story links + titles for deduplication and repeat-saga tracking (skip in dry run)
+      if (result.success && !DRY_RUN && sentStories.length > 0) {
         await supabase.from('sent_stories').insert(
-          sentLinks.map(link => ({ subscriber_id: subscriber.id, story_link: link }))
+          sentStories.map(({ link, title }) => ({ subscriber_id: subscriber.id, story_link: link, title }))
         )
       }
 
@@ -321,25 +323,38 @@ async function runCron() {
 // ----------------------------------------------------------------
 // Entry point (only runs when executed directly, not when imported)
 // ----------------------------------------------------------------
+// Maps each delivery time slot to its cron expression (America/New_York)
+const SLOT_CRONS = {
+  '6:00am':  '0 6 * * *',
+  '6:30am':  '30 6 * * *',
+  '7:00am':  '0 7 * * *',
+  '7:30am':  '30 7 * * *',
+  '8:00am':  '0 8 * * *',
+  '8:30am':  '30 8 * * *',
+  '9:00am':  '0 9 * * *',
+  '9:30am':  '30 9 * * *',
+  '10:00am': '0 10 * * *',
+}
+
 if (require.main === module) {
   if (process.env.RUN_NOW === 'true') {
-    // Manual trigger for testing — run immediately without waiting for schedule
-    logger.cron('RUN_NOW=true — executing immediately')
+    // Manual trigger for testing — run all slots immediately
+    logger.cron('RUN_NOW=true — executing all slots immediately')
     runCron().catch(err => {
       logger.error('Cron run failed', err)
       process.exit(1)
     })
   } else {
-    // Production schedule: 2:00am every day, Eastern Time
-    cron.schedule('0 2 * * *', () => {
-      runCron().catch(err => {
-        logger.error('Cron run failed', err)
-      })
-    }, {
-      timezone: 'America/New_York'
-    })
+    // Production: each slot fires at its exact delivery time (America/New_York)
+    for (const [slot, expression] of Object.entries(SLOT_CRONS)) {
+      cron.schedule(expression, () => {
+        processSlot(slot).catch(err => {
+          logger.error(`Cron slot ${slot} failed`, err)
+        })
+      }, { timezone: 'America/New_York' })
+    }
 
-    logger.cron(`Cron scheduled — runs at 2:00am ET daily${DRY_RUN ? ' [DRY RUN mode]' : ''}`)
+    logger.cron(`Cron scheduled — each slot fires at its delivery time (America/New_York)${DRY_RUN ? ' [DRY RUN mode]' : ''}`)
   }
 }
 

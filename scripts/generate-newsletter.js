@@ -50,7 +50,7 @@ function calculateStoryAllocation(subscriber, topicStories) {
   return allocation
 }
 
-function buildPrompt(subscriber, topicStories, quoteStyle, allocation) {
+function buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTitles = []) {
   const topicBlocks = topicStories.map(({ topic, stories }) => {
     const count = allocation[topic] || 1
     const subtopics = subscriber.preferences?.[topic]
@@ -64,12 +64,16 @@ function buildPrompt(subscriber, topicStories, quoteStyle, allocation) {
     return `TOPIC: ${topic} [Write exactly ${count} ${count === 1 ? 'story' : 'stories'}]${subtopicLine ? `\n${subtopicLine}` : ''}\n${storyList}`
   }).join('\n\n---\n\n')
 
+  const recentTitlesBlock = recentTitles.length > 0
+    ? `Already sent to ${subscriber.first_name} in the last 2 days — do NOT cover these same events or ongoing sagas again today:\n${recentTitles.map(t => `- ${t}`).join('\n')}\n`
+    : ''
+
   return `You are the editor of Morning Memo, a warm, intelligent daily briefing written for an older audience.
 Write a personalized newsletter for ${subscriber.first_name}.
 
 ${subscriber.city ? `Their city: ${subscriber.city}` : ''}
 ${subscriber.extra_notes ? `Personal note from subscriber: "${subscriber.extra_notes}"` : ''}
-
+${recentTitlesBlock}
 Today's stories, organized by topic:
 ${topicBlocks}
 
@@ -114,9 +118,9 @@ Headlines must answer "what happened?" not "what is this about?"
   RIGHT: "House Republicans Propose $880B Medicaid Cut Ahead of 2026 Midterms"
 
 ═══ CONTENT RULES ═══
-- SPORTS: Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. Always use the player's full name (first and last) on first reference.
-  WRONG: "The Lakers won a close game last night behind a strong fourth quarter."
-  RIGHT: "The Los Angeles Lakers defeated the Golden State Warriors 112-108, with LeBron James scoring 28 points in the fourth quarter to seal the comeback win."
+- SPORTS: Always name the sport explicitly in every summary — never assume the reader knows which sport from team names, event names, or context alone. Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. Always use the player's full name (first and last) on first reference.
+  WRONG: "USA and Mexico meet as unbeaten teams heading into World Cup preparations on FOX tonight."
+  RIGHT: "The U.S. men's soccer team hosts Mexico tonight at 8 p.m. ET on FOX in a World Cup warm-up match, with both nations entering undefeated and using the friendly to finalize their rosters before the tournament."
 
 - FINANCE: Every finance or market story must include at least one concrete figure — a percentage, a price, a rate, or a dollar amount. Vague market commentary is not acceptable.
   WRONG: "Markets fell sharply on Wednesday amid recession fears."
@@ -131,6 +135,10 @@ Headlines must answer "what happened?" not "what is this about?"
   RIGHT: "Patrick Mahomes threw for 340 yards as the Kansas City Chiefs defeated the Buffalo Bills 27-21."
 
 - ACRONYMS: The first time you use an acronym, spell it out in full with the acronym in parentheses: "The Organisation for Economic Co-operation and Development (OECD)..." After that, the acronym alone is fine.
+
+- NO REPEATS: If a candidate story covers the same ongoing event, court case, or policy dispute as any story in the "Already sent" list above, skip it entirely and use a different story from the available pool instead.
+  WRONG: Sending a second tariff court ruling story the day after already covering a tariff Supreme Court challenge.
+  RIGHT: Choosing a different story from the pool that covers a fresh, unrelated event.
 
 - TOPIC RELEVANCE: A story must be substantively about the topic it appears under — not just mention it in passing or use it as a theme, aesthetic, or decoration. If the topic term appears only as an adjective describing something else, the story does not belong in that panel. Skip it entirely rather than force it in.
   WRONG: Including a celebrity wedding story in a "Medieval" history panel because the venue was "medieval-themed."
@@ -369,14 +377,14 @@ async function fetchWithRetry(fn, retries = 3) {
 // topicStories: array of { topic, stories[] } from fetch-rss.js
 // Returns: { subject, body_html }
 // ----------------------------------------------------------------
-async function generateNewsletter(subscriber, topicStories) {
+async function generateNewsletter(subscriber, topicStories, recentTitles = []) {
   if (!topicStories || topicStories.length === 0) {
     throw new Error(`No stories available for subscriber ${subscriber.id} — cannot generate newsletter`)
   }
 
   const quoteStyle = resolveQuoteStyle(subscriber.quote_style)
   const allocation = calculateStoryAllocation(subscriber, topicStories)
-  const prompt = buildPrompt(subscriber, topicStories, quoteStyle, allocation)
+  const prompt = buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTitles)
 
   const rawText = await fetchWithRetry(async () => {
     const message = await client.messages.create({
@@ -480,12 +488,12 @@ async function generateNewsletter(subscriber, topicStories) {
   const subject = `Your Morning Memo — ${formattedDate}`
   const body_html = buildMissionControlEmail(parsed, formattedDate, subscriber.pref_token)
 
-  // Collect all story links included in this newsletter for deduplication tracking
-  const sentLinks = parsed.topics
-    .flatMap(t => t.stories.map(s => s.link))
-    .filter(Boolean)
+  // Collect all sent stories (link + headline) for deduplication and repeat-saga tracking
+  const sentStories = parsed.topics
+    .flatMap(t => t.stories.map(s => ({ link: s.link, title: s.headline })))
+    .filter(s => s.link)
 
-  return { subject, body_html, sentLinks }
+  return { subject, body_html, sentStories }
 }
 
 // ----------------------------------------------------------------

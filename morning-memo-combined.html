@@ -1102,10 +1102,10 @@
     // ── Team / sub-option data ────────────────────────────────────────────────
     const subTags = {
       // Sports leagues → teams
-      'NFL':  ['Bills','Patriots','Dolphins','Jets','Ravens','Bengals','Browns','Steelers','Texans','Colts','Jaguars','Titans','Broncos','Chiefs','Raiders','Chargers','Cowboys','Giants','Eagles','Commanders','Bears','Lions','Packers','Vikings','Falcons','Panthers','Saints','Buccaneers','Cardinals','Rams','49ers','Seahawks'],
-      'NBA':  ['Celtics','Nets','Knicks','76ers','Raptors','Bulls','Cavaliers','Pistons','Pacers','Bucks','Hawks','Hornets','Heat','Magic','Wizards','Nuggets','Timberwolves','Thunder','Trail Blazers','Jazz','Warriors','Clippers','Lakers','Suns','Kings','Mavericks','Rockets','Grizzlies','Pelicans','Spurs'],
-      'MLB':  ['Yankees','Red Sox','Blue Jays','Rays','Orioles','White Sox','Guardians','Tigers','Royals','Twins','Astros','Angels','Athletics','Mariners','Rangers','Braves','Marlins','Mets','Phillies','Nationals','Cubs','Reds','Brewers','Pirates','Cardinals','Diamondbacks','Rockies','Dodgers','Padres','Giants'],
-      'NHL':  ['Bruins','Sabres','Red Wings','Panthers','Canadiens','Senators','Lightning','Maple Leafs','Hurricanes','Blue Jackets','Devils','Islanders','Rangers','Flyers','Penguins','Capitals','Blackhawks','Avalanche','Stars','Wild','Predators','Blues','Jets','Ducks','Flames','Oilers','Kings','Sharks','Canucks','Golden Knights','Kraken'],
+      'NFL':  ['49ers','Bears','Bengals','Bills','Broncos','Browns','Buccaneers','Cardinals','Chargers','Chiefs','Colts','Commanders','Cowboys','Dolphins','Eagles','Falcons','Giants','Jaguars','Jets','Lions','Packers','Panthers','Patriots','Raiders','Rams','Ravens','Saints','Seahawks','Steelers','Texans','Titans','Vikings'],
+      'NBA':  ['76ers','Bucks','Bulls','Cavaliers','Celtics','Clippers','Grizzlies','Hawks','Heat','Hornets','Jazz','Kings','Knicks','Lakers','Magic','Mavericks','Nets','Nuggets','Pacers','Pelicans','Pistons','Raptors','Rockets','Spurs','Suns','Thunder','Timberwolves','Trail Blazers','Warriors','Wizards'],
+      'MLB':  ['Angels','Astros','Athletics','Blue Jays','Braves','Brewers','Cardinals','Cubs','Diamondbacks','Dodgers','Giants','Guardians','Mariners','Marlins','Mets','Nationals','Orioles','Padres','Phillies','Pirates','Rangers','Rays','Red Sox','Reds','Rockies','Royals','Tigers','Twins','White Sox','Yankees'],
+      'NHL':  ['Avalanche','Blackhawks','Blue Jackets','Blues','Bruins','Canadiens','Canucks','Capitals','Devils','Ducks','Flames','Flyers','Golden Knights','Hurricanes','Islanders','Jets','Kings','Kraken','Lightning','Maple Leafs','Oilers','Panthers','Penguins','Predators','Rangers','Red Wings','Sabres','Senators','Sharks','Stars','Wild'],
       'College Football': ['Alabama','Ohio State','Georgia','Michigan','Texas','USC','Notre Dame','Clemson','Penn State','Oklahoma','LSU','Florida State','Tennessee','Oregon','Washington','Miami','Auburn','Florida','Wisconsin','Iowa','Other...'],
       'College Basketball': ['Duke','Kentucky','Kansas','UNC','Gonzaga','Connecticut','Houston','Arizona','Purdue','Michigan State','Villanova','Syracuse','Louisville','UCLA','Indiana','Ohio State','Wisconsin','Texas','Baylor','Florida','Other...'],
       'Soccer / MLS': ['LAFC','LA Galaxy','Inter Miami','Atlanta United','Seattle Sounders','Portland Timbers','NYCFC','Red Bulls','Toronto FC','Montreal','Chicago Fire','Columbus Crew','FC Cincinnati','Nashville SC','Austin FC','Real Salt Lake','Colorado Rapids','Sporting KC','Other...'],
@@ -1605,9 +1605,9 @@
         block.style.cssText = `margin-bottom:36px; padding-bottom:36px; border-bottom:1px solid var(--border);`;
         if (idx === selected.length - 1) block.style.borderBottom = 'none';
 
-        let html = `<div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
-          <span style="font-size:1.4rem;">${config.icon}</span>
-          <span style="font-family:'Playfair Display',serif; font-size:1.15rem;">${topic}</span>
+        let html = `<div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding:10px 16px; background:rgba(0,212,255,0.05); border-left:3px solid #00d4ff;">
+          <span style="font-size:1.25rem; line-height:1;">${config.icon}</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#00d4ff;">${topic}</span>
         </div>`;
 
         config.questions.forEach(q => {

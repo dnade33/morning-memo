@@ -209,6 +209,80 @@ app.post('/api/run-cron', (req, res) => {
 })
 
 // ----------------------------------------------------------------
+// Admin auth middleware
+// ----------------------------------------------------------------
+function requireAdmin(req, res, next) {
+  const auth = req.headers['authorization']
+  if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+  next()
+}
+
+// ----------------------------------------------------------------
+// GET /api/admin/metrics
+// ----------------------------------------------------------------
+app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
+  const now = new Date()
+  const todayStart = new Date(now)
+  todayStart.setHours(0, 0, 0, 0)
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+  const [
+    { data: subscribers },
+    { data: recentNewsletters }
+  ] = await Promise.all([
+    supabase
+      .from('subscribers')
+      .select('id, first_name, email, topics, delivery_time, active, created_at')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('newsletters')
+      .select('id, subject, status, created_at, subscriber_id')
+      .gte('created_at', weekAgo.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(100)
+  ])
+
+  // Join newsletters with subscriber info
+  const subMap = Object.fromEntries((subscribers || []).map(s => [s.id, s]))
+  const enriched = (recentNewsletters || []).map(n => ({
+    ...n,
+    subscriber_name: subMap[n.subscriber_id]?.first_name,
+    subscriber_email: subMap[n.subscriber_id]?.email
+  }))
+
+  // Compute topic + time breakdowns (active subscribers only)
+  const topicCounts = {}
+  const timeCounts = {}
+  for (const sub of (subscribers || [])) {
+    if (!sub.active) continue
+    for (const t of (sub.topics || [])) topicCounts[t] = (topicCounts[t] || 0) + 1
+    if (sub.delivery_time) timeCounts[sub.delivery_time] = (timeCounts[sub.delivery_time] || 0) + 1
+  }
+
+  const activeCount = (subscribers || []).filter(s => s.active).length
+  const todaySent = enriched.filter(n => n.status === 'sent' && new Date(n.created_at) >= todayStart).length
+  const todayFailed = enriched.filter(n => n.status === 'failed' && new Date(n.created_at) >= todayStart).length
+
+  res.json({
+    generated_at: now.toISOString(),
+    subscribers: {
+      total: (subscribers || []).length,
+      active: activeCount,
+      inactive: (subscribers || []).length - activeCount,
+      by_delivery_time: timeCounts,
+      by_topic: topicCounts,
+      list: subscribers || []
+    },
+    newsletters: {
+      today: { sent: todaySent, failed: todayFailed },
+      recent: enriched
+    }
+  })
+})
+
+// ----------------------------------------------------------------
 // GET /health
 // ----------------------------------------------------------------
 app.get('/health', (_req, res) => {

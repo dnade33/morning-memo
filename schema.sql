@@ -44,13 +44,15 @@ create index if not exists idx_newsletters_subscriber_id
 
 -- ============================================================
 -- sent_stories table
--- Tracks which story links were sent to each subscriber.
--- Used to deduplicate: skip stories already sent in the last 2 days.
+-- Tracks which story links + headlines were sent to each subscriber.
+-- Used to deduplicate (skip stories already sent in last 2 days) and
+-- to prevent repeat-saga coverage across consecutive days.
 -- ============================================================
 create table if not exists sent_stories (
   id            uuid primary key default gen_random_uuid(),
   subscriber_id uuid not null references subscribers (id) on delete cascade,
   story_link    text not null,
+  title         text,
   sent_at       timestamptz not null default now()
 );
 
