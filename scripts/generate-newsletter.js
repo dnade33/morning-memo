@@ -259,7 +259,7 @@ function buildMissionControlEmail(parsed, formattedDate, prefToken = null) {
           <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid rgba(255,255,255,0.07);border-radius:2px;">
             <tr>
               <td style="background:rgba(0,212,255,0.05);border-bottom:1px solid rgba(0,212,255,0.15);padding:8px 18px;">
-                <p style="margin:0;font-family:${mono};font-size:10px;letter-spacing:3px;color:#00d4ff;text-transform:uppercase;">${TOPIC_EMOJIS[name] ? TOPIC_EMOJIS[name] + ' ' : ''}${esc(name)}</p>
+                <p style="margin:0;font-family:${mono};font-size:10px;letter-spacing:3px;color:#00d4ff;text-transform:uppercase;">${esc(name)}</p>
               </td>
             </tr>
             ${storyRows}
