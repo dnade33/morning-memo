@@ -467,24 +467,24 @@
       const prefs = sub.preferences || {}
       for (const league of LEAGUE_LIST) {
         const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
-        for (const team of (prefs[`sub-sports-leagues-${safeId}`] || [])) {
+        for (const team of [...new Set(prefs[`sub-sports-leagues-${safeId}`] || [])]) {
           if (!teamCounts[league]) teamCounts[league] = {}
           teamCounts[league][team] = (teamCounts[league][team] || 0) + 1
         }
       }
       // Finance areas → specific picks
-      for (const area of (prefs['Finance'] || [])) {
+      for (const area of [...new Set(prefs['Finance'] || [])]) {
         const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
-        for (const pick of (prefs[`sub-finance-areas-${safeId}`] || [])) {
+        for (const pick of [...new Set(prefs[`sub-finance-areas-${safeId}`] || [])]) {
           if (!subSubCounts['Finance']) subSubCounts['Finance'] = {}
           if (!subSubCounts['Finance'][area]) subSubCounts['Finance'][area] = {}
           subSubCounts['Finance'][area][pick] = (subSubCounts['Finance'][area][pick] || 0) + 1
         }
       }
       // Technology areas → specific companies
-      for (const area of (prefs['Technology'] || [])) {
+      for (const area of [...new Set(prefs['Technology'] || [])]) {
         const safeId = area.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
-        for (const company of (prefs[`sub-tech-areas-${safeId}`] || [])) {
+        for (const company of [...new Set(prefs[`sub-tech-areas-${safeId}`] || [])]) {
           if (!subSubCounts['Technology']) subSubCounts['Technology'] = {}
           if (!subSubCounts['Technology'][area]) subSubCounts['Technology'][area] = {}
           subSubCounts['Technology'][area][company] = (subSubCounts['Technology'][area][company] || 0) + 1
