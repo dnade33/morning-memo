@@ -257,7 +257,12 @@
 
   <!-- Subscriber list -->
   <div class="panel">
-    <div class="panel-header">Subscribers</div>
+    <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>Subscribers</span>
+      <button class="topic-toggle" id="sub-expand-btn" onclick="toggleSubscribers()" style="padding:0 4px;" aria-label="Expand subscribers">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
     <table>
       <thead>
         <tr>
@@ -271,11 +276,19 @@
       </thead>
       <tbody id="subscriber-table"></tbody>
     </table>
+    <div id="sub-show-more" style="display:none; text-align:center; padding:10px 0; border-top:1px solid var(--border);">
+      <button onclick="toggleSubscribers()" style="background:none;border:none;color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;" id="sub-more-btn"></button>
+    </div>
   </div>
 
   <!-- Recent deliveries -->
   <div class="panel">
-    <div class="panel-header">Recent Deliveries — Last 7 Days</div>
+    <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>Recent Deliveries — Last 7 Days</span>
+      <button class="topic-toggle" id="del-expand-btn" onclick="toggleDeliveries()" style="padding:0 4px;" aria-label="Expand deliveries">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
     <table>
       <thead>
         <tr>
@@ -288,6 +301,9 @@
       </thead>
       <tbody id="delivery-table"></tbody>
     </table>
+    <div id="del-show-more" style="display:none; text-align:center; padding:10px 0; border-top:1px solid var(--border);">
+      <button onclick="toggleDeliveries()" style="background:none;border:none;color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;" id="del-more-btn"></button>
+    </div>
   </div>
 
 </div><!-- #dashboard -->
@@ -424,7 +440,7 @@
       topicRows.length ? topicRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
 
     // Subscriber table
-    const subRows = (subscribers.list || []).map(s => `<tr>
+    window._allSubRows = (subscribers.list || []).map(s => `<tr>
       <td style="font-weight:600;color:var(--text);">${esc(s.first_name)}</td>
       <td class="mono dim" style="font-size:11px;">${esc(s.email)}</td>
       <td><div class="chip-list">${(s.topics || []).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div></td>
@@ -432,11 +448,11 @@
       <td><span class="badge ${s.active ? 'badge-active' : 'badge-inactive'}">${s.active ? 'Active' : 'Inactive'}</span></td>
       <td class="mono dim" style="font-size:11px;">${fmtDate(s.created_at)}</td>
     </tr>`)
-    document.getElementById('subscriber-table').innerHTML =
-      subRows.length ? subRows.join('') : '<tr class="empty-row"><td colspan="6">No subscribers yet</td></tr>'
+    window._subsExpanded = false
+    renderSubscriberTable()
 
     // Delivery table
-    const deliveryRows = (newsletters.recent || []).map(n => `<tr>
+    window._allDeliveryRows = (newsletters.recent || []).map(n => `<tr>
       <td>
         <div style="font-weight:600;color:var(--text);">${esc(n.subscriber_name || '—')}</div>
         <div class="mono dim" style="font-size:10px;margin-top:2px;">${esc(n.subscriber_email || '')}</div>
@@ -446,8 +462,8 @@
       <td class="mono dim" style="font-size:11px;">${fmtDateTime(n.sent_at)}</td>
       <td>${n.status === 'sent' ? `<button class="preview-btn" onclick="openPreview('${n.id}')">Preview</button>` : ''}</td>
     </tr>`)
-    document.getElementById('delivery-table').innerHTML =
-      deliveryRows.length ? deliveryRows.join('') : '<tr class="empty-row"><td colspan="4">No deliveries in the last 7 days</td></tr>'
+    window._deliveriesExpanded = false
+    renderDeliveryTable()
 
     // Last updated
     document.getElementById('last-updated').textContent =
@@ -492,6 +508,60 @@
     if (!row || !btn) return
     const open = row.classList.toggle('open')
     btn.classList.toggle('open', open)
+  }
+
+  // ── Subscriber collapse ───────────────────────────────────────
+  const SUB_PREVIEW = 5
+
+  function renderSubscriberTable() {
+    const rows = window._allSubRows || []
+    const expanded = window._subsExpanded
+    const visible = expanded ? rows : rows.slice(0, SUB_PREVIEW)
+    document.getElementById('subscriber-table').innerHTML =
+      visible.length ? visible.join('') : '<tr class="empty-row"><td colspan="6">No subscribers yet</td></tr>'
+    const showMore = document.getElementById('sub-show-more')
+    const moreBtn = document.getElementById('sub-more-btn')
+    const expandBtn = document.getElementById('sub-expand-btn')
+    if (rows.length > SUB_PREVIEW) {
+      showMore.style.display = 'block'
+      const hidden = rows.length - SUB_PREVIEW
+      moreBtn.textContent = expanded ? '▲ Show less' : `▼ Show ${hidden} more`
+      expandBtn.classList.toggle('open', expanded)
+    } else {
+      showMore.style.display = 'none'
+    }
+  }
+
+  function toggleSubscribers() {
+    window._subsExpanded = !window._subsExpanded
+    renderSubscriberTable()
+  }
+
+  // ── Delivery collapse ─────────────────────────────────────────
+  const DEL_PREVIEW = 5
+
+  function renderDeliveryTable() {
+    const rows = window._allDeliveryRows || []
+    const expanded = window._deliveriesExpanded
+    const visible = expanded ? rows : rows.slice(0, DEL_PREVIEW)
+    document.getElementById('delivery-table').innerHTML =
+      visible.length ? visible.join('') : '<tr class="empty-row"><td colspan="5">No deliveries in the last 7 days</td></tr>'
+    const showMore = document.getElementById('del-show-more')
+    const moreBtn = document.getElementById('del-more-btn')
+    const expandBtn = document.getElementById('del-expand-btn')
+    if (rows.length > DEL_PREVIEW) {
+      showMore.style.display = 'block'
+      const hidden = rows.length - DEL_PREVIEW
+      moreBtn.textContent = expanded ? '▲ Show less' : `▼ Show ${hidden} more`
+      expandBtn.classList.toggle('open', expanded)
+    } else {
+      showMore.style.display = 'none'
+    }
+  }
+
+  function toggleDeliveries() {
+    window._deliveriesExpanded = !window._deliveriesExpanded
+    renderDeliveryTable()
   }
 
   // ── Helpers ───────────────────────────────────────────────────
