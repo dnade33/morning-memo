@@ -230,12 +230,20 @@
 
   <!-- Delivery time + topic popularity -->
   <div class="two-col">
-    <div class="panel">
-      <div class="panel-header">Topic Popularity</div>
-      <table>
-        <thead><tr><th>Topic</th><th>Subscribers</th></tr></thead>
-        <tbody id="topic-table"></tbody>
-      </table>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-header">Topic Popularity</div>
+        <table>
+          <thead><tr><th>Topic</th><th>Subscribers</th></tr></thead>
+          <tbody id="topic-table"></tbody>
+        </table>
+      </div>
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-header">Subscriber Growth — Last 5 Days</div>
+        <div style="padding:16px 16px 8px;">
+          <svg id="growth-chart" width="100%" viewBox="0 0 400 160" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
     </div>
     <div style="display:flex; flex-direction:column; gap:12px; min-height:0;">
       <div class="panel" style="margin-bottom:0;">
@@ -476,6 +484,49 @@
     })
     document.getElementById('topic-table').innerHTML =
       topicRows.length ? topicRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
+
+    // Subscriber growth chart — last 5 days
+    const list = subscribers.list || []
+    const days = []
+    for (let i = 4; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0)
+      days.push(d)
+    }
+    const counts = days.map(dayStart => {
+      const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1)
+      return list.filter(s => { const t = new Date(s.created_at); return t >= dayStart && t < dayEnd }).length
+    })
+    const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    const labels = days.map(d => DAY_NAMES[d.getDay()])
+    const W = 400, H = 160, padL = 36, padR = 20, padT = 20, padB = 32
+    const plotW = W - padL - padR, plotH = H - padT - padB
+    const maxVal = Math.max(...counts, 1)
+    const xPos = i => padL + (i / 4) * plotW
+    const yPos = v => padT + plotH - (v / maxVal) * plotH
+    const gridLines = [0, 0.5, 1].map(frac => {
+      const y = padT + plotH * (1 - frac)
+      const val = Math.round(frac * maxVal)
+      return `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <text x="${padL - 6}" y="${y + 4}" text-anchor="end" font-size="9" fill="rgba(255,255,255,0.3)" font-family="monospace">${val}</text>`
+    }).join('')
+    const pts = counts.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' ')
+    const fillPts = `${xPos(0)},${padT + plotH} ${pts} ${xPos(4)},${padT + plotH}`
+    const dots = counts.map((v, i) => `
+      <circle cx="${xPos(i)}" cy="${yPos(v)}" r="4" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>
+      ${v > 0 ? `<text x="${xPos(i)}" y="${yPos(v) - 10}" text-anchor="middle" font-size="10" fill="var(--accent)" font-family="monospace" font-weight="600">${v}</text>` : ''}
+    `).join('')
+    const xLabels = labels.map((l, i) => `<text x="${xPos(i)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.4)" font-family="monospace">${l}</text>`).join('')
+    document.getElementById('growth-chart').innerHTML = `
+      <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+      </linearGradient></defs>
+      ${gridLines}
+      <polygon points="${fillPts}" fill="url(#cg)"/>
+      <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      ${xLabels}
+    `
 
     // Subscriber table
     window._allSubRows = (subscribers.list || []).map(s => `<tr>
