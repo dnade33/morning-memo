@@ -121,7 +121,9 @@ Headlines must answer "what happened?" not "what is this about?"
   RIGHT: "House Republicans Propose $880B Medicaid Cut Ahead of 2026 Midterms"
 
 ═══ CONTENT RULES ═══
-- SPORTS: Always name the sport explicitly in every summary — never assume the reader knows which sport from team names, event names, or context alone. Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. Always use the player's full name (first and last) on first reference.
+- SPORTS: The panel header already tells the reader the sport — do NOT repeat it in the opening words of each summary (e.g. never write "In NBA basketball..." or "NFL football saw..."). Jump straight into the action. Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. Always use the player's full name (first and last) on first reference.
+  WRONG: "In NBA basketball, Oklahoma City Thunder guard Shai Gilgeous-Alexander matched a record..."
+  RIGHT: "Oklahoma City Thunder guard Shai Gilgeous-Alexander matched a record set by Wilt Chamberlain..."
   WRONG: "USA and Mexico meet as unbeaten teams heading into World Cup preparations on FOX tonight."
   RIGHT: "The U.S. men's soccer team hosts Mexico tonight at 8 p.m. ET on FOX in a World Cup warm-up match, with both nations entering undefeated and using the friendly to finalize their rosters before the tournament."
 
