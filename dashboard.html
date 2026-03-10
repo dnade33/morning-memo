@@ -458,6 +458,29 @@
       bySubtopic['Sports'] = { ...(bySubtopic['Sports'] || {}), ...extraLeagueSubs }
     }
 
+    // Fix league counts using subscribers.list directly — counts anyone who selected teams
+    // for a league, even if that league isn't stored in preferences['Sports'] (legacy format)
+    const leagueCountsFromTeams = {}
+    for (const sub of (subscribers.list || [])) {
+      if (!sub.active) continue
+      const prefs = sub.preferences || {}
+      const sportsPref = prefs['Sports'] || []
+      for (const league of ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR']) {
+        if (sportsPref.includes(league)) continue // already counted by server
+        const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+        const teams = prefs[`sub-sports-leagues-${safeId}`]
+        if (Array.isArray(teams) && teams.length > 0) {
+          leagueCountsFromTeams[league] = (leagueCountsFromTeams[league] || 0) + 1
+        }
+      }
+    }
+    if (Object.keys(leagueCountsFromTeams).length > 0) {
+      if (!bySubtopic['Sports']) bySubtopic['Sports'] = {}
+      for (const [league, count] of Object.entries(leagueCountsFromTeams)) {
+        bySubtopic['Sports'][league] = (bySubtopic['Sports'][league] || 0) + count
+      }
+    }
+
     // Build team counts for Sports leagues, and sub-pick counts for Finance/Technology
     const teamCounts = {}
     const subSubCounts = {}
