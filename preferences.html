@@ -450,7 +450,8 @@
       {
         value: 'Sports', label: '⚽ Sports',
         type: 'leagues',
-        subs: ['NFL', 'NBA', 'MLB', 'NHL', 'College Football', 'College Basketball', 'Soccer / MLS', 'Golf']
+        subs: ['NFL', 'NBA', 'MLB', 'NHL', 'College Football', 'College Basketball', 'Soccer / MLS', 'Golf'],
+        niches: ['Trading Cards & Memorabilia', 'Sports Business & Contracts', 'Coaching Moves & Front Office', 'Sports Records & Milestones', 'Stadium & Arena News']
       },
       {
         value: 'World News', label: '🌍 World News',
@@ -465,32 +466,32 @@
       {
         value: 'Finance', label: '📈 Finance',
         subKey: 'finance-areas',
-        subs: ['Stock Market', 'Crypto & Digital Assets', 'Real Estate', 'Personal Finance', 'Corporate News', 'Federal Reserve', 'Startups & Venture Capital', 'Earnings & Results']
+        subs: ['Stock Market', 'Crypto & Digital Assets', 'Real Estate', 'Personal Finance', 'Corporate News', 'Federal Reserve', 'Startups & Venture Capital', 'Earnings & Results', 'Billionaire Moves & Wealth', 'Mergers & Acquisitions', 'Small Business & Startups', 'The Federal Reserve & Economy']
       },
       {
         value: 'Technology', label: '💻 Technology',
         subKey: 'tech-areas',
-        subs: ['Artificial Intelligence', 'Consumer Gadgets', 'Cybersecurity', 'Social Media', 'EVs & Energy', 'Startups & Big Tech', 'Blockchain & Web3', 'Semiconductors']
+        subs: ['Artificial Intelligence', 'Consumer Gadgets', 'Cybersecurity', 'Social Media', 'EVs & Energy', 'Startups & Big Tech', 'Blockchain & Web3', 'Semiconductors', 'Tech Failures & Scandals', 'Patents & Legal Battles', 'Cybersecurity & Hacking', 'The Future of AI']
       },
       {
         value: 'Science', label: '🔬 Science',
         subKey: 'science-fields',
-        subs: ['Space & Astronomy', 'Biology & Life Sciences', 'Climate & Environment', 'Physics', 'Medicine & Health Research', 'Genetics & Biotechnology', 'Neuroscience']
+        subs: ['Space & Astronomy', 'Biology & Life Sciences', 'Climate & Environment', 'Physics', 'Medicine & Health Research', 'Genetics & Biotechnology', 'Neuroscience', 'Deep Ocean Discoveries', 'Animal Kingdom Oddities', 'Extreme Weather & Natural Phenomena', 'Space Exploration']
       },
       {
         value: 'Health', label: '🫀 Health',
         subKey: 'health-areas',
-        subs: ['Fitness & Exercise', 'Nutrition & Diet', 'Mental Health', 'Medical Research', 'Wellness & Longevity', 'Public Health']
+        subs: ['Fitness & Exercise', 'Nutrition & Diet', 'Mental Health', 'Medical Research', 'Wellness & Longevity', 'Public Health', 'Cutting-Edge Medical Treatments', 'The Science of Sleep', 'Mental Health Breakthroughs', 'Longevity & Anti-Aging Research']
       },
       {
         value: 'Arts & Culture', label: '🎨 Arts & Culture',
         subKey: 'arts-areas',
-        subs: ['Film & Cinema', 'Music', 'Theater & Broadway', 'Visual Art & Museums', 'Television & Streaming', 'Video Games', 'Photography', 'Fashion']
+        subs: ['Film & Cinema', 'Music', 'Theater & Broadway', 'Visual Art & Museums', 'Television & Streaming', 'Video Games', 'Photography', 'Fashion', 'The Auction & Art Market', 'Music Industry & Business', 'Box Office & Film Business']
       },
       {
         value: 'Food & Travel', label: '🍽 Food & Travel',
         subKey: 'food-travel',
-        subs: ['Restaurant & Food News', 'Recipes & Cooking', 'Travel Destinations', 'Food & Drink Culture', 'Wine & Spirits']
+        subs: ['Restaurant & Food News', 'Recipes & Cooking', 'Travel Destinations', 'Food & Drink Culture', 'Wine & Spirits', 'Street Food Around the World', 'Food Science & Innovation']
       },
       {
         value: 'History', label: '🏺 History',
@@ -597,6 +598,17 @@
           return `<div class="subtopic-chip ${isSelected ? 'selected' : ''}" data-subkey="${t.value || ''}" data-type="${t.type || 'chips'}" onclick="toggleSubtopic(this)">${s}</div>`
         }).join('')
 
+        // Sports niche chips (stored in preferences['sports-niches'], not topics[])
+        let nichesHtml = ''
+        if (t.niches) {
+          const selectedNiches = Array.isArray(prefs['sports-niches']) ? prefs['sports-niches'] : []
+          nichesHtml = `
+              <div class="subtopics-hint" style="margin-top:12px">Beyond the box scores</div>
+              <div class="subtopics-chips">${t.niches.map(n =>
+                `<div class="subtopic-chip ${selectedNiches.includes(n) ? 'selected' : ''}" data-subkey="sports-niches" data-type="chips" onclick="toggleSubtopic(this)">${n}</div>`
+              ).join('')}</div>`
+        }
+
         return `
           <div class="topic-with-subs">
             <label class="topic-item">
@@ -608,6 +620,7 @@
             <div class="subtopics-panel ${isChecked ? 'open' : ''}" id="sub-${sid}">
               <div class="subtopics-hint">${hint}</div>
               <div class="subtopics-chips${t.type === 'leagues' || hasFocusPicks ? ' leagues' : ''}">${chipsHtml}</div>
+              ${nichesHtml}
             </div>
           </div>
         `

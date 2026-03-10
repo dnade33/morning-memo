@@ -211,6 +211,47 @@ const HISTORY_ERA_SUBTOPICS = new Set([
   'Modern History (1980s–present)'
 ])
 
+// ----------------------------------------------------------------
+// Niche subtopic queries — hand-crafted Google News searches for
+// alternative focus areas across all topics.
+// Key format: "Topic::Niche" → query string
+// ----------------------------------------------------------------
+const NICHE_QUERIES = {
+  // Sports
+  'Sports::Trading Cards & Memorabilia':   'sports trading card OR memorabilia OR card grading PSA BGS OR sports collectible auction',
+  'Sports::Sports Business & Contracts':   'sports contract OR athlete salary OR sports deal OR franchise valuation OR sports rights deal',
+  'Sports::Coaching Moves & Front Office': 'coach fired OR coach hired OR sports GM OR front office move OR head coach search',
+  'Sports::Sports Records & Milestones':   'sports record broken OR all-time record athlete OR historic milestone sports',
+  'Sports::Stadium & Arena News':          'stadium construction OR arena naming rights OR sports venue OR new stadium plan',
+  // Finance
+  'Finance::Billionaire Moves & Wealth':   'billionaire wealth OR Elon Musk investment OR Jeff Bezos deal OR ultra-wealthy OR Forbes billionaire news',
+  'Finance::Mergers & Acquisitions':       'merger acquisition deal OR company buyout OR takeover bid OR M&A announced',
+  'Finance::Small Business & Startups':    'small business owner economy OR main street business OR startup founder raised funding',
+  'Finance::The Federal Reserve & Economy': 'Federal Reserve rate decision OR Fed chair Powell OR interest rate inflation economy',
+  // Technology
+  'Technology::Tech Failures & Scandals':  'tech company scandal OR data breach OR tech outage OR tech layoffs OR tech controversy',
+  'Technology::Patents & Legal Battles':   'tech patent lawsuit OR Apple Google lawsuit OR intellectual property tech court',
+  'Technology::Cybersecurity & Hacking':   'cyberattack hacking OR data breach security OR ransomware attack OR cybersecurity threat',
+  'Technology::The Future of AI':          'artificial intelligence future OR AI regulation OR generative AI OR AI safety OR AI breakthrough',
+  // Science
+  'Science::Deep Ocean Discoveries':       'deep sea discovery OR ocean research OR marine biology OR undersea exploration OR deep ocean',
+  'Science::Animal Kingdom Oddities':      'new species discovered OR animal behavior unusual OR rare creature OR animal discovery science',
+  'Science::Extreme Weather & Natural Phenomena': 'extreme weather record OR natural disaster OR unusual weather phenomenon OR earthquake volcano tsunami',
+  'Science::Space Exploration':            'space mission OR NASA OR SpaceX rocket OR astronaut OR Mars lunar OR space exploration',
+  // Health
+  'Health::Cutting-Edge Medical Treatments': 'new medical treatment OR clinical trial breakthrough OR FDA approval drug OR medical innovation',
+  'Health::The Science of Sleep':          'sleep research OR sleep study OR insomnia science OR sleep deprivation OR circadian rhythm',
+  'Health::Mental Health Breakthroughs':   'mental health research OR depression treatment new OR anxiety breakthrough OR psychiatry study',
+  'Health::Longevity & Anti-Aging Research': 'longevity research OR anti-aging study OR lifespan extension OR centenarian OR aging reversal',
+  // Arts & Culture
+  'Arts & Culture::The Auction & Art Market': 'art auction record OR Christie\'s Sotheby\'s Phillips OR artwork sold OR art market OR fine art sale',
+  'Arts & Culture::Music Industry & Business': 'record label deal OR music streaming rights OR artist contract OR music acquisition OR Spotify Apple Music',
+  'Arts & Culture::Box Office & Film Business': 'box office results OR film revenue OR studio acquisition OR movie rights OR Hollywood deal',
+  // Food & Travel
+  'Food & Travel::Street Food Around the World': 'street food culture OR food market OR street food festival OR local cuisine tradition',
+  'Food & Travel::Food Science & Innovation':    'food science OR lab-grown meat OR food technology OR food innovation OR sustainable food',
+}
+
 // Niche history subtopics get hand-crafted queries for best results
 const HISTORY_NICHE_QUERIES = {
   'Lost Treasures & Shipwrecks':   'shipwreck discovered OR treasure found OR lost artifact recovered OR sunken ship OR buried treasure history',
@@ -225,7 +266,12 @@ const HISTORY_NICHE_QUERIES = {
 
 function getTeamFeedUrl(teamName, leagueName) {
   let query
-  if (leagueName === 'History') {
+
+  // Check niche queries first (covers Sports, Finance, Technology, Science, Health, Arts, Food)
+  const nicheKey = `${leagueName}::${teamName}`
+  if (NICHE_QUERIES[nicheKey]) {
+    query = NICHE_QUERIES[nicheKey]
+  } else if (leagueName === 'History') {
     if (HISTORY_NICHE_QUERIES[teamName]) {
       query = HISTORY_NICHE_QUERIES[teamName]
     } else if (HISTORY_ERA_SUBTOPICS.has(teamName)) {

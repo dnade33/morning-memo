@@ -1127,6 +1127,8 @@
           { id: 'sports-leagues', label: 'Which sports do you follow?', type: 'tags-with-sub',
             options: ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR'],
             subLabel: 'Pick your teams:' },
+          { id: 'sports-niches', label: 'Beyond the box scores:', type: 'tags',
+            options: ['Trading Cards & Memorabilia','Sports Business & Contracts','Coaching Moves & Front Office','Sports Records & Milestones','Stadium & Arena News'] }
         ]
       },
       'World News': {
@@ -1144,13 +1146,17 @@
           { id: 'finance-areas', label: 'What financial areas interest you?', type: 'tags-with-sub',
             options: ['Stock Market','Crypto & Digital Assets','Real Estate','Personal Finance','Corporate News','Federal Reserve & Monetary Policy','Startups & Venture Capital','Commodities & Futures','ETFs & Index Funds','Options & Derivatives','Private Equity & Hedge Funds','International Markets','Earnings & Company Results','Mergers & Acquisitions'],
             subLabel: 'Pick specific ones you follow:' },
+          { id: 'finance-niches', label: 'The financial angles most newsletters miss:', type: 'tags',
+            options: ['Billionaire Moves & Wealth','Mergers & Acquisitions','Small Business & Startups','The Federal Reserve & Economy'] }
         ]
       },
       'Arts & Culture': {
         icon: '🎨',
         questions: [
           { id: 'arts-areas', label: 'Which areas do you enjoy?', type: 'tags',
-            options: ['Film & Cinema','Music','Theater & Broadway','Visual Art & Museums','Literature','Architecture & Design','Fashion','Photography','Dance & Performance','Podcasts & Audio','Television & Streaming','Culinary Arts','Video Games & Interactive Media','Collectibles & Antiques','Cultural Heritage & Traditions'] }
+            options: ['Film & Cinema','Music','Theater & Broadway','Visual Art & Museums','Literature','Architecture & Design','Fashion','Photography','Dance & Performance','Podcasts & Audio','Television & Streaming','Culinary Arts','Video Games & Interactive Media','Collectibles & Antiques','Cultural Heritage & Traditions'] },
+          { id: 'arts-niches', label: 'The culture stories most newsletters miss:', type: 'tags',
+            options: ['The Auction & Art Market','Music Industry & Business','Box Office & Film Business'] }
         ]
       },
       'History': {
@@ -1166,7 +1172,9 @@
         icon: '🔬',
         questions: [
           { id: 'science-fields', label: 'Which fields fascinate you?', type: 'tags',
-            options: ['Space & Astronomy','Biology & Life Sciences','Climate & Environment','Physics','Medicine & Health Research','AI & Computer Science','Archaeology & Paleontology','Neuroscience & Brain Science','Genetics & Biotechnology','Ocean & Marine Science','Mathematics & Statistics','Energy & Clean Technology'] }
+            options: ['Space & Astronomy','Biology & Life Sciences','Climate & Environment','Physics','Medicine & Health Research','AI & Computer Science','Archaeology & Paleontology','Neuroscience & Brain Science','Genetics & Biotechnology','Ocean & Marine Science','Mathematics & Statistics','Energy & Clean Technology'] },
+          { id: 'science-niches', label: 'The science stories most newsletters miss:', type: 'tags',
+            options: ['Deep Ocean Discoveries','Animal Kingdom Oddities','Extreme Weather & Natural Phenomena','Space Exploration'] }
         ]
       },
       'Technology': {
@@ -1175,6 +1183,8 @@
           { id: 'tech-areas', label: 'What tech topics do you care about?', type: 'tags-with-sub',
             options: ['Artificial Intelligence','Consumer Gadgets','Startups & Big Tech','Cybersecurity','Social Media','Electric Vehicles & Energy','Robotics','Space Technology','Blockchain & Web3','Cloud Computing','Semiconductors & Chips','Biotech & Health Tech','Fintech','Augmented & Virtual Reality','Autonomous Vehicles','Quantum Computing','Software & Apps','Gaming Technology'],
             subLabel: 'Pick specific companies:' },
+          { id: 'tech-niches', label: 'The tech stories most newsletters miss:', type: 'tags',
+            options: ['Tech Failures & Scandals','Patents & Legal Battles','Cybersecurity & Hacking','The Future of AI'] }
         ]
       },
       'Politics': {
@@ -1192,14 +1202,18 @@
           { id: 'food-interests', label: 'What food topics interest you?', type: 'tags',
             options: ['Restaurants & Reviews','Home Cooking & Recipes','Wine & Spirits','Food Culture & Trends','Healthy Eating'] },
           { id: 'travel-regions', label: 'Which travel regions excite you?', type: 'tags',
-            options: ['Europe','Asia & Pacific','Latin America','Middle East & Africa','Caribbean','North America','Cruises'] }
+            options: ['Europe','Asia & Pacific','Latin America','Middle East & Africa','Caribbean','North America','Cruises'] },
+          { id: 'food-niches', label: 'The food stories most newsletters miss:', type: 'tags',
+            options: ['Street Food Around the World','Food Science & Innovation'] }
         ]
       },
       'Health': {
         icon: '🫀',
         questions: [
           { id: 'health-areas', label: 'Which health topics matter to you?', type: 'tags',
-            options: ['Fitness & Exercise','Nutrition & Diet','Mental Health & Wellness','Medical News & Research','Longevity & Aging','Sleep & Recovery','Heart Health & Cardiology','Cancer Research & Treatment','Gut Health & Digestion','Alternative & Holistic Medicine'] }
+            options: ['Fitness & Exercise','Nutrition & Diet','Mental Health & Wellness','Medical News & Research','Longevity & Aging','Sleep & Recovery','Heart Health & Cardiology','Cancer Research & Treatment','Gut Health & Digestion','Alternative & Holistic Medicine'] },
+          { id: 'health-niches', label: 'The health stories most newsletters miss:', type: 'tags',
+            options: ['Cutting-Edge Medical Treatments','The Science of Sleep','Mental Health Breakthroughs','Longevity & Anti-Aging Research'] }
         ]
       },
       'Books & Ideas': {

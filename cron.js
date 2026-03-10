@@ -113,16 +113,26 @@ async function processSlot(slot) {
 
       const expandedTopics = subscriber.topics.flatMap(topic => {
 
-        // ── Sports: league → team ──────────────────────────────────────────────
+        // ── Sports: league → team (niches route as Sports::niche) ────────────
         if (topic === 'Sports') {
-          const leagues = subscriber.preferences?.['Sports']
-          if (!leagues || leagues.length === 0) {
+          const SPORT_LEAGUES = new Set(['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR'])
+          // preferences['Sports'] may contain leagues AND mixed niches (from subscription form)
+          // preferences['sports-niches'] contains niches saved via the preferences update form
+          const sportsPrefs = subscriber.preferences?.['Sports'] || []
+          const sportsNiches = subscriber.preferences?.['sports-niches'] || []
+          const allSportsItems = [...new Set([...sportsPrefs, ...sportsNiches])]
+          if (allSportsItems.length === 0) {
             topicOriginMap['Sports'] = 'Sports'
             return ['Sports']
           }
-          const selectedLeagues = pickSubtopics('Sports', leagues)
-          selectedLeagues.forEach(l => selectedSubtopicsForLogging.push({ topic: 'Sports', subtopic: l }))
-          return selectedLeagues.flatMap(league => {
+          const selected = pickSubtopics('Sports', allSportsItems)
+          selected.forEach(l => selectedSubtopicsForLogging.push({ topic: 'Sports', subtopic: l }))
+          return selected.flatMap(league => {
+            // Niche topics (non-leagues) → Google News search via Sports::niche
+            if (!SPORT_LEAGUES.has(league)) {
+              topicOriginMap[`Sports::${league}`] = 'Sports'
+              return [`Sports::${league}`]
+            }
             const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
             const teams = subscriber.preferences?.[`sub-sports-leagues-${safeId}`]
             if (teams && teams.length > 0) {
