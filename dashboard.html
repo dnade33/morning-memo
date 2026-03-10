@@ -252,6 +252,16 @@
           <tbody id="quote-table"></tbody>
         </table>
       </div>
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>New Subscribers Today</span>
+          <span id="new-today-count" style="font-family:var(--mono);font-size:11px;color:var(--success);"></span>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Time</th></tr></thead>
+          <tbody id="new-today-table"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -399,6 +409,18 @@
       </tr>`)
     document.getElementById('quote-table').innerHTML =
       quoteRows.length ? quoteRows.join('') : '<tr class="empty-row"><td colspan="2">No data</td></tr>'
+
+    // New subscribers today
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0)
+    const newToday = (subscribers.list || []).filter(s => s.created_at && new Date(s.created_at) >= todayStart)
+    document.getElementById('new-today-count').textContent = newToday.length ? `+${newToday.length}` : ''
+    const newTodayRows = newToday.map(s => `<tr>
+      <td style="font-weight:600;color:var(--text);">${esc(s.first_name)}</td>
+      <td class="mono dim" style="font-size:11px;">${esc(s.email)}</td>
+      <td class="mono dim" style="font-size:11px;">${fmtTime(s.created_at)}</td>
+    </tr>`)
+    document.getElementById('new-today-table').innerHTML =
+      newTodayRows.length ? newTodayRows.join('') : '<tr class="empty-row"><td colspan="3">No new subscribers today</td></tr>'
 
     // Topic popularity table with subtopic accordions
     const topicEmoji = {
@@ -572,6 +594,10 @@
   function fmtDate(iso) {
     if (!iso) return '—'
     return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+  function fmtTime(iso) {
+    if (!iso) return '—'
+    return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
   }
   function fmtDateTime(iso) {
     if (!iso) return '—'
