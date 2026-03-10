@@ -121,7 +121,9 @@ Headlines must answer "what happened?" not "what is this about?"
   RIGHT: "House Republicans Propose $880B Medicaid Cut Ahead of 2026 Midterms"
 
 ═══ CONTENT RULES ═══
-- SPORTS: The panel header already tells the reader the sport — do NOT repeat it in the opening words of each summary (e.g. never write "In NBA basketball..." or "NFL football saw..."). Jump straight into the action. Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. Always use the player's full name (first and last) on first reference.
+- SPORTS: The panel header already tells the reader the sport — do NOT repeat it in the opening words of each summary (e.g. never write "In NBA basketball..." or "NFL football saw..."). Jump straight into the action. Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. Always use the player's full name (first and last) on first reference. When covering a record or streak, always state the specific number — never leave it vague.
+  WRONG: "Shai Gilgeous-Alexander tied a record set by Wilt Chamberlain over 60 years ago."
+  RIGHT: "Shai Gilgeous-Alexander extended his streak of consecutive 20-point games to 53, tying a record Wilt Chamberlain set in 1962."
   WRONG: "In NBA basketball, Oklahoma City Thunder guard Shai Gilgeous-Alexander matched a record..."
   RIGHT: "Oklahoma City Thunder guard Shai Gilgeous-Alexander matched a record set by Wilt Chamberlain..."
   WRONG: "USA and Mexico meet as unbeaten teams heading into World Cup preparations on FOX tonight."
