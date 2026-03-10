@@ -428,8 +428,24 @@
       'History': '🏛', 'Science': '🔬', 'Technology': '💻', 'Politics': '🏛️',
       'Food & Travel': '🍽', 'Local Weather': '🌤', 'Health': '🫀', 'Books & Ideas': '📚'
     }
-    const bySubtopic = subscribers.by_subtopic || {}
-    const topicEntries = Object.entries(subscribers.by_topic)
+    const SPORT_LEAGUES = new Set(['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR'])
+    // Merge standalone league entries (from preferences-form subscribers) back under Sports
+    const rawByTopic = subscribers.by_topic || {}
+    const mergedByTopic = {}
+    const extraLeagueSubs = {}
+    for (const [topic, count] of Object.entries(rawByTopic)) {
+      if (SPORT_LEAGUES.has(topic)) {
+        mergedByTopic['Sports'] = (mergedByTopic['Sports'] || 0) + count
+        extraLeagueSubs[topic] = count
+      } else {
+        mergedByTopic[topic] = count
+      }
+    }
+    const bySubtopic = { ...(subscribers.by_subtopic || {}) }
+    if (Object.keys(extraLeagueSubs).length > 0) {
+      bySubtopic['Sports'] = { ...(bySubtopic['Sports'] || {}), ...extraLeagueSubs }
+    }
+    const topicEntries = Object.entries(mergedByTopic)
       .sort((a, b) => {
         if (a[0] === 'Local Weather') return 1
         if (b[0] === 'Local Weather') return -1
