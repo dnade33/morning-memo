@@ -202,16 +202,37 @@ async function getWeatherStory(city) {
 // History subtopics get a discovery/archaeology bias so results feel
 // like genuine historical content rather than contemporary media coverage.
 // ----------------------------------------------------------------
-const HISTORY_SUBTOPICS = new Set([
+const HISTORY_ERA_SUBTOPICS = new Set([
   'Medieval', 'Ancient Rome', 'Ancient Greece', 'Ancient Egypt', 'Renaissance',
   'World War II', 'World War I', 'American Revolution', 'Civil War',
-  'Cold War', 'Byzantine', 'Viking', 'Ottoman', 'Aztec', 'Inca', 'Mayan'
+  'Cold War', 'Byzantine', 'Viking', 'Ottoman', 'Aztec', 'Inca', 'Mayan',
+  'Ancient Civilizations', 'Roman Empire', 'Age of Exploration',
+  'Industrial Revolution', 'Victorian Era', 'American History', 'World War I & II',
+  'Modern History (1980s–present)'
 ])
+
+// Niche history subtopics get hand-crafted queries for best results
+const HISTORY_NICHE_QUERIES = {
+  'Lost & Found':                 'shipwreck discovered OR treasure found OR lost artifact recovered OR sunken ship OR buried treasure history',
+  'Forgotten Figures':            '"forgotten" OR "overlooked" OR "unsung" historical figure biography history',
+  'Historical Mysteries':         'historical mystery unsolved history cold case ancient unexplained',
+  'Auction Block':                'historic item auction sold record price antique provenance',
+  'Decoded & Deciphered':         'ancient language deciphered OR manuscript decoded OR inscription translated archaeology',
+  'Stolen & Recovered':           'stolen art recovered OR looted artifact repatriated OR art theft history',
+  'Secret Histories':             'declassified secret history espionage intelligence cold war hidden',
+  'Food & Drink Through History': 'food history ancient cuisine OR historical recipe OR drink history archaeology'
+}
 
 function getTeamFeedUrl(teamName, leagueName) {
   let query
-  if (leagueName === 'History' && HISTORY_SUBTOPICS.has(teamName)) {
-    query = `${teamName} (discovery OR archaeology OR excavation OR artifact OR research OR historian OR ancient)`
+  if (leagueName === 'History') {
+    if (HISTORY_NICHE_QUERIES[teamName]) {
+      query = HISTORY_NICHE_QUERIES[teamName]
+    } else if (HISTORY_ERA_SUBTOPICS.has(teamName)) {
+      query = `${teamName} (discovery OR archaeology OR excavation OR artifact OR research OR historian)`
+    } else {
+      query = `${teamName} history`
+    }
   } else {
     query = `${teamName} ${leagueName}`
   }
