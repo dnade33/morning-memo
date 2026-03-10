@@ -295,6 +295,25 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
 })
 
 // ----------------------------------------------------------------
+// GET /api/admin/newsletter/:id
+// Returns the HTML body of a single newsletter (for preview)
+// ----------------------------------------------------------------
+app.get('/api/admin/newsletter/:id', requireAdmin, async (req, res) => {
+  const { id } = req.params
+  const { data, error } = await supabase
+    .from('newsletters')
+    .select('body_html, subject, sent_at')
+    .eq('id', id)
+    .single()
+
+  if (error || !data) {
+    return res.status(404).json({ error: 'Newsletter not found' })
+  }
+
+  res.json({ html: data.body_html, subject: data.subject, sent_at: data.sent_at })
+})
+
+// ----------------------------------------------------------------
 // GET /health
 // ----------------------------------------------------------------
 app.get('/health', (_req, res) => {

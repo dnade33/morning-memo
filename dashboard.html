@@ -144,6 +144,37 @@
     .mono { font-family: var(--mono); }
     .dim  { color: var(--muted); }
 
+    /* Preview modal */
+    .preview-btn {
+      background: none; border: 1px solid rgba(0,212,255,0.3); color: var(--accent);
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+      padding: 3px 8px; cursor: pointer; text-transform: uppercase; white-space: nowrap;
+    }
+    .preview-btn:hover { border-color: var(--accent); background: rgba(0,212,255,0.06); }
+    #preview-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    #preview-modal.open { display: flex; }
+    .preview-inner {
+      background: var(--card); border: 1px solid var(--border);
+      width: 90vw; max-width: 760px; height: 88vh;
+      display: flex; flex-direction: column;
+    }
+    .preview-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .preview-header-info { display: flex; flex-direction: column; gap: 2px; }
+    .preview-subject { font-family: var(--mono); font-size: 12px; color: var(--text); }
+    .preview-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .preview-close {
+      background: none; border: none; color: var(--muted); font-size: 20px;
+      cursor: pointer; line-height: 1; padding: 4px 8px;
+    }
+    .preview-close:hover { color: var(--text); }
+    #preview-frame { flex: 1; width: 100%; border: none; background: #fff; }
+
     @media (max-width: 800px) {
       .stat-grid { grid-template-columns: repeat(2, 1fr); }
       .two-col   { grid-template-columns: 1fr; }
@@ -252,6 +283,7 @@
           <th>Subject</th>
           <th>Status</th>
           <th>Sent At</th>
+          <th></th>
         </tr>
       </thead>
       <tbody id="delivery-table"></tbody>
@@ -259,6 +291,20 @@
   </div>
 
 </div><!-- #dashboard -->
+
+<!-- ── PREVIEW MODAL ── -->
+<div id="preview-modal">
+  <div class="preview-inner">
+    <div class="preview-header">
+      <div class="preview-header-info">
+        <div class="preview-subject" id="preview-subject">—</div>
+        <div class="preview-meta" id="preview-meta">—</div>
+      </div>
+      <button class="preview-close" onclick="closePreview()">✕</button>
+    </div>
+    <iframe id="preview-frame" title="Newsletter Preview"></iframe>
+  </div>
+</div>
 
 <script>
   const PW_KEY = 'mm_admin_pw'
@@ -398,6 +444,7 @@
       <td style="font-size:12px;max-width:320px;">${esc(n.subject || '—')}</td>
       <td><span class="badge ${n.status === 'sent' ? 'badge-sent' : 'badge-failed'}">${esc(n.status)}</span></td>
       <td class="mono dim" style="font-size:11px;">${fmtDateTime(n.sent_at)}</td>
+      <td>${n.status === 'sent' ? `<button class="preview-btn" onclick="openPreview('${n.id}')">Preview</button>` : ''}</td>
     </tr>`)
     document.getElementById('delivery-table').innerHTML =
       deliveryRows.length ? deliveryRows.join('') : '<tr class="empty-row"><td colspan="4">No deliveries in the last 7 days</td></tr>'
@@ -406,6 +453,37 @@
     document.getElementById('last-updated').textContent =
       'Updated ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' })
   }
+
+  // ── Newsletter preview ────────────────────────────────────────
+  async function openPreview(id) {
+    const pw = sessionStorage.getItem(PW_KEY)
+    if (!pw) return
+    document.getElementById('preview-subject').textContent = 'Loading...'
+    document.getElementById('preview-meta').textContent = ''
+    document.getElementById('preview-frame').srcdoc = ''
+    document.getElementById('preview-modal').classList.add('open')
+    try {
+      const res = await fetch(`/api/admin/newsletter/${id}`, {
+        headers: { 'Authorization': `Bearer ${pw}` }
+      })
+      if (!res.ok) throw new Error('Failed to load')
+      const { html, subject, sent_at } = await res.json()
+      document.getElementById('preview-subject').textContent = subject || '—'
+      document.getElementById('preview-meta').textContent = fmtDateTime(sent_at)
+      document.getElementById('preview-frame').srcdoc = html || '<p>No content</p>'
+    } catch {
+      document.getElementById('preview-subject').textContent = 'Error loading preview'
+    }
+  }
+
+  function closePreview() {
+    document.getElementById('preview-modal').classList.remove('open')
+    document.getElementById('preview-frame').srcdoc = ''
+  }
+
+  document.getElementById('preview-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('preview-modal')) closePreview()
+  })
 
   // ── Subtopic accordion toggle ──────────────────────────────────
   function toggleSubtopics(uid) {
