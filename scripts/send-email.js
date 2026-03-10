@@ -172,11 +172,16 @@ async function sendAndLog(subscriber, subject, body_html, supabase, dryRun = fal
   let sendError = null
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
+      const unsubscribeUrl = `${process.env.APP_URL || 'https://morningmemo.live'}/unsubscribe.html?token=${subscriber.pref_token}`
       const { error } = await resend.emails.send({
         from: `Morning Memo <${process.env.RESEND_FROM_EMAIL}>`,
         to: subscriber.email,
         subject,
-        html: body_html
+        html: body_html,
+        headers: {
+          'List-Unsubscribe': `<${unsubscribeUrl}>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+        }
       })
       if (error) throw new Error(error.message)
       sendError = null
