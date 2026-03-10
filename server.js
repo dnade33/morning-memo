@@ -271,6 +271,23 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
     if (sub.quote_style) quoteCounts[sub.quote_style] = (quoteCounts[sub.quote_style] || 0) + 1
   }
 
+  // Fix Sports league counts: some subscribers have team prefs but no explicit league in preferences['Sports']
+  // (legacy form stored leagues under a different key). Count any subscriber who has teams for a league.
+  const SPORT_LEAGUES = ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR']
+  for (const sub of (subscribers || [])) {
+    if (!sub.active || !sub.topics?.includes('Sports')) continue
+    const sportsPref = sub.preferences?.['Sports'] || []
+    for (const league of SPORT_LEAGUES) {
+      if (sportsPref.includes(league)) continue // already counted above
+      const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+      const teams = sub.preferences?.[`sub-sports-leagues-${safeId}`]
+      if (Array.isArray(teams) && teams.length > 0) {
+        if (!subtopicCounts['Sports']) subtopicCounts['Sports'] = {}
+        subtopicCounts['Sports'][league] = (subtopicCounts['Sports'][league] || 0) + 1
+      }
+    }
+  }
+
   const activeCount = (subscribers || []).filter(s => s.active).length
   const todaySent = enriched.filter(n => n.status === 'sent' && new Date(n.sent_at) >= todayStart).length
   const todayFailed = enriched.filter(n => n.status === 'failed' && new Date(n.sent_at) >= todayStart).length
