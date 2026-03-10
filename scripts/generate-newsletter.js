@@ -29,13 +29,16 @@ function resolveQuoteStyle(style) {
 // stories to topics with the most subtopics selected.
 // ----------------------------------------------------------------
 function calculateStoryAllocation(subscriber, topicStories) {
-  const n = topicStories.length
+  const MAX_STORIES = 8
   const allocation = {}
-  for (const { topic } of topicStories) allocation[topic] = 1
 
-  if (n < 6) {
-    let remaining = 6 - n
-    const sorted = [...topicStories].sort((a, b) =>
+  // If more panels than max, only include the first MAX_STORIES panels
+  const cappedTopics = topicStories.slice(0, MAX_STORIES)
+  for (const { topic } of cappedTopics) allocation[topic] = 1
+
+  if (cappedTopics.length < 6) {
+    let remaining = 6 - cappedTopics.length
+    const sorted = [...cappedTopics].sort((a, b) =>
       (subscriber.preferences?.[b.topic] || []).length -
       (subscriber.preferences?.[a.topic] || []).length
     )
