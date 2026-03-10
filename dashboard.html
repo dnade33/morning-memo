@@ -461,7 +461,7 @@
            </button>`
         : ''
       const topicRow = `<tr>
-        <td style="display:flex;align-items:center;gap:6px;">${topicEmoji[t] || ''}${esc(t)}${toggleBtn}</td>
+        <td style="display:flex;align-items:center;gap:6px;"><span style="margin-right:4px;">${topicEmoji[t] || ''}</span>${esc(t)}${toggleBtn}</td>
         <td class="mono" style="color:var(--accent);">${n}</td>
       </tr>`
       if (!hasSubtopics) return [topicRow]
