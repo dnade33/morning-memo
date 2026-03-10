@@ -197,11 +197,24 @@ async function getWeatherStory(city) {
 }
 
 // ----------------------------------------------------------------
-// Team-specific Google News RSS feed
-// Topic format from cron: "League::Team" (e.g. "NHL::Devils")
+// Google News RSS feed for a subtopic search
+// Topic format from cron: "Parent::Subtopic" (e.g. "NHL::Devils", "History::Medieval")
+// History subtopics get a discovery/archaeology bias so results feel
+// like genuine historical content rather than contemporary media coverage.
 // ----------------------------------------------------------------
+const HISTORY_SUBTOPICS = new Set([
+  'Medieval', 'Ancient Rome', 'Ancient Greece', 'Ancient Egypt', 'Renaissance',
+  'World War II', 'World War I', 'American Revolution', 'Civil War',
+  'Cold War', 'Byzantine', 'Viking', 'Ottoman', 'Aztec', 'Inca', 'Mayan'
+])
+
 function getTeamFeedUrl(teamName, leagueName) {
-  const query = `${teamName} ${leagueName}`
+  let query
+  if (leagueName === 'History' && HISTORY_SUBTOPICS.has(teamName)) {
+    query = `${teamName} (discovery OR archaeology OR excavation OR artifact OR research OR historian OR ancient)`
+  } else {
+    query = `${teamName} ${leagueName}`
+  }
   return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`
 }
 
