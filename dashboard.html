@@ -139,6 +139,10 @@
     }
     .subtopic-item:last-child { border-bottom: none; }
     .subtopic-item .st-count { color: var(--accent); min-width: 24px; text-align: right; }
+    .team-list { display: none; flex-direction: column; gap: 2px; padding: 2px 0 4px 14px; }
+    .team-list.open { display: flex; }
+    .team-item { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.3); padding: 2px 0; }
+    .team-item .t-count { color: var(--accent); opacity: 0.6; min-width: 24px; text-align: right; }
 
     /* Mono text helper */
     .mono { font-family: var(--mono); }
@@ -453,6 +457,22 @@
     if (Object.keys(extraLeagueSubs).length > 0) {
       bySubtopic['Sports'] = { ...(bySubtopic['Sports'] || {}), ...extraLeagueSubs }
     }
+
+    // Build team counts for Sports leagues from subscriber preferences
+    const teamCounts = {}
+    const LEAGUE_LIST = ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR']
+    for (const sub of (subscribers.list || [])) {
+      if (!sub.active) continue
+      const prefs = sub.preferences || {}
+      for (const league of LEAGUE_LIST) {
+        const safeId = league.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+        for (const team of (prefs[`sub-sports-leagues-${safeId}`] || [])) {
+          if (!teamCounts[league]) teamCounts[league] = {}
+          teamCounts[league][team] = (teamCounts[league][team] || 0) + 1
+        }
+      }
+    }
+
     const topicEntries = Object.entries(mergedByTopic)
       .sort((a, b) => {
         if (a[0] === 'Local Weather') return 1
@@ -475,7 +495,29 @@
       if (!hasSubtopics) return [topicRow]
       const stItems = Object.entries(subtopics)
         .sort((a, b) => b[1] - a[1])
-        .map(([st, cnt]) => `<div class="subtopic-item"><span>${esc(st)}</span><span class="st-count">${cnt}</span></div>`)
+        .map(([st, cnt], si) => {
+          const teams = t === 'Sports' ? teamCounts[st] : null
+          if (teams && Object.keys(teams).length > 0) {
+            const tuid = `tm-${i}-${si}`
+            const teamItems = Object.entries(teams)
+              .sort((a, b) => b[1] - a[1])
+              .map(([team, tc]) => `<div class="team-item"><span>${esc(team)}</span><span class="t-count">${tc}</span></div>`)
+              .join('')
+            return `<div>
+              <div class="subtopic-item">
+                <span>${esc(st)}</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="st-count">${cnt}</span>
+                  <button class="topic-toggle" id="tbtn-${tuid}" onclick="toggleTeams('${tuid}')" aria-label="Expand teams">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="team-list" id="${tuid}">${teamItems}</div>
+            </div>`
+          }
+          return `<div class="subtopic-item"><span>${esc(st)}</span><span class="st-count">${cnt}</span></div>`
+        })
         .join('')
       const subRow = `<tr class="subtopic-row" id="${uid}">
         <td colspan="2"><div class="subtopic-list">${stItems}</div></td>
@@ -589,6 +631,15 @@
   document.getElementById('preview-modal').addEventListener('click', e => {
     if (e.target === document.getElementById('preview-modal')) closePreview()
   })
+
+  // ── Team accordion toggle (third level: Sports → league → teams) ──
+  function toggleTeams(uid) {
+    const list = document.getElementById(uid)
+    const btn = document.getElementById('tbtn-' + uid)
+    if (!list || !btn) return
+    const open = list.classList.toggle('open')
+    btn.classList.toggle('open', open)
+  }
 
   // ── Subtopic accordion toggle ──────────────────────────────────
   function toggleSubtopics(uid) {
