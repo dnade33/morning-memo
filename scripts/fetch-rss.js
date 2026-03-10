@@ -213,14 +213,14 @@ const HISTORY_ERA_SUBTOPICS = new Set([
 
 // Niche history subtopics get hand-crafted queries for best results
 const HISTORY_NICHE_QUERIES = {
-  'Lost & Found':                 'shipwreck discovered OR treasure found OR lost artifact recovered OR sunken ship OR buried treasure history',
-  'Forgotten Figures':            '"forgotten" OR "overlooked" OR "unsung" historical figure biography history',
-  'Historical Mysteries':         'historical mystery unsolved history cold case ancient unexplained',
-  'Auction Block':                'historic item auction sold record price antique provenance',
-  'Decoded & Deciphered':         'ancient language deciphered OR manuscript decoded OR inscription translated archaeology',
-  'Stolen & Recovered':           'stolen art recovered OR looted artifact repatriated OR art theft history',
-  'Secret Histories':             'declassified secret history espionage intelligence cold war hidden',
-  'Food & Drink Through History': 'food history ancient cuisine OR historical recipe OR drink history archaeology'
+  'Lost Treasures & Shipwrecks':   'shipwreck discovered OR treasure found OR lost artifact recovered OR sunken ship OR buried treasure history',
+  'People History Overlooked':     '"forgotten" OR "overlooked" OR "unsung" historical figure biography history',
+  'Unsolved Historical Mysteries': 'historical mystery unsolved history cold case ancient unexplained',
+  'Historic Items at Auction':     'historic item auction sold record price antique provenance',
+  'Ancient Languages & Manuscripts': 'ancient language deciphered OR manuscript decoded OR inscription translated archaeology',
+  'Stolen Art & Repatriation':     'stolen art recovered OR looted artifact repatriated OR art theft history',
+  'Declassified & Secret Histories': 'declassified secret history espionage intelligence cold war hidden',
+  'Food & Drink Through History':  'food history ancient cuisine OR historical recipe OR drink history archaeology'
 }
 
 function getTeamFeedUrl(teamName, leagueName) {
