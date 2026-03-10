@@ -275,7 +275,7 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
   // (legacy form stored leagues under a different key). Count any subscriber who has teams for a league.
   const SPORT_LEAGUES = ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf','Tennis','UFC / Boxing','NASCAR']
   for (const sub of (subscribers || [])) {
-    if (!sub.active || !sub.topics?.includes('Sports')) continue
+    if (!sub.active) continue
     const sportsPref = sub.preferences?.['Sports'] || []
     for (const league of SPORT_LEAGUES) {
       if (sportsPref.includes(league)) continue // already counted above
