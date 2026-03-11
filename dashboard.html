@@ -659,7 +659,8 @@
       const { html, subject, sent_at } = await res.json()
       document.getElementById('preview-subject').textContent = subject || '—'
       document.getElementById('preview-meta').textContent = fmtDateTime(sent_at)
-      document.getElementById('preview-frame').srcdoc = html || '<p>No content</p>'
+      const safeHtml = (html || '<p>No content</p>').replace('<head>', '<head><base target="_blank">')
+      document.getElementById('preview-frame').srcdoc = safeHtml
     } catch {
       document.getElementById('preview-subject').textContent = 'Error loading preview'
     }

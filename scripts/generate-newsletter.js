@@ -143,6 +143,8 @@ Headlines must answer "what happened?" not "what is this about?"
 
 - ACRONYMS: The first time you use an acronym, spell it out in full with the acronym in parentheses: "The Organisation for Economic Co-operation and Development (OECD)..." After that, the acronym alone is fine.
 
+- THIN STORIES: If the source material for a story is too thin to support a genuine 2-3 sentence summary — essentially just a headline reworded into one sentence — skip it entirely and use a different story from the available pool. Never pad a stub into fake substance.
+
 - NO REPEATS: If a candidate story covers the same ongoing event, court case, or policy dispute as any story in the "Already sent" list above, skip it entirely and use a different story from the available pool instead.
   WRONG: Sending a second tariff court ruling story the day after already covering a tariff Supreme Court challenge.
   RIGHT: Choosing a different story from the pool that covers a fresh, unrelated event.
@@ -391,7 +393,8 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = []) {
 
   const quoteStyle = resolveQuoteStyle(subscriber.quote_style)
   const allocation = calculateStoryAllocation(subscriber, topicStories)
-  const prompt = buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTitles)
+  const cappedTopicStories = topicStories.slice(0, Object.keys(allocation).length)
+  const prompt = buildPrompt(subscriber, cappedTopicStories, quoteStyle, allocation, recentTitles)
 
   const rawText = await fetchWithRetry(async () => {
     const message = await client.messages.create({

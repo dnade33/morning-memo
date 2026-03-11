@@ -24,7 +24,7 @@ const RSS_FEEDS = {
   'World News':         'https://feeds.reuters.com/reuters/topNews',
   'Politics':           'https://rss.politico.com/politics-news.xml',
   'Finance':            'https://search.cnbc.com/rs/search/combinedcms/view.php?partnerId=wrss01&id=100003114',
-  'Technology':         'https://feeds.feedburner.com/TechCrunch',
+  'Technology':         'https://www.theverge.com/rss/index.xml',
   'Science':            'https://www.sciencedaily.com/rss/top/science.xml',
   'Health':             'https://rss.webmd.com/rss/rss.aspx?RSSSource=RSS_PUBLIC',
   'Arts & Culture':     'https://www.theguardian.com/culture/rss',
@@ -40,7 +40,8 @@ const RSS_FEEDS = {
 const BLOCKED_DOMAINS = [
   'britannica.com', 'wikipedia.org', 'wikimedia.org',
   'merriam-webster.com', 'dictionary.com', 'encyclopedia.com',
-  'thoughtco.com', 'reference.com', 'factmonster.com'
+  'thoughtco.com', 'reference.com', 'factmonster.com',
+  'indianexpress.com'
 ]
 
 const REFERENCE_TITLE_PATTERNS = [
@@ -154,6 +155,7 @@ async function getCachedFeed(url) {
       }))
       .filter(s => isFreshArticle(s.date))
       .filter(s => !isReferenceArticle(s.title, s.link))
+      .filter(s => s.summary && s.summary.trim().length >= 80)
       .slice(0, 5)
   })
 
@@ -316,7 +318,7 @@ async function getCachedStories(topics, city) {
       const url = getTeamFeedUrl(team, league)
       try {
         const stories = await getCachedFeed(url)
-        results.push({ topic: team, leagueFallback: league, stories })
+        results.push({ topic, stories })
       } catch (err) {
         logger.warn(`Team feed fetch failed for ${team} (${league})`, err.message)
       }
