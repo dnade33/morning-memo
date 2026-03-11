@@ -137,6 +137,8 @@ Headlines must answer "what happened?" not "what is this about?"
   WRONG: "The controversial bill passed despite fierce opposition from those who called it an attack on working families."
   RIGHT: "The bill passed 52-48. Supporters say it will reduce regulatory burdens and lower costs for small businesses. Opponents argue it weakens environmental protections and could cost an estimated 200,000 jobs."
 
+- TITLES & ROLES: Use the title a person currently holds at the time of the article — do not rely on your training data for titles. If the source says "President Trump," write "President Trump." Never prepend "former" to a title unless the source explicitly says the person has left that role.
+
 - FULL NAMES: Always use a person's full name (first and last) the first time they appear. Never refer to anyone by last name only.
   WRONG: "Mahomes threw for 340 yards in the Chiefs' win."
   RIGHT: "Patrick Mahomes threw for 340 yards as the Kansas City Chiefs defeated the Buffalo Bills 27-21."
