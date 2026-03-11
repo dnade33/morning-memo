@@ -154,6 +154,10 @@ Headlines must answer "what happened?" not "what is this about?"
 
 - ACRONYMS: The first time you use an acronym, spell it out in full with the acronym in parentheses: "The Organisation for Economic Co-operation and Development (OECD)..." After that, the acronym alone is fine.
 
+- SPECIFICITY REQUIRED: Every summary must answer the basic journalistic questions the source provides — Who, What, Where, When. For any discovery, event, or development story: name the location, name the people involved, and state what was actually found or decided. A summary that omits where something happened or what was specifically discovered is not acceptable.
+  WRONG: "Archaeologists have uncovered evidence of a previously unknown settlement that challenges the conventional timeline of early contact in North America."
+  RIGHT: "Archaeologists excavating a site in coastal Virginia have uncovered a 15th-century settlement predating Columbus's arrival — evidence that challenges the established timeline of European contact with Native Americans by nearly a century."
+
 - THIN STORIES: If the source material for a story is too thin to support a genuine 2-3 sentence summary — essentially just a headline reworded into one sentence — skip it entirely and use a different story from the available pool. Never pad a stub into fake substance.
 
 - NO INVENTED FACTS: Every statistic, record, ranking, score, date, or comparison in your summary must come directly from the source material provided. Never supply supporting facts, figures, or historical comparisons from your own memory. If the source does not state it, you do not state it.
