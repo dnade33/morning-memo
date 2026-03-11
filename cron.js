@@ -247,8 +247,18 @@ async function processSlot(slot) {
       return { success: false }
     }
 
+    // Shuffle topic order so panels appear in a different sequence each day.
+    // Local Weather is always pinned to the end.
+    const weatherPanel = topicStories.find(t => t.topic === 'Local Weather')
+    const nonWeather = topicStories.filter(t => t.topic !== 'Local Weather')
+    for (let i = nonWeather.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [nonWeather[i], nonWeather[j]] = [nonWeather[j], nonWeather[i]]
+    }
+    const shuffledTopicStories = weatherPanel ? [...nonWeather, weatherPanel] : nonWeather
+
     // Generate newsletter via Claude Haiku
-    const { subject, body_html, sentStories } = await generateNewsletter(subscriber, topicStories, recentTitles)
+    const { subject, body_html, sentStories } = await generateNewsletter(subscriber, shuffledTopicStories, recentTitles)
 
     // Send + log
     const result = await sendAndLog(subscriber, subject, body_html, supabase, DRY_RUN)
