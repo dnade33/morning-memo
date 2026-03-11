@@ -145,6 +145,10 @@ Headlines must answer "what happened?" not "what is this about?"
 
 - THIN STORIES: If the source material for a story is too thin to support a genuine 2-3 sentence summary — essentially just a headline reworded into one sentence — skip it entirely and use a different story from the available pool. Never pad a stub into fake substance.
 
+- NO INVENTED FACTS: Every statistic, record, ranking, score, date, or comparison in your summary must come directly from the source material provided. Never supply supporting facts, figures, or historical comparisons from your own memory. If the source does not state it, you do not state it.
+  WRONG: "Only Wilt Chamberlain (100 points in 1962) and Kobe Bryant (81 points in 2006) have scored more in a single game." — if this comparison is not in the source text, do not write it.
+  RIGHT: Stick strictly to what the article says. If a record is mentioned in the source, quote or paraphrase it. If it is not, leave it out.
+
 - NO REPEATS: If a candidate story covers the same ongoing event, court case, or policy dispute as any story in the "Already sent" list above, skip it entirely and use a different story from the available pool instead.
   WRONG: Sending a second tariff court ruling story the day after already covering a tariff Supreme Court challenge.
   RIGHT: Choosing a different story from the pool that covers a fresh, unrelated event.
