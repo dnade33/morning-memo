@@ -1056,6 +1056,17 @@
         </div>
       </div>
 
+      <!-- Already subscribed -->
+      <div class="s-panel" id="sp-duplicate">
+        <div class="confirmation">
+          <div class="confirmation-icon">📬</div>
+          <h2>You're already subscribed!</h2>
+          <p>Looks like <strong id="dup-email"></strong> is already getting Morning Memo.</p>
+          <p>Want to change your topics, delivery time, or preferences?</p>
+          <p><a id="dup-prefs-link" href="/preferences.html" style="color:var(--accent);font-weight:500;">Update my preferences →</a></p>
+        </div>
+      </div>
+
     </div>
     </div>
   </section>
@@ -1915,6 +1926,16 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, topics, city, tagAnswers, time, quoteStyle, extra })
         });
+        if (res.status === 409) {
+          const body = await res.json();
+          document.getElementById('dup-email').textContent = email;
+          if (body.pref_token) {
+            document.getElementById('dup-prefs-link').href = `/preferences.html?token=${body.pref_token}`;
+          }
+          document.querySelectorAll('.s-panel').forEach(p => p.classList.remove('active'));
+          document.getElementById('sp-duplicate').classList.add('active');
+          return;
+        }
         if (!res.ok) throw new Error('Subscription failed');
       } catch (err) {
         alert('Something went wrong — please try again in a moment.');

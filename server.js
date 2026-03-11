@@ -62,7 +62,18 @@ app.post('/api/subscribe', async (req, res) => {
   const cleanCity = city ? city.trim() : null
   const preferences = (tagAnswers && typeof tagAnswers === 'object') ? tagAnswers : {}
 
-  // --- Upsert to Supabase (re-subscribers update their prefs) ---
+  // --- Check for existing active subscriber ---
+  const { data: existing } = await supabase
+    .from('subscribers')
+    .select('id, pref_token, active')
+    .eq('email', cleanEmail)
+    .single()
+
+  if (existing && existing.active) {
+    return res.status(409).json({ error: 'already_subscribed', pref_token: existing.pref_token })
+  }
+
+  // --- Upsert to Supabase (handles re-subscribers who previously unsubscribed) ---
   const { data, error } = await supabase
     .from('subscribers')
     .upsert(
