@@ -133,6 +133,14 @@ Headlines must answer "what happened?" not "what is this about?"
   WRONG: "Markets fell sharply on Wednesday amid recession fears."
   RIGHT: "The S&P 500 dropped 1.8% on Wednesday — its steepest single-day decline in three months — after weak manufacturing data reignited fears that the Fed's rate hikes are slowing the broader economy."
 
+- POLLS & SURVEYS: Whenever a story references a poll, survey, or public opinion finding, always include the specific percentage from the source. Never write "a majority," "most people," or "many Americans" — give the number. This applies to every topic, not just politics.
+  WRONG: "A majority of Americans oppose military action against Iran."
+  RIGHT: "62% of Americans oppose military action against Iran, according to a new poll."
+
+- OPINION LABELING: If the source article is an opinion piece, editorial, or analysis column — rather than straight news reporting — begin the headline with "Opinion:" so the reader knows it is a viewpoint, not a factual report.
+  WRONG: "Why Pulling Out of the Stock Market Right Now Would Be a Bad Idea"
+  RIGHT: "Opinion: Why Pulling Out of the Stock Market Right Now Would Be a Bad Idea"
+
 - POLITICS: Present both sides or stick to facts only. Never editorialize. Never use loaded language like "controversial" or "embattled" without factual grounding.
   WRONG: "The controversial bill passed despite fierce opposition from those who called it an attack on working families."
   RIGHT: "The bill passed 52-48. Supporters say it will reduce regulatory burdens and lower costs for small businesses. Opponents argue it weakens environmental protections and could cost an estimated 200,000 jobs."
