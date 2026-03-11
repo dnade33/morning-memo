@@ -139,8 +139,9 @@ Headlines must answer "what happened?" not "what is this about?"
 
 - TITLES & ROLES: Use the title a person currently holds at the time of the article — do not rely on your training data for titles. If the source says "President Trump," write "President Trump." Never prepend "former" to a title unless the source explicitly says the person has left that role.
 
-- FULL NAMES: Always use a person's full name (first and last) the first time they appear. Never refer to anyone by last name only.
+- FULL NAMES: Always use a person's full name (first and last) the first time they appear. Never refer to anyone by last name only. Never omit a person's name entirely and replace them with a vague description like "a key offensive lineman" or "a veteran player" — if the article names them, use that name.
   WRONG: "Mahomes threw for 340 yards in the Chiefs' win."
+  WRONG: "The Cowboys lost a key offensive lineman to the Steelers." (if the article names the player, use the name)
   RIGHT: "Patrick Mahomes threw for 340 yards as the Kansas City Chiefs defeated the Buffalo Bills 27-21."
 
 - ACRONYMS: The first time you use an acronym, spell it out in full with the acronym in parentheses: "The Organisation for Economic Co-operation and Development (OECD)..." After that, the acronym alone is fine.
