@@ -647,7 +647,7 @@
       const quoteGrid = document.getElementById('quote-grid')
       quoteGrid.innerHTML = QUOTE_STYLES.map(s => `
         <div class="quote-chip ${data.quote_style === s ? 'selected' : ''}"
-          onclick="selectQuote(this)">${s === 'Surprise Me' ? '✦ ' : ''}${s}</div>
+          data-value="${s}" onclick="selectQuote(this)">${s === 'Surprise Me' ? '✦ ' : ''}${s}</div>
       `).join('')
 
       document.getElementById('loading').style.display = 'none'
@@ -696,7 +696,7 @@
 
       const city = document.getElementById('city-input').value.trim()
       const time = document.querySelector('input[name="time"]:checked')?.value
-      const quoteStyle = document.querySelector('.quote-chip.selected')?.textContent?.trim()
+      const quoteStyle = document.querySelector('.quote-chip.selected')?.dataset.value
       const extra = document.getElementById('extra-input')?.value.trim() || ''
 
       // Subtopic chip selections → tagAnswers (only non-leagues)
