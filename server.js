@@ -4,6 +4,7 @@ require('dotenv').config()
 
 const express = require('express')
 const cors = require('cors')
+const rateLimit = require('express-rate-limit')
 const { createClient } = require('@supabase/supabase-js')
 const { logger } = require('./logger')
 const { sendWelcomeEmail } = require('./scripts/send-email')
@@ -12,8 +13,40 @@ const { runCron } = require('./cron')
 const path = require('path')
 
 const app = express()
-app.use(cors())
+
+// Restrict CORS to the production domain (and localhost for local dev)
+const allowedOrigins = [
+  'https://morningmemo.live',
+  'https://www.morningmemo.live',
+  'http://localhost:3001',
+  'http://localhost:3000'
+]
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (same-origin, curl, Postman)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true)
+    callback(new Error('Not allowed by CORS'))
+  }
+}))
+
 app.use(express.json())
+
+// Rate limiters
+const subscribeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,                    // max 5 subscription attempts per IP per hour
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests — please try again later.' }
+})
+
+const preferencesLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,                   // max 20 preference updates per IP per 15 min
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests — please try again later.' }
+})
 
 // Serve static files; use morning-memo-combined.html as the default root page
 app.use(express.static(path.join(__dirname), { index: 'morning-memo-combined.html' }))
@@ -33,7 +66,7 @@ function isValidEmail(email) {
 // ----------------------------------------------------------------
 // POST /api/subscribe
 // ----------------------------------------------------------------
-app.post('/api/subscribe', async (req, res) => {
+app.post('/api/subscribe', subscribeLimiter, async (req, res) => {
   const { name, email, topics, city, tagAnswers, time, quoteStyle, extra } = req.body
 
   // --- Validate required fields ---
@@ -140,7 +173,7 @@ app.get('/api/preferences', async (req, res) => {
 // POST /api/preferences
 // Updates subscriber preferences by token
 // ----------------------------------------------------------------
-app.post('/api/preferences', async (req, res) => {
+app.post('/api/preferences', preferencesLimiter, async (req, res) => {
   const { token, topics, city, tagAnswers, time, quoteStyle, extra } = req.body
 
   if (!token) {

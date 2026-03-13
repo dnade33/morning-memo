@@ -71,8 +71,11 @@ function buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTit
     ? `Already sent to ${subscriber.first_name} in the last 2 days — do NOT cover these same events or ongoing sagas again today:\n${recentTitles.map(t => `- ${t}`).join('\n')}\n`
     : ''
 
+  const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+
   return `You are the editor of Morning Memo, a warm, intelligent daily briefing written for an older audience.
 Write a personalized newsletter for ${subscriber.first_name}.
+Today's date: ${todayStr}
 
 ${subscriber.city ? `Their city: ${subscriber.city}` : ''}
 ${subscriber.extra_notes ? `Personal note from subscriber: "${subscriber.extra_notes}"` : ''}
@@ -87,11 +90,11 @@ One or two warm, personal sentences greeting ${subscriber.first_name} by name. E
 
 [TOPIC: TopicNameHere]
 [HEADLINE]Headline text here[/HEADLINE]
-2-3 sentence summary in plain, clear English.
+2-3 sentence summary in plain, clear English. Hard limit: 3 sentences maximum. No exceptions.
 [LINK]paste-the-original-link-url-here[/LINK]
 
 [HEADLINE]Second headline here[/HEADLINE]
-2-3 sentence summary.
+2-3 sentence summary. Hard limit: 3 sentences maximum. No exceptions.
 [LINK]paste-the-original-link-url-here[/LINK]
 
 (repeat [TOPIC: ...] blocks for each topic)
@@ -111,6 +114,9 @@ One or two warm, personal sentences greeting ${subscriber.first_name} by name. E
 
 ═══ THE CARDINAL RULE ═══
 Every story panel must leave the reader genuinely more informed than the headline alone did. If someone reads only your summary and never clicks the link, they must still walk away knowing something real.
+
+═══ THE LENGTH RULE ═══
+Every story summary is capped at 3 sentences. Not 4. Not 5. 3. This is a morning briefing, not an essay. If you cannot make your point in 3 sentences, cut the least important sentence.
 
 NEVER restate the headline. The summary must add information — start one level deeper: explain why, what it means, or what happens next.
   WRONG: "The Fed raised interest rates again as inflation concerns persist."
@@ -160,11 +166,24 @@ Headlines must answer "what happened?" not "what is this about?"
 
 - THIN STORIES: If the source material for a story is too thin to support a genuine 2-3 sentence summary — essentially just a headline reworded into one sentence — skip it entirely and use a different story from the available pool. Never pad a stub into fake substance.
 
-- NO INVENTED FACTS: Every statistic, record, ranking, score, date, or comparison in your summary must come directly from the source material provided. Never supply supporting facts, figures, or historical comparisons from your own memory. If the source does not state it, you do not state it.
+- NO CLICKBAIT: Never reproduce the withholding style of source headlines. If the article names a specific vegetable, drug, food, person, place, study finding, or product — use that name in your summary. Never write "one vegetable," "a particular supplement," "a key ingredient," or any phrasing that deliberately withholds the answer. The reader should not need to click to learn the core fact the story is about.
+  WRONG: "A gastroenterologist identifies one vegetable that stands out for its ability to nourish healthy gut bacteria."
+  RIGHT: "Gastroenterologists recommend leeks as a top choice for gut health, citing their high prebiotic fiber content as a key driver of beneficial gut bacteria growth."
+
+- NO INVENTED FACTS: Every statistic, record, ranking, score, date, position, roster move, or comparison in your summary must come directly from the source material provided. Never supply supporting facts, figures, player positions, team affiliations, or historical comparisons from your own training data memory. If the source does not state it, you do not state it. This applies especially to sports stories — never assign a player to a team, a position, or a roster action unless the source explicitly states it.
+  WRONG: "Bo Bichette has been honest about his early struggles at third base" — if the source doesn't say that, don't write it.
   WRONG: "Only Wilt Chamberlain (100 points in 1962) and Kobe Bryant (81 points in 2006) have scored more in a single game." — if this comparison is not in the source text, do not write it.
-  RIGHT: Stick strictly to what the article says. If a record is mentioned in the source, quote or paraphrase it. If it is not, leave it out.
+  RIGHT: Stick strictly to what the article says. If a fact is mentioned in the source, paraphrase it. If it is not in the source, leave it out entirely. When in doubt, omit.
 
 - NO SAME-EVENT DUPLICATES: Within a single newsletter, never cover the same event, game, or development twice — even if two different articles about it appear in the source pool. Pick the one with more substance and skip the other entirely.
+
+- WEATHER — FORWARD ONLY: The newsletter is delivered in the morning. The Local Weather panel must only cover today's current conditions and future days. Never reference yesterday or any day that has already passed. Use today's date (provided above) to determine which days are in the past and exclude them entirely.
+  WRONG: Mentioning "Tuesday looks mild" in a Wednesday morning newsletter — Tuesday is already over.
+  RIGHT: "Today is partly cloudy with a high of 45°F. Wednesday warms to 56°F, and Thursday clears up to sunny skies."
+
+- NO SPORTS BLEED: Sports stories must never appear in non-Sports panels. If the subscriber selected Sports as a topic, sports stories belong exclusively in the Sports panel. If the subscriber did NOT select Sports, skip sports stories entirely — do not place them in World News, Politics, Finance, or any other panel. A subscriber who did not choose Sports does not want sports content. A game result, trade, league story, or athlete profile is a sports story regardless of which RSS feed it came from.
+  WRONG: Placing "Italy Stuns United States 8-6 in World Baseball Classic" in the World News panel — whether or not the subscriber has a Sports panel.
+  RIGHT: If the subscriber has a Sports panel, that story goes there. If they have no Sports panel, skip it entirely.
 
 - NO REPEATS: If a candidate story covers the same ongoing event, court case, or policy dispute as any story in the "Already sent" list above, skip it entirely and use a different story from the available pool instead.
   WRONG: Sending a second tariff court ruling story the day after already covering a tariff Supreme Court challenge.
@@ -445,7 +464,15 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = []) {
     if (!mergedTopicMap[parent]) mergedTopicMap[parent] = { name: parent, stories: [] }
     mergedTopicMap[parent].stories.push(...parsedTopic.stories)
   }
-  parsed.topics = Object.values(mergedTopicMap)
+  // Restore the shuffled input order — Claude may reorder topics in its output
+  const inputOrder = topicStories.map(t => t.topic.toLowerCase())
+  parsed.topics = Object.values(mergedTopicMap).sort((a, b) => {
+    const ai = inputOrder.indexOf(a.name.toLowerCase())
+    const bi = inputOrder.indexOf(b.name.toLowerCase())
+    const aPos = ai === -1 ? 999 : ai
+    const bPos = bi === -1 ? 999 : bi
+    return aPos - bPos
+  })
 
   // Hard-cap every topic to its allocated story count regardless of what Claude wrote.
   // Use case-insensitive lookup so minor name variations (e.g. "Health" vs "Health & Wellness")

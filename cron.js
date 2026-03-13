@@ -119,7 +119,26 @@ async function processSlot(slot) {
         // preferences['sports-niches'] contains niches saved via the preferences update form
         const sportsPrefs = subscriber.preferences?.['Sports'] || []
         const sportsNiches = subscriber.preferences?.['sports-niches'] || []
-        const allSportsItems = [...new Set([...sportsPrefs, ...sportsNiches])]
+
+        // If the 'Sports' league list is missing, infer leagues from sub-keys
+        // (handles subscribers whose preferences were saved without the parent array)
+        const LEAGUE_SUB_KEY_MAP = {
+          'sub-sports-leagues-nfl':                'NFL',
+          'sub-sports-leagues-nba':                'NBA',
+          'sub-sports-leagues-mlb':                'MLB',
+          'sub-sports-leagues-nhl':                'NHL',
+          'sub-sports-leagues-college-football':   'College Football',
+          'sub-sports-leagues-college-basketball': 'College Basketball',
+          'sub-sports-leagues-soccer---mls':       'Soccer / MLS',
+          'sub-sports-leagues-golf':               'Golf',
+        }
+        const inferredLeagues = sportsPrefs.length === 0
+          ? Object.entries(LEAGUE_SUB_KEY_MAP)
+              .filter(([key]) => subscriber.preferences?.[key]?.length > 0)
+              .map(([, league]) => league)
+          : []
+
+        const allSportsItems = [...new Set([...sportsPrefs, ...sportsNiches, ...inferredLeagues])]
         if (allSportsItems.length === 0) {
           topicOriginMap['Sports'] = 'Sports'
           return ['Sports']
