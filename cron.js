@@ -25,6 +25,36 @@ const supabase = createClient(
 )
 
 // ----------------------------------------------------------------
+// Sports story detector — used to strip sports content from
+// non-sports panels before stories ever reach Claude
+// ----------------------------------------------------------------
+const SPORTS_TOPIC_KEYS = new Set([
+  'Sports', 'NFL', 'NBA', 'MLB', 'NHL',
+  'College Football', 'College Basketball', 'Soccer / MLS', 'Golf'
+])
+
+const SPORTS_KEYWORDS = [
+  // Leagues & tournaments
+  /\bNFL\b/, /\bNBA\b/, /\bMLB\b/, /\bNHL\b/, /\bMLS\b/, /\bUFC\b/, /\bPGA\b/,
+  /\bWBC\b/, /world baseball classic/i, /world cup/i, /super bowl/i,
+  /world series/i, /stanley cup/i, /march madness/i, /ncaa tournament/i,
+  /champions league/i, /premier league/i,
+  // Game/sport terms
+  /\bplayoff[s]?\b/i, /\bpostseason\b/i, /\bdraft pick\b/i, /\btrade deadline\b/i,
+  /\bfree agent\b/i, /\broster move\b/i, /\bspring training\b/i,
+  /\bhome run\b/i, /\btouchdown\b/i, /\bthree.pointer\b/i, /\bhat trick\b/i,
+  /\bno.hitter\b/i, /\bshutout\b/i, /\bovertim[e]\b/i,
+  /\bquarterback\b/i, /\bpitcher\b/i, /\bgoalkeeper\b/i,
+  /\badvances to (the )?semifinal/i, /\badvances to (the )?final/i,
+  /\bdefeated .+ \d+.?\d+\b/i,
+]
+
+function isSportsStory(title = '', summary = '') {
+  const text = `${title} ${summary}`
+  return SPORTS_KEYWORDS.some(re => re.test(text))
+}
+
+// ----------------------------------------------------------------
 // Delivery time slots (matches what the form offers subscribers)
 // ----------------------------------------------------------------
 const TIME_SLOTS = [
@@ -253,10 +283,20 @@ async function processSlot(slot) {
       mergedGroups[originalTopic].push(...stories)
     }
 
-    // Filter out already-seen stories
+    // Filter out already-seen stories, and strip sports stories from non-sports panels
     const topicStories = []
     for (const [topic, stories] of Object.entries(mergedGroups)) {
-      const freshStories = stories.filter(s => !s.link || !seenLinks.has(s.link))
+      const isSportsPanel = SPORTS_TOPIC_KEYS.has(topic)
+      const freshStories = stories.filter(s => {
+        if (s.link && seenLinks.has(s.link)) return false
+        // If this is a non-sports panel and the subscriber has a sports panel (or has no sports
+        // panel at all), strip any story that reads as a sports story
+        if (!isSportsPanel && isSportsStory(s.title, s.summary)) {
+          logger.cron(`Stripped sports story from "${topic}" panel for ${subscriber.email}: ${s.title}`)
+          return false
+        }
+        return true
+      })
       if (freshStories.length > 0) {
         topicStories.push({ topic, stories: freshStories })
       } else {

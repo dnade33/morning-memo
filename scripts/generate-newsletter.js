@@ -73,10 +73,15 @@ function buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTit
 
   const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 
+  const subscriberTopics = topicStories.map(t => t.topic)
+  const hasSports = subscriberTopics.some(t => t === 'Sports' || ['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf'].includes(t))
+
   return `You are the editor of Morning Memo, a warm, intelligent daily briefing written for an older audience.
 Write a personalized newsletter for ${subscriber.first_name}.
 Today's date: ${todayStr}
+This subscriber's topics: ${subscriberTopics.join(', ')}
 
+${hasSports ? `⚠ HARD RULE — SPORTS CONTAINMENT: This subscriber has a Sports panel. Sports stories (games, scores, trades, athletes, leagues, tournaments) are ONLY permitted inside the Sports panel. They are strictly forbidden in World News, Politics, Finance, or any other panel. A baseball game result is not World News. A trade is not Finance. A tournament bracket is not Politics. If a story is about a sport, it goes in Sports or gets skipped — no exceptions.\n` : `⚠ HARD RULE — NO SPORTS: This subscriber did NOT select Sports. Do not include any sports stories, game results, trades, athlete news, or league updates in any panel.\n`}
 ${subscriber.city ? `Their city: ${subscriber.city}` : ''}
 ${subscriber.extra_notes ? `Personal note from subscriber: "${subscriber.extra_notes}"` : ''}
 ${recentTitlesBlock}
@@ -86,7 +91,9 @@ ${topicBlocks}
 Format your response using EXACTLY these markers — do not deviate:
 
 [GREETING]
-One or two warm, personal sentences greeting ${subscriber.first_name} by name. Energizing and friendly — no weather references.
+Two sentences. The first greets ${subscriber.first_name} by name — warm and energizing, no weather references. The second is a punchy teaser that previews 2-3 of the actual stories appearing below — like a friend giving you a quick heads-up on what's in today's memo. Only reference stories that genuinely appear in today's newsletter. Never invent or allude to content that isn't there.
+  WRONG: "The Devils are in trouble tonight." — if there is no Devils story below, do not say this.
+  RIGHT: "The Senators pulled off a stunner, markets are jittery ahead of the Fed decision, and there's a wild story out of Italy you won't want to miss."
 
 [TOPIC: TopicNameHere]
 [HEADLINE]Headline text here[/HEADLINE]
@@ -139,6 +146,10 @@ Headlines must answer "what happened?" not "what is this about?"
   WRONG: "Markets fell sharply on Wednesday amid recession fears."
   RIGHT: "The S&P 500 dropped 1.8% on Wednesday — its steepest single-day decline in three months — after weak manufacturing data reignited fears that the Fed's rate hikes are slowing the broader economy."
 
+- FINANCE — TIME AWARENESS: Be precise about market timing. If a story covers Friday's session, futures reference Monday's open — not "the open." Never write "futures pointing to weakness at the open" after markets have already closed without specifying which day's open is meant.
+  WRONG: "The Dow dropped 700 points during Friday's session, with futures pointing to further weakness at the open."
+  RIGHT: "The Dow dropped 700 points on Friday, with futures suggesting Monday's open could see further losses."
+
 - POLLS & SURVEYS: Whenever a story references a poll, survey, or public opinion finding, always include the specific percentage from the source. Never write "a majority," "most people," or "many Americans" — give the number. This applies to every topic, not just politics.
   WRONG: "A majority of Americans oppose military action against Iran."
   RIGHT: "62% of Americans oppose military action against Iran, according to a new poll."
@@ -169,6 +180,10 @@ Headlines must answer "what happened?" not "what is this about?"
 - NO CLICKBAIT: Never reproduce the withholding style of source headlines. If the article names a specific vegetable, drug, food, person, place, study finding, or product — use that name in your summary. Never write "one vegetable," "a particular supplement," "a key ingredient," or any phrasing that deliberately withholds the answer. The reader should not need to click to learn the core fact the story is about.
   WRONG: "A gastroenterologist identifies one vegetable that stands out for its ability to nourish healthy gut bacteria."
   RIGHT: "Gastroenterologists recommend leeks as a top choice for gut health, citing their high prebiotic fiber content as a key driver of beneficial gut bacteria growth."
+
+- ONE STORY ONE EVENT: Each story entry must cover exactly one event, development, or topic. Never combine two unrelated stories into a single headline or summary. If two separate stories happen to appear near each other in the source pool, write them as separate entries or pick the stronger one — never merge them.
+  WRONG: "USA advances in World Baseball Classic as tensions ease over Middle East ceasefire" — these are two completely unrelated events.
+  RIGHT: Cover each event separately, or choose one and skip the other.
 
 - NO INVENTED FACTS: Every statistic, record, ranking, score, date, position, roster move, or comparison in your summary must come directly from the source material provided. Never supply supporting facts, figures, player positions, team affiliations, or historical comparisons from your own training data memory. If the source does not state it, you do not state it. This applies especially to sports stories — never assign a player to a team, a position, or a roster action unless the source explicitly states it.
   WRONG: "Bo Bichette has been honest about his early struggles at third base" — if the source doesn't say that, don't write it.
