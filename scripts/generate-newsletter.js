@@ -53,7 +53,7 @@ function calculateStoryAllocation(subscriber, topicStories) {
   return allocation
 }
 
-function buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTitles = []) {
+function buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTitles = [], recentQuotes = []) {
   const topicBlocks = topicStories.map(({ topic, stories }) => {
     const count = allocation[topic] || 1
     const subtopics = subscriber.preferences?.[topic]
@@ -204,7 +204,7 @@ Headlines must answer "what happened?" not "what is this about?"
 ═══ QUOTE RULES ═══
 - Quote style: ${quoteStyle} — strict requirement. The quote MUST match this style regardless of the newsletter topics.
 - Must be a real, well-known quote from a real, named person. No made-up attributions, no publication names.
-- If the style is "Humor & Wit": use a genuinely funny quote — witty one-liners, dry humor, or absurdist observations. Mix it up.`
+- If the style is "Humor & Wit": use a genuinely funny quote — witty one-liners, dry humor, or absurdist observations. Mix it up.${recentQuotes.length > 0 ? `\n- DO NOT use quotes from any of these people — they were used recently and must not repeat: ${recentQuotes.join(', ')}` : ''}`
 }
 
 // ----------------------------------------------------------------
@@ -426,7 +426,7 @@ async function fetchWithRetry(fn, retries = 3) {
 // topicStories: array of { topic, stories[] } from fetch-rss.js
 // Returns: { subject, body_html }
 // ----------------------------------------------------------------
-async function generateNewsletter(subscriber, topicStories, recentTitles = []) {
+async function generateNewsletter(subscriber, topicStories, recentTitles = [], recentQuotes = []) {
   if (!topicStories || topicStories.length === 0) {
     throw new Error(`No stories available for subscriber ${subscriber.id} — cannot generate newsletter`)
   }
@@ -434,7 +434,7 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = []) {
   const quoteStyle = resolveQuoteStyle(subscriber.quote_style)
   const allocation = calculateStoryAllocation(subscriber, topicStories)
   const cappedTopicStories = topicStories.slice(0, Object.keys(allocation).length)
-  const prompt = buildPrompt(subscriber, cappedTopicStories, quoteStyle, allocation, recentTitles)
+  const prompt = buildPrompt(subscriber, cappedTopicStories, quoteStyle, allocation, recentTitles, recentQuotes)
 
   const rawText = await fetchWithRetry(async () => {
     const message = await client.messages.create({
@@ -551,7 +551,9 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = []) {
     .flatMap(t => t.stories.map(s => ({ link: s.link, title: s.headline })))
     .filter(s => s.link)
 
-  return { subject, body_html, sentStories }
+  const quoteAttribution = parsed.quote?.attribution || null
+
+  return { subject, body_html, sentStories, quoteAttribution }
 }
 
 // ----------------------------------------------------------------

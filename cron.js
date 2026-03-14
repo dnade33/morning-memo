@@ -236,8 +236,11 @@ async function processSlot(slot) {
       .select('story_link, title')
       .eq('subscriber_id', subscriber.id)
       .gte('sent_at', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
-    const seenLinks = new Set((recentRows || []).map(r => r.story_link))
+    const seenLinks = new Set((recentRows || []).map(r => r.story_link).filter(l => !l?.startsWith('quote::')))
     const recentTitles = (recentRows || []).map(r => r.title).filter(Boolean)
+    const recentQuotes = (recentRows || [])
+      .filter(r => r.story_link?.startsWith('quote::'))
+      .map(r => r.story_link.replace('quote::', ''))
 
     // Merge all fetched results into one pool per subscriber top-level topic.
     // topicOriginMap resolves any expanded key back to its origin:
@@ -277,16 +280,20 @@ async function processSlot(slot) {
     const shuffledTopicStories = weatherPanel ? [...nonWeather, weatherPanel] : nonWeather
 
     // Generate newsletter via Claude Haiku
-    const { subject, body_html, sentStories } = await generateNewsletter(subscriber, shuffledTopicStories, recentTitles)
+    const { subject, body_html, sentStories, quoteAttribution } = await generateNewsletter(subscriber, shuffledTopicStories, recentTitles, recentQuotes)
 
     // Send + log
     const result = await sendAndLog(subscriber, subject, body_html, supabase, DRY_RUN)
 
     // Log sent story links + titles for deduplication and repeat-saga tracking (skip in dry run)
-    if (result.success && !DRY_RUN && sentStories.length > 0) {
-      await supabase.from('sent_stories').insert(
-        sentStories.map(({ link, title }) => ({ subscriber_id: subscriber.id, story_link: link, title }))
-      )
+    if (result.success && !DRY_RUN) {
+      const inserts = sentStories.map(({ link, title }) => ({ subscriber_id: subscriber.id, story_link: link, title }))
+      if (quoteAttribution) {
+        inserts.push({ subscriber_id: subscriber.id, story_link: `quote::${quoteAttribution}`, title: null })
+      }
+      if (inserts.length > 0) {
+        await supabase.from('sent_stories').insert(inserts)
+      }
     }
 
     // Log covered subtopics for rotation (skip in dry run)
