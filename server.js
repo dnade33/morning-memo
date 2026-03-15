@@ -285,7 +285,7 @@ app.get('/api/admin/metrics', requireAdmin, async (req, res) => {
       .select('id, subject, status, sent_at, subscriber_id')
       .gte('sent_at', weekAgo.toISOString())
       .order('sent_at', { ascending: false })
-      .limit(100)
+      .limit(1000)
   ])
 
   // Join newsletters with subscriber info
