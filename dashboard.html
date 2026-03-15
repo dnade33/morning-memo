@@ -585,11 +585,17 @@
     const W = 400, H = 160, padL = 36, padR = 20, padT = 20, padB = 32
     const plotW = W - padL - padR, plotH = H - padT - padB
     const maxVal = Math.max(...counts, 1)
+    // Round ceiling up to a nice integer so ticks land on whole numbers
+    const niceCeil = maxVal <= 5 ? maxVal : Math.ceil(maxVal / 5) * 5
     const xPos = i => padL + (i / 4) * plotW
-    const yPos = v => padT + plotH - (v / maxVal) * plotH
-    const gridLines = [0, 0.5, 1].map(frac => {
-      const y = padT + plotH * (1 - frac)
-      const val = Math.round(frac * maxVal)
+    const yPos = v => padT + plotH - (v / niceCeil) * plotH
+    // Integer ticks — max 5 grid lines, step sized to fit
+    const tickStep = Math.ceil(niceCeil / 5)
+    const ticks = []
+    for (let v = 0; v <= niceCeil; v += tickStep) ticks.push(v)
+    if (ticks[ticks.length - 1] < niceCeil) ticks.push(niceCeil)
+    const gridLines = ticks.map(val => {
+      const y = yPos(val)
       return `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
               <text x="${padL - 6}" y="${y + 4}" text-anchor="end" font-size="9" fill="rgba(255,255,255,0.3)" font-family="monospace">${val}</text>`
     }).join('')
