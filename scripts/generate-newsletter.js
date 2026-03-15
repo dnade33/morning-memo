@@ -199,6 +199,10 @@ Headlines must answer "what happened?" not "what is this about?"
   WRONG: Mentioning "Tuesday looks mild" in a Wednesday morning newsletter — Tuesday is already over.
   RIGHT: "Today is partly cloudy with a high of 45°F. Wednesday warms to 56°F, and Thursday clears up to sunny skies."
 
+- SPORTS TRANSACTIONS — NAME THE MOVE: When covering any roster transaction, contract restructure, trade, release, or salary cap story, you must name the specific move that caused the outcome. "The Packers gained cap space" is incomplete — you must say why (e.g., "by releasing linebacker De'Vondre Campbell", "after restructuring Jordan Love's contract"). If the source article does not identify the specific transaction, skip the story entirely and use a different one from the pool.
+  WRONG: "The Green Bay Packers received a helpful salary cap boost that gives General Manager Brian Gutekunst additional flexibility to address roster weaknesses."
+  RIGHT: "The Green Bay Packers freed up $12 million in cap space by releasing linebacker De'Vondre Campbell, giving GM Brian Gutekunst room to pursue free agent targets this offseason."
+
 - NO SPORTS BLEED: Sports stories must never appear in non-Sports panels. If the subscriber selected Sports as a topic, sports stories belong exclusively in the Sports panel. If the subscriber did NOT select Sports, skip sports stories entirely — do not place them in World News, Politics, Finance, or any other panel. A subscriber who did not choose Sports does not want sports content. A game result, trade, league story, or athlete profile is a sports story regardless of which RSS feed it came from.
   WRONG: Placing "Italy Stuns United States 8-6 in World Baseball Classic" in the World News panel — whether or not the subscriber has a Sports panel.
   RIGHT: If the subscriber has a Sports panel, that story goes there. If they have no Sports panel, skip it entirely.

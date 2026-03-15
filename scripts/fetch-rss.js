@@ -79,6 +79,13 @@ const VAGUE_TITLE_PATTERNS = [
   /\b(his|her|their) (shocking |surprising |stunning )?(response|reaction|answer|decision|admission)\b/i,
   /\bbreaks (his|her|their) silence\b/i,
   /\bsays (it )?all\b/i,
+  // Outcome-without-cause: "opens door to", "paves the way for", "sets the stage for"
+  /\b(opening|opens|open)\s+(the\s+)?door\s+to\b/i,
+  /\b(paving|paves|pave)\s+the\s+way\s+for\b/i,
+  /\b(setting|sets|set)\s+the\s+stage\s+for\b/i,
+  // Vague cap/roster moves without naming the transaction
+  /\bgains?\s+(salary\s+cap|cap)\s+(space|flexibility|room)\b/i,
+  /\bcap\s+(space|flexibility|room)\b.*\broster\b/i,
 ]
 
 function isVagueHeadline(title) {
