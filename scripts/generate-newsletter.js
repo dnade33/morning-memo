@@ -177,13 +177,16 @@ Headlines must answer "what happened?" not "what is this about?"
 
 - THIN STORIES: If the source material for a story is too thin to support a genuine 2-3 sentence summary — essentially just a headline reworded into one sentence — skip it entirely and use a different story from the available pool. Never pad a stub into fake substance.
 
-- NO CLICKBAIT: Never reproduce the withholding style of source headlines. If the article names a specific vegetable, drug, food, person, place, study finding, or product — use that name in your summary. Never write "one vegetable," "a particular supplement," "a key ingredient," or any phrasing that deliberately withholds the answer. The reader should not need to click to learn the core fact the story is about.
+- NO CLICKBAIT: Never reproduce the withholding style of source headlines. If the article names a specific vegetable, drug, food, person, place, study finding, decision, or outcome — state it directly. Never write "one vegetable," "a particular supplement," "makes a decision," "announces his future," or any phrasing that withholds the actual answer. The reader must not need to click to learn the core fact.
   WRONG: "A gastroenterologist identifies one vegetable that stands out for its ability to nourish healthy gut bacteria."
   RIGHT: "Gastroenterologists recommend leeks as a top choice for gut health, citing their high prebiotic fiber content as a key driver of beneficial gut bacteria growth."
+  WRONG: "Kirk Cousins has made his retirement decision as the quarterback landscape shifts."
+  RIGHT: "Kirk Cousins has announced his retirement, ending a 12-year NFL career."
 
-- ONE STORY ONE EVENT: Each story entry must cover exactly one event, development, or topic. Never combine two unrelated stories into a single headline or summary. If two separate stories happen to appear near each other in the source pool, write them as separate entries or pick the stronger one — never merge them.
-  WRONG: "USA advances in World Baseball Classic as tensions ease over Middle East ceasefire" — these are two completely unrelated events.
-  RIGHT: Cover each event separately, or choose one and skip the other.
+- ONE STORY ONE EVENT: Each story entry must cover exactly one event, development, or topic. Never combine two unrelated stories into a single headline or summary. If two separate stories appear near each other in the source pool, write them as separate entries or pick the stronger one — never merge them. Every sentence in a summary must be about the same subject as the headline.
+  WRONG: "USA advances in World Baseball Classic as tensions ease over Middle East ceasefire" — two unrelated events.
+  WRONG: "Kirk Cousins has made his retirement decision as one surprise NFC contender emerges as a destination for free agents" — the NFC contender story has nothing to do with Kirk Cousins.
+  RIGHT: Cover each story separately. If a sentence introduces a new subject unrelated to the headline, delete it.
 
 - NO INVENTED FACTS: Every statistic, record, ranking, score, date, position, roster move, or comparison in your summary must come directly from the source material provided. Never supply supporting facts, figures, player positions, team affiliations, or historical comparisons from your own training data memory. If the source does not state it, you do not state it. This applies especially to sports stories — never assign a player to a team, a position, or a roster action unless the source explicitly states it.
   WRONG: "Bo Bichette has been honest about his early struggles at third base" — if the source doesn't say that, don't write it.
@@ -225,6 +228,16 @@ Headlines must answer "what happened?" not "what is this about?"
 // ----------------------------------------------------------------
 // Parse Claude's structured response into sections
 // ----------------------------------------------------------------
+// Hard sentence cap — enforced in code regardless of what Claude wrote
+// ----------------------------------------------------------------
+function truncateToSentences(text, max = 3) {
+  if (!text) return text
+  const sentences = text.match(/[^.!?]*[.!?]+[\s]*/g)
+  if (!sentences) return text
+  return sentences.slice(0, max).join('').trim()
+}
+
+// ----------------------------------------------------------------
 function parseNewsletterContent(text) {
   const result = { greeting: '', topics: [], quote: null }
 
@@ -249,7 +262,7 @@ function parseNewsletterContent(text) {
         const linkMatch = rawBody.match(/\[LINK\](https?:\/\/[^\s\[\]]+)/)
         const link = linkMatch ? linkMatch[1].trim() : ''
         const body = rawBody.replace(/\[LINK\][\s\S]*?(?:\[\/LINK\]|$)/, '').trim()
-        stories.push({ headline: storyMatch[1].trim(), body, link })
+        stories.push({ headline: storyMatch[1].trim(), body: truncateToSentences(body), link })
       }
     }
 

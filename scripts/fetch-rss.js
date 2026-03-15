@@ -64,6 +64,29 @@ const REFERENCE_TITLE_PATTERNS = [
 ]
 
 // ----------------------------------------------------------------
+// Vague/clickbait headline filter — blocks stories that withhold
+// the core outcome (e.g. "makes a decision", "reveals his plans")
+// These can never produce a useful summary regardless of prompt rules.
+// ----------------------------------------------------------------
+const VAGUE_TITLE_PATTERNS = [
+  /\bmakes (a |his |her |their )?(retirement |career |final |big |major |surprise |shocking )?(decision|announcement|choice|move|call)\b/i,
+  /\breveals (his|her|their) (plans|future|decision|next move|answer|secret|choice)\b/i,
+  /\bannounces (his|her|their) (future|plans|decision|next step|choice)\b/i,
+  /\b(what|here's what) (really )?(happened|he|she|they) (said|did|decided|chose)\b/i,
+  /\bthe (truth|real reason|shocking truth) (about|behind|why)\b/i,
+  /\byou (won't|will never) believe\b/i,
+  /\bhere's (what|why|how) (you|he|she|they|it)\b/i,
+  /\b(his|her|their) (shocking |surprising |stunning )?(response|reaction|answer|decision|admission)\b/i,
+  /\bbreaks (his|her|their) silence\b/i,
+  /\bsays (it )?all\b/i,
+]
+
+function isVagueHeadline(title) {
+  if (!title) return false
+  return VAGUE_TITLE_PATTERNS.some(re => re.test(title))
+}
+
+// ----------------------------------------------------------------
 // Listicle / roundup filter — blocks "Top N…", "10 Best…", year-end
 // roundups, and other list-format articles that produce vague summaries.
 // These are structurally incapable of yielding specific news coverage.
@@ -155,6 +178,7 @@ async function getCachedFeed(url) {
       }))
       .filter(s => isFreshArticle(s.date))
       .filter(s => !isReferenceArticle(s.title, s.link))
+      .filter(s => !isVagueHeadline(s.title))
       .filter(s => s.summary && s.summary.trim().length >= 80)
       .slice(0, 5)
   })
