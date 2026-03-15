@@ -581,10 +581,10 @@
               <div class="league-teams-panel ${isSelected ? 'open' : ''}" id="${panelId}">
                 <div class="teams-label">Pick your ${s} teams:</div>
                 <div class="teams-chips">${teamChips}</div>
-                <div class="teams-other-row">
+                ${['College Football','College Basketball','Soccer / MLS'].includes(s) ? `<div class="teams-other-row">
                   <input class="teams-other-input" placeholder="Other team..." data-leaguekey="${teamKey}" onkeydown="if(event.key==='Enter'){addCustomTeam(this)}" />
                   <button class="teams-other-btn" onclick="addCustomTeam(this.previousElementSibling)">+ ADD</button>
-                </div>
+                </div>` : ''}
               </div>
             </div>`
           }
