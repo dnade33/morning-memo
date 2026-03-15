@@ -67,7 +67,7 @@ function isValidEmail(email) {
 // POST /api/subscribe
 // ----------------------------------------------------------------
 app.post('/api/subscribe', subscribeLimiter, async (req, res) => {
-  const { name, email, topics, city, tagAnswers, time, quoteStyle, extra } = req.body
+  const { name, email, topics, city, tagAnswers, time, quoteStyle, extra, timezone } = req.body
 
   // --- Validate required fields ---
   if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -119,6 +119,7 @@ app.post('/api/subscribe', subscribeLimiter, async (req, res) => {
         delivery_time: time,
         quote_style: quoteStyle,
         extra_notes: extra || null,
+        timezone: (typeof timezone === 'string' && timezone.trim()) ? timezone.trim() : 'America/New_York',
         active: true
       },
       { onConflict: 'email' }
@@ -174,7 +175,7 @@ app.get('/api/preferences', async (req, res) => {
 // Updates subscriber preferences by token
 // ----------------------------------------------------------------
 app.post('/api/preferences', preferencesLimiter, async (req, res) => {
-  const { token, topics, city, tagAnswers, time, quoteStyle, extra } = req.body
+  const { token, topics, city, tagAnswers, time, quoteStyle, extra, timezone } = req.body
 
   if (!token) {
     return res.status(400).json({ error: 'token is required' })
@@ -202,7 +203,8 @@ app.post('/api/preferences', preferencesLimiter, async (req, res) => {
       preferences,
       delivery_time: time,
       quote_style: quoteStyle,
-      extra_notes: extra || null
+      extra_notes: extra || null,
+      ...(typeof timezone === 'string' && timezone.trim() ? { timezone: timezone.trim() } : {})
     })
     .eq('pref_token', token)
 

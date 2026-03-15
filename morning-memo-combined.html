@@ -1924,7 +1924,7 @@
         const res = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, topics, city, tagAnswers, time, quoteStyle, extra })
+          body: JSON.stringify({ name, email, topics, city, tagAnswers, time, quoteStyle, extra, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })
         });
         if (res.status === 409) {
           const body = await res.json();

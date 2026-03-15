@@ -1,6 +1,7 @@
 // Morning Memo — Daily newsletter cron orchestrator
-// Each delivery time slot has its own cron schedule (America/New_York).
-// Subscribers receive their email at the exact time they chose.
+// A single cron fires every 30 minutes (UTC). For each subscriber,
+// we check what time it is in THEIR timezone — if it matches their
+// chosen delivery_time slot, they get their newsletter.
 // Usage:
 //   node cron.js              → runs on schedule (production)
 //   DRY_RUN=true node cron.js → generates newsletters, logs only (no emails sent)
@@ -66,22 +67,32 @@ const TIME_SLOTS = [
 ]
 
 // ----------------------------------------------------------------
-// Process one delivery time slot
+// Returns the current time slot string (e.g. "7:00am") for a given
+// IANA timezone. Returns null if the current minute doesn't land on
+// one of our defined slots.
 // ----------------------------------------------------------------
-async function processSlot(slot) {
-  logger.cron(`Starting slot: ${slot}`)
-
-  // 1. Fetch active subscribers for this slot
-  const { data: subscribers, error } = await supabase
-    .from('subscribers')
-    .select('*')
-    .eq('active', true)
-    .eq('delivery_time', slot)
-
-  if (error) {
-    logger.error(`Failed to fetch subscribers for slot ${slot}`, error)
-    return { sent: 0, failed: 0 }
+function getCurrentSlot(timezone) {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }).formatToParts(new Date())
+    const hour   = parts.find(p => p.type === 'hour').value
+    const minute = parts.find(p => p.type === 'minute').value
+    const period = parts.find(p => p.type === 'dayPeriod').value.toLowerCase()
+    return `${hour}:${minute}${period}` // e.g. "7:00am"
+  } catch {
+    return null
   }
+}
+
+// ----------------------------------------------------------------
+// Process one delivery time slot — subscribers must be pre-fetched
+// ----------------------------------------------------------------
+async function processSlot(slot, subscribers) {
+  logger.cron(`Starting slot: ${slot}`)
 
   if (!subscribers || subscribers.length === 0) {
     logger.cron(`No subscribers for slot ${slot} — skipping`)
@@ -385,22 +396,50 @@ async function processSlot(slot) {
 }
 
 // ----------------------------------------------------------------
-// Main run function — processes all time slots sequentially
+// Fetch all active subscribers from Supabase
+// ----------------------------------------------------------------
+async function fetchAllActiveSubscribers() {
+  const { data, error } = await supabase
+    .from('subscribers')
+    .select('*')
+    .eq('active', true)
+  if (error) {
+    logger.error('Failed to fetch active subscribers', error)
+    return []
+  }
+  return data || []
+}
+
+// ----------------------------------------------------------------
+// Main run function — used by RUN_NOW (processes every subscriber
+// regardless of current time, grouped by their delivery_time slot)
 // ----------------------------------------------------------------
 async function runCron() {
   const startTime = new Date()
   logger.cron(`=== Morning Memo cron started${DRY_RUN ? ' [DRY RUN]' : ''} ===`)
 
+  const allSubs = await fetchAllActiveSubscribers()
+
+  // Group by delivery_time slot
+  const slotGroups = {}
+  for (const sub of allSubs) {
+    const slot = sub.delivery_time
+    if (!slot) continue
+    if (!slotGroups[slot]) slotGroups[slot] = []
+    slotGroups[slot].push(sub)
+  }
+
   let totalSent = 0
   let totalFailed = 0
 
   for (const slot of TIME_SLOTS) {
+    const subs = slotGroups[slot]
+    if (!subs || subs.length === 0) continue
     try {
-      const { sent, failed } = await processSlot(slot)
+      const { sent, failed } = await processSlot(slot, subs)
       totalSent += sent
       totalFailed += failed
     } catch (err) {
-      // Catch unexpected errors so one slot failure doesn't abort the rest
       logger.error(`Unexpected error processing slot ${slot}`, err)
     }
   }
@@ -417,38 +456,41 @@ async function runCron() {
 // ----------------------------------------------------------------
 // Entry point (only runs when executed directly, not when imported)
 // ----------------------------------------------------------------
-// Maps each delivery time slot to its cron expression (America/New_York)
-const SLOT_CRONS = {
-  '6:00am':  '0 6 * * *',
-  '6:30am':  '30 6 * * *',
-  '7:00am':  '0 7 * * *',
-  '7:30am':  '30 7 * * *',
-  '8:00am':  '0 8 * * *',
-  '8:30am':  '30 8 * * *',
-  '9:00am':  '0 9 * * *',
-  '9:30am':  '30 9 * * *',
-  '10:00am': '0 10 * * *',
-}
-
 if (require.main === module) {
   if (process.env.RUN_NOW === 'true') {
-    // Manual trigger for testing — run all slots immediately
+    // Manual trigger for testing — run all active subscribers immediately
     logger.cron('RUN_NOW=true — executing all slots immediately')
     runCron().catch(err => {
       logger.error('Cron run failed', err)
       process.exit(1)
     })
   } else {
-    // Production: each slot fires at its exact delivery time (America/New_York)
-    for (const [slot, expression] of Object.entries(SLOT_CRONS)) {
-      cron.schedule(expression, () => {
-        processSlot(slot).catch(err => {
+    // Production: single cron fires every 30 min (UTC).
+    // For each active subscriber, check if "now" in their timezone
+    // matches their chosen delivery_time — if so, send their newsletter.
+    cron.schedule('0,30 * * * *', async () => {
+      const allSubs = await fetchAllActiveSubscribers()
+      if (allSubs.length === 0) return
+
+      // Group subscribers whose local time matches a valid slot right now
+      const slotGroups = {}
+      for (const sub of allSubs) {
+        const tz   = sub.timezone || 'America/New_York'
+        const slot = getCurrentSlot(tz)
+        if (!slot || !TIME_SLOTS.includes(slot)) continue
+        if (sub.delivery_time !== slot) continue
+        if (!slotGroups[slot]) slotGroups[slot] = []
+        slotGroups[slot].push(sub)
+      }
+
+      for (const [slot, subs] of Object.entries(slotGroups)) {
+        processSlot(slot, subs).catch(err => {
           logger.error(`Cron slot ${slot} failed`, err)
         })
-      }, { timezone: 'America/New_York' })
-    }
+      }
+    }, { timezone: 'UTC' })
 
-    logger.cron(`Cron scheduled — each slot fires at its delivery time (America/New_York)${DRY_RUN ? ' [DRY RUN mode]' : ''}`)
+    logger.cron(`Cron scheduled — fires every 30 min (UTC), timezone-aware per subscriber${DRY_RUN ? ' [DRY RUN mode]' : ''}`)
   }
 }
 
