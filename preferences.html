@@ -186,6 +186,10 @@
       color: #a8b8cc; cursor: pointer; letter-spacing: 0.5px; user-select: none;
     }
     .team-chip.selected { border-color: rgba(0,212,255,0.4); color: #00d4ff; background: rgba(0,212,255,0.05); }
+    .teams-other-row { display: flex; gap: 6px; margin-top: 8px; }
+    .teams-other-input { flex: 1; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #dde2ed; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 10px; padding: 4px 8px; outline: none; }
+    .teams-other-input::placeholder { color: #4a5568; }
+    .teams-other-btn { padding: 4px 10px; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 10px; letter-spacing: 1px; background: transparent; border: 1px solid rgba(0,212,255,0.3); color: #00d4ff; cursor: pointer; }
 
     /* City field */
     .city-row {
@@ -577,6 +581,10 @@
               <div class="league-teams-panel ${isSelected ? 'open' : ''}" id="${panelId}">
                 <div class="teams-label">Pick your ${s} teams:</div>
                 <div class="teams-chips">${teamChips}</div>
+                <div class="teams-other-row">
+                  <input class="teams-other-input" placeholder="Other team..." data-leaguekey="${teamKey}" onkeydown="if(event.key==='Enter'){addCustomTeam(this)}" />
+                  <button class="teams-other-btn" onclick="addCustomTeam(this.previousElementSibling)">+ ADD</button>
+                </div>
               </div>
             </div>`
           }
@@ -662,6 +670,24 @@
     function onWeatherChange() {
       const checked = document.getElementById('weather-check').checked
       document.getElementById('city-row').classList.toggle('visible', checked)
+    }
+
+    function addCustomTeam(input) {
+      const val = input.value.trim()
+      if (!val) return
+      const leagueKey = input.dataset.leaguekey
+      const chipsContainer = input.closest('.league-teams-panel').querySelector('.teams-chips')
+      // Don't add duplicates
+      const existing = Array.from(chipsContainer.querySelectorAll('.team-chip'))
+        .find(c => c.textContent.toLowerCase() === val.toLowerCase())
+      if (existing) { existing.classList.add('selected'); input.value = ''; return }
+      const chip = document.createElement('div')
+      chip.className = 'team-chip selected'
+      chip.dataset.leaguekey = leagueKey
+      chip.textContent = val
+      chip.onclick = () => chip.classList.toggle('selected')
+      chipsContainer.appendChild(chip)
+      input.value = ''
     }
 
     function toggleSubtopic(el) {
