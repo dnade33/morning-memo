@@ -267,6 +267,7 @@ async function processSlot(slot) {
       .eq('subscriber_id', subscriber.id)
       .gte('sent_at', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
     const seenLinks = new Set((recentRows || []).map(r => r.story_link).filter(l => !l?.startsWith('quote::')))
+    const seenTitles = new Set((recentRows || []).filter(r => r.title && !r.story_link?.startsWith('quote::')).map(r => r.title.toLowerCase().trim()))
     const recentTitles = (recentRows || []).map(r => r.title).filter(Boolean)
     const recentQuotes = (recentRows || [])
       .filter(r => r.story_link?.startsWith('quote::'))
@@ -289,6 +290,7 @@ async function processSlot(slot) {
       const isSportsPanel = SPORTS_TOPIC_KEYS.has(topic)
       const freshStories = stories.filter(s => {
         if (s.link && seenLinks.has(s.link)) return false
+        if (s.title && seenTitles.has(s.title.toLowerCase().trim())) return false
         // If this is a non-sports panel and the subscriber has a sports panel (or has no sports
         // panel at all), strip any story that reads as a sports story
         if (!isSportsPanel && isSportsStory(s.title, s.summary)) {
