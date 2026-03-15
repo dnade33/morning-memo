@@ -270,7 +270,7 @@ async function processSlot(slot) {
     const recentTitles = (recentRows || []).map(r => r.title).filter(Boolean)
     const recentQuotes = (recentRows || [])
       .filter(r => r.story_link?.startsWith('quote::'))
-      .map(r => r.story_link.replace('quote::', ''))
+      .map(r => ({ attribution: r.story_link.replace('quote::', ''), text: r.title || '' }))
 
     // Merge all fetched results into one pool per subscriber top-level topic.
     // topicOriginMap resolves any expanded key back to its origin:
@@ -320,7 +320,7 @@ async function processSlot(slot) {
     const shuffledTopicStories = weatherPanel ? [...nonWeather, weatherPanel] : nonWeather
 
     // Generate newsletter via Claude Haiku
-    const { subject, body_html, sentStories, quoteAttribution } = await generateNewsletter(subscriber, shuffledTopicStories, recentTitles, recentQuotes)
+    const { subject, body_html, sentStories, quoteAttribution, quoteText } = await generateNewsletter(subscriber, shuffledTopicStories, recentTitles, recentQuotes)
 
     // Send + log
     const result = await sendAndLog(subscriber, subject, body_html, supabase, DRY_RUN)
@@ -329,7 +329,7 @@ async function processSlot(slot) {
     if (result.success && !DRY_RUN) {
       const inserts = sentStories.map(({ link, title }) => ({ subscriber_id: subscriber.id, story_link: link, title }))
       if (quoteAttribution) {
-        inserts.push({ subscriber_id: subscriber.id, story_link: `quote::${quoteAttribution}`, title: null })
+        inserts.push({ subscriber_id: subscriber.id, story_link: `quote::${quoteAttribution}`, title: quoteText })
       }
       if (inserts.length > 0) {
         await supabase.from('sent_stories').insert(inserts)

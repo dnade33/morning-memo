@@ -219,7 +219,7 @@ Headlines must answer "what happened?" not "what is this about?"
 ═══ QUOTE RULES ═══
 - Quote style: ${quoteStyle} — strict requirement. The quote MUST match this style regardless of the newsletter topics.
 - Must be a real, well-known quote from a real, named person. No made-up attributions, no publication names.
-- If the style is "Humor & Wit": use a genuinely funny quote — witty one-liners, dry humor, or absurdist observations. Mix it up.${recentQuotes.length > 0 ? `\n- DO NOT use quotes from any of these people — they were used recently and must not repeat: ${recentQuotes.join(', ')}` : ''}`
+- If the style is "Humor & Wit": use a genuinely funny quote — witty one-liners, dry humor, or absurdist observations. Mix it up.${recentQuotes.length > 0 ? `\n- DO NOT reuse any of the following quotes or their authors — both the person and the quote text are banned for today:\n${recentQuotes.map(q => `  • "${q.text}" — ${q.attribution}`).join('\n')}` : ''}`
 }
 
 // ----------------------------------------------------------------
@@ -567,8 +567,9 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = [], r
     .filter(s => s.link)
 
   const quoteAttribution = parsed.quote?.attribution || null
+  const quoteText = parsed.quote?.text || null
 
-  return { subject, body_html, sentStories, quoteAttribution }
+  return { subject, body_html, sentStories, quoteAttribution, quoteText }
 }
 
 // ----------------------------------------------------------------
