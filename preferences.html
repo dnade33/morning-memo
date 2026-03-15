@@ -186,10 +186,14 @@
       color: #a8b8cc; cursor: pointer; letter-spacing: 0.5px; user-select: none;
     }
     .team-chip.selected { border-color: rgba(0,212,255,0.4); color: #00d4ff; background: rgba(0,212,255,0.05); }
-    .teams-other-row { display: flex; gap: 6px; margin-top: 8px; }
+    .teams-other-row { position: relative; display: flex; gap: 6px; margin-top: 8px; }
     .teams-other-input { flex: 1; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #dde2ed; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 10px; padding: 4px 8px; outline: none; }
     .teams-other-input::placeholder { color: #4a5568; }
     .teams-other-btn { padding: 4px 10px; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 10px; letter-spacing: 1px; background: transparent; border: 1px solid rgba(0,212,255,0.3); color: #00d4ff; cursor: pointer; }
+    .teams-autocomplete { position: absolute; top: 100%; left: 0; right: 40px; background: #111827; border: 1px solid rgba(0,212,255,0.2); z-index: 100; max-height: 160px; overflow-y: auto; display: none; }
+    .teams-autocomplete.open { display: block; }
+    .teams-autocomplete-item { padding: 5px 8px; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 10px; color: #a8b8cc; cursor: pointer; }
+    .teams-autocomplete-item:hover { background: rgba(0,212,255,0.08); color: #00d4ff; }
 
     /* City field */
     .city-row {
@@ -433,8 +437,8 @@
       'NBA':  ['76ers','Bucks','Bulls','Cavaliers','Celtics','Clippers','Grizzlies','Hawks','Heat','Hornets','Jazz','Kings','Knicks','Lakers','Magic','Mavericks','Nets','Nuggets','Pacers','Pelicans','Pistons','Raptors','Rockets','Spurs','Suns','Thunder','Timberwolves','Trail Blazers','Warriors','Wizards'],
       'MLB':  ['Angels','Astros','Athletics','Blue Jays','Braves','Brewers','Cardinals','Cubs','Diamondbacks','Dodgers','Giants','Guardians','Mariners','Marlins','Mets','Nationals','Orioles','Padres','Phillies','Pirates','Rangers','Rays','Red Sox','Reds','Rockies','Royals','Tigers','Twins','White Sox','Yankees'],
       'NHL':  ['Avalanche','Blackhawks','Blue Jackets','Blues','Bruins','Canadiens','Canucks','Capitals','Devils','Ducks','Flames','Flyers','Golden Knights','Hurricanes','Islanders','Jets','Kings','Kraken','Lightning','Maple Leafs','Oilers','Panthers','Penguins','Predators','Rangers','Red Wings','Sabres','Senators','Sharks','Stars','Wild'],
-      'College Football': ['Alabama','Ohio State','Georgia','Michigan','Texas','USC','Notre Dame','Clemson','Penn State','Oklahoma','LSU','Florida State','Tennessee','Oregon','Washington','Miami','Auburn','Florida','Wisconsin','Iowa'],
-      'College Basketball': ['Duke','Kentucky','Kansas','UNC','Gonzaga','Connecticut','Houston','Arizona','Purdue','Michigan State','Villanova','Syracuse','Louisville','UCLA','Indiana','Ohio State','Wisconsin','Texas','Baylor','Florida'],
+      'College Football': ['Alabama','Ohio State','Georgia','Michigan','Texas','USC','Notre Dame','Clemson','Penn State','Oklahoma','LSU','Florida State','Tennessee','Oregon','Washington','Miami','Auburn','Florida','Wisconsin','Iowa','Arkansas','Arizona State','Baylor','Boston College','Cal','Colorado','Duke','Georgia Tech','Illinois','Indiana','Iowa State','Kansas','Kansas State','Kentucky','Maryland','Memphis','Miami OH','Michigan State','Minnesota','Mississippi State','Missouri','NC State','Nebraska','North Carolina','Northwestern','Ohio','Oklahoma State','Ole Miss','Oregon State','Pittsburgh','Purdue','Rutgers','SMU','Stanford','Syracuse','TCU','Texas A&M','Texas Tech','Tulane','UCF','Utah','Vanderbilt','Virginia','Virginia Tech','Wake Forest','West Virginia'],
+      'College Basketball': ['Duke','Kentucky','Kansas','UNC','Gonzaga','Connecticut','Houston','Arizona','Purdue','Michigan State','Villanova','Syracuse','Louisville','UCLA','Indiana','Ohio State','Wisconsin','Texas','Baylor','Florida','Alabama','Arkansas','Auburn','Boston College','Butler','Cincinnati','Clemson','Colorado','Creighton','Davidson','Dayton','DePaul','Drake','Florida State','Georgetown','Georgia','Georgia Tech','Illinois','Iowa','Iowa State','Kansas State','Marquette','Maryland','Memphis','Miami','Michigan','Minnesota','Mississippi State','Missouri','NC State','Nebraska','North Carolina State','Northwestern','Notre Dame','Ohio State','Oklahoma','Oklahoma State','Ole Miss','Oregon','Penn State','Pittsburgh','Providence','Rutgers','Saint Louis','San Diego State','Seton Hall','SMU','South Carolina','Stanford','St. John\'s','Tennessee','Texas A&M','Texas Tech','Utah','Vanderbilt','Virginia','Virginia Tech','Wake Forest','West Virginia','Xavier'],
       'Soccer / MLS': ['LAFC','LA Galaxy','Inter Miami','Atlanta United','Seattle Sounders','Portland Timbers','NYCFC','Red Bulls','Toronto FC','Montreal','Chicago Fire','Columbus Crew','FC Cincinnati','Nashville SC','Austin FC']
     }
 
@@ -582,8 +586,12 @@
                 <div class="teams-label">Pick your ${s} teams:</div>
                 <div class="teams-chips">${teamChips}</div>
                 ${['College Football','College Basketball','Soccer / MLS'].includes(s) ? `<div class="teams-other-row">
-                  <input class="teams-other-input" placeholder="Other team..." data-leaguekey="${teamKey}" onkeydown="if(event.key==='Enter'){addCustomTeam(this)}" />
-                  <button class="teams-other-btn" onclick="addCustomTeam(this.previousElementSibling)">+ ADD</button>
+                  <input class="teams-other-input" placeholder="Search for a team..." data-leaguekey="${teamKey}" data-league="${s}"
+                    oninput="handleTeamSearch(this)"
+                    onkeydown="if(event.key==='Enter'){addCustomTeam(this);closeAutocomplete(this)}"
+                    onblur="setTimeout(()=>closeAutocomplete(this),150)" />
+                  <div class="teams-autocomplete" id="ac-${panelId}"></div>
+                  <button class="teams-other-btn" onclick="addCustomTeam(this.previousElementSibling.previousElementSibling)">+ ADD</button>
                 </div>` : ''}
               </div>
             </div>`
@@ -670,6 +678,36 @@
     function onWeatherChange() {
       const checked = document.getElementById('weather-check').checked
       document.getElementById('city-row').classList.toggle('visible', checked)
+    }
+
+    function handleTeamSearch(input) {
+      const val = input.value.trim().toLowerCase()
+      const league = input.dataset.league
+      const panelId = input.closest('.league-teams-panel').id
+      const dropdown = document.getElementById('ac-' + panelId)
+      if (!dropdown) return
+      if (!val) { dropdown.classList.remove('open'); return }
+      const allTeams = LEAGUE_TEAMS[league] || []
+      const matches = allTeams.filter(t => t.toLowerCase().includes(val)).slice(0, 8)
+      if (matches.length === 0) { dropdown.classList.remove('open'); return }
+      dropdown.innerHTML = matches.map(t =>
+        `<div class="teams-autocomplete-item" onmousedown="selectAutocompleteTeam(this)" data-team="${t}">${t}</div>`
+      ).join('')
+      dropdown.classList.add('open')
+    }
+
+    function selectAutocompleteTeam(item) {
+      const input = item.closest('.teams-other-row').querySelector('.teams-other-input')
+      input.value = item.dataset.team
+      addCustomTeam(input)
+      closeAutocomplete(input)
+    }
+
+    function closeAutocomplete(input) {
+      const panelId = input.closest('.league-teams-panel').id
+      const dropdown = document.getElementById('ac-' + panelId)
+      if (dropdown) { dropdown.classList.remove('open'); dropdown.innerHTML = '' }
+      input.value = ''
     }
 
     function addCustomTeam(input) {
