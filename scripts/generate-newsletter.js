@@ -161,6 +161,10 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
   WRONG: "Shai Gilgeous-Alexander tied a record set by Wilt Chamberlain over 60 years ago."
   RIGHT: "Shai Gilgeous-Alexander extended his streak of consecutive 20-point games to 53, tying Wilt Chamberlain's 1962 record."
 
+- SCIENCE & DISCOVERY: Name the actual finding. If a study found a specific mechanism, compound, species, or number — write it. Never substitute the finding with phrases like "in unexpected ways," "mechanisms scientists did not previously understand," or "could reshape how we think."
+  WRONG: "Researchers found that ocean pressure supports marine life through mechanisms scientists did not previously understand."
+  RIGHT: "Researchers found that deep-sea pressure drives chemosynthesis in piezophilic bacteria, sustaining ecosystems without sunlight."
+
 - FINANCE TIME AWARENESS: Be precise about market timing. If a story covers Friday's session, futures reference Monday's open — not "the open."
   WRONG: "The Dow dropped 700 points, with futures pointing to further weakness at the open."
   RIGHT: "The Dow dropped 700 points on Friday, with futures suggesting Monday's open could see further losses."

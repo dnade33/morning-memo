@@ -86,6 +86,11 @@ const VAGUE_TITLE_PATTERNS = [
   // Vague cap/roster moves without naming the transaction
   /\bgains?\s+(salary\s+cap|cap)\s+(space|flexibility|room)\b/i,
   /\bcap\s+(space|flexibility|room)\b.*\broster\b/i,
+  // Vague science/discovery — withholds the actual finding
+  /\bin (unexpected|surprising|new|strange|bizarre|remarkable|fascinating) ways?\b/i,
+  /\b(could|may|might) (change|reshape|revolutionize|transform) (the way|how|what) (we|scientists|researchers)\b/i,
+  /\bscientists (still )?don'?t (fully )?understand\b/i,
+  /\bnew (clues?|evidence|insight) (into|about|on) (the )?(mystery|secret|puzzle|question) of\b/i,
 ]
 
 function isVagueHeadline(title) {
