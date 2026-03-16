@@ -161,7 +161,7 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
   WRONG: "Shai Gilgeous-Alexander tied a record set by Wilt Chamberlain over 60 years ago."
   RIGHT: "Shai Gilgeous-Alexander extended his streak of consecutive 20-point games to 53, tying Wilt Chamberlain's 1962 record."
 
-- SCIENCE & DISCOVERY: Name the actual finding. If a study found a specific mechanism, compound, species, or number — write it. Never substitute the finding with phrases like "in unexpected ways," "mechanisms scientists did not previously understand," or "could reshape how we think."
+- NAME THE FINDING: Any story covering a study, discovery, decision, treatment, or outcome must state the actual result. Never use vague placeholders like "in unexpected ways," "mechanisms not previously understood," "surprising new evidence," or "could reshape how we think." This applies to every topic — science, health, finance, politics, sports, history.
   WRONG: "Researchers found that ocean pressure supports marine life through mechanisms scientists did not previously understand."
   RIGHT: "Researchers found that deep-sea pressure drives chemosynthesis in piezophilic bacteria, sustaining ecosystems without sunlight."
 
