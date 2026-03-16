@@ -123,6 +123,21 @@ async function processSlot(slot, subscribers) {
   let failed = 0
 
   async function processSubscriber(subscriber) {
+    // Guard: skip if already sent today (prevents duplicate sends on Railway deploys)
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+    const { data: sentToday } = await supabase
+      .from('newsletters')
+      .select('id')
+      .eq('subscriber_id', subscriber.id)
+      .eq('status', 'sent')
+      .gte('sent_at', todayStart.toISOString())
+      .limit(1)
+    if (sentToday && sentToday.length > 0) {
+      logger.cron(`Already sent today — skipping ${subscriber.email}`)
+      return
+    }
+
     // Fetch subtopics covered for this subscriber in the last 36 hours
     // so we can rotate coverage across subtopics day-to-day.
     const { data: recentSubtopicRows } = await supabase
