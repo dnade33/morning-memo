@@ -556,6 +556,18 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = [], r
     .flatMap(t => t.stories.map(s => ({ link: s.link, title: originalTitleByLink[s.link] || s.headline })))
     .filter(s => s.link)
 
+  // Code-level quote dedup — Claude sometimes ignores the prompt ban on recent quotes.
+  // If the returned quote matches a banned author or text, strip it entirely.
+  if (parsed.quote && recentQuotes.length > 0) {
+    const returnedAuthor = (parsed.quote.attribution || '').toLowerCase().trim()
+    const returnedText   = (parsed.quote.text || '').toLowerCase().trim()
+    const isBanned = recentQuotes.some(q =>
+      (q.attribution && q.attribution.toLowerCase().trim() === returnedAuthor) ||
+      (q.text && q.text.toLowerCase().trim() === returnedText)
+    )
+    if (isBanned) parsed.quote = null
+  }
+
   const quoteAttribution = parsed.quote?.attribution || null
   const quoteText = parsed.quote?.text || null
 
