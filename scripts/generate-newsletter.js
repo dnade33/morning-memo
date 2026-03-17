@@ -542,9 +542,18 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = [], r
   const subject = `Your Morning Memo — ${formattedDate}`
   const body_html = buildMissionControlEmail(parsed, formattedDate, subscriber.pref_token)
 
-  // Collect all sent stories (link + headline) for deduplication and repeat-saga tracking
+  // Build link → original RSS title map so we store the raw title for deduplication,
+  // not Claude's rewritten headline (which never matches the RSS feed title on the next run)
+  const originalTitleByLink = {}
+  for (const { stories } of topicStories) {
+    for (const s of stories) {
+      if (s.link && s.title) originalTitleByLink[s.link] = s.title
+    }
+  }
+
+  // Collect all sent stories (link + original RSS title) for deduplication
   const sentStories = parsed.topics
-    .flatMap(t => t.stories.map(s => ({ link: s.link, title: s.headline })))
+    .flatMap(t => t.stories.map(s => ({ link: s.link, title: originalTitleByLink[s.link] || s.headline })))
     .filter(s => s.link)
 
   const quoteAttribution = parsed.quote?.attribution || null
