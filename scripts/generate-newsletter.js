@@ -128,6 +128,9 @@ Headlines must answer "what happened?" — not "what is this about?"
   WRONG: "Medicaid and the politics of health care and elections."
   RIGHT: "House Republicans Propose $880B Medicaid Cut Ahead of 2026 Midterms"
 
+═══ CARDINAL RULE ═══
+Every story panel must leave the reader genuinely more informed than the headline alone did. If someone reads only your summary and never clicks the link, they must still walk away knowing something real. A summary that merely restates the headline in different words has failed.
+
 ═══ LENGTH RULE ═══
 Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
 
@@ -150,6 +153,8 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
 - ONE STORY, ONE EVENT: Each entry covers exactly one event. Never combine unrelated stories into one headline or summary. Never cover the same event twice in the same newsletter — if two source articles cover the same game or development, pick the one with more substance and skip the other.
   WRONG: "USA advances in World Baseball Classic as tensions ease over Middle East ceasefire." — two unrelated events.
   WRONG: "Kirk Cousins retires as one surprise NFC contender emerges as a free-agent destination." — unrelated second story bolted on.
+
+- THIN STORIES: If the source material is too thin to support a genuine 2–3 sentence summary — essentially just a headline reworded into one sentence — skip it entirely and use a different story from the pool. Never pad a stub into fake substance.
 
 - NO REPEATS: If a story covers the same ongoing event, court case, or policy dispute as any story in the "Already sent" list above, skip it and use a different story from the pool.
 
