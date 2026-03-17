@@ -103,12 +103,6 @@ async function processSlot(slot, subscribers) {
 
   // 2. Pre-fetch all unique topics needed for this slot batch
   const allTopics = [...new Set(subscribers.flatMap(s => s.topics))]
-  // Collect unique cities for Local Weather subscribers
-  const weatherCities = [...new Set(
-    subscribers
-      .filter(s => s.topics.includes('Local Weather') && s.city)
-      .map(s => s.city)
-  )]
 
   // Prime the cache for non-weather topics (best-effort — failures are handled per-subscriber)
   const primeTopics = allTopics.filter(t => t !== 'Local Weather')
@@ -124,15 +118,20 @@ async function processSlot(slot, subscribers) {
 
   async function processSubscriber(subscriber) {
     // Guard: skip if already sent today (prevents duplicate sends on Railway deploys)
+    // Use UTC midnight so the boundary is consistent with Railway's server timezone.
     const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
-    const { data: sentToday } = await supabase
+    todayStart.setUTCHours(0, 0, 0, 0)
+    const { data: sentToday, error: sentTodayErr } = await supabase
       .from('newsletters')
       .select('id')
       .eq('subscriber_id', subscriber.id)
       .eq('status', 'sent')
       .gte('sent_at', todayStart.toISOString())
       .limit(1)
+    if (sentTodayErr) {
+      logger.error(`Guard query failed for ${subscriber.email} — skipping to be safe`, sentTodayErr)
+      return
+    }
     if (sentToday && sentToday.length > 0) {
       logger.cron(`Already sent today — skipping ${subscriber.email}`)
       return
