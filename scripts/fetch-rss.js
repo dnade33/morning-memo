@@ -124,13 +124,19 @@ const LISTICLE_TITLE_PATTERNS = [
 // Freshness filter — drops articles older than 7 days.
 // Articles with no date or an unparseable date are kept (safe default).
 // ----------------------------------------------------------------
-const MAX_ARTICLE_AGE_MS = 7 * 24 * 60 * 60 * 1000
+const MAX_ARTICLE_AGE_MS       = 7 * 24 * 60 * 60 * 1000
+const MAX_SPORTS_ARTICLE_AGE_MS = 36 * 60 * 60 * 1000  // 36 hours — game recaps go stale fast
 
-function isFreshArticle(dateStr) {
+const SPORTS_TOPIC_KEYS = new Set([
+  'Sports', 'NFL', 'NBA', 'MLB', 'NHL',
+  'College Football', 'College Basketball', 'Soccer / MLS', 'Golf'
+])
+
+function isFreshArticle(dateStr, maxAgeMs = MAX_ARTICLE_AGE_MS) {
   if (!dateStr) return true
   const published = new Date(dateStr)
   if (isNaN(published.getTime())) return true
-  return (Date.now() - published.getTime()) <= MAX_ARTICLE_AGE_MS
+  return (Date.now() - published.getTime()) <= maxAgeMs
 }
 
 function isReferenceArticle(title, link) {
@@ -353,7 +359,7 @@ async function getCachedStories(topics, city) {
       const [league, team] = topic.split('::')
       const url = getTeamFeedUrl(team, league)
       try {
-        const stories = await getCachedFeed(url)
+        const stories = (await getCachedFeed(url)).filter(s => isFreshArticle(s.date, MAX_SPORTS_ARTICLE_AGE_MS))
         results.push({ topic, stories })
       } catch (err) {
         logger.warn(`Team feed fetch failed for ${team} (${league})`, err.message)
@@ -368,8 +374,12 @@ async function getCachedStories(topics, city) {
       continue
     }
 
+    const isSportsTopic = SPORTS_TOPIC_KEYS.has(topic)
     try {
-      const stories = await getCachedFeed(url)
+      const allStories = await getCachedFeed(url)
+      const stories = isSportsTopic
+        ? allStories.filter(s => isFreshArticle(s.date, MAX_SPORTS_ARTICLE_AGE_MS))
+        : allStories
       results.push({ topic, stories })
     } catch (err) {
       logger.warn(`RSS fetch failed for topic: ${topic}`, err.message)
