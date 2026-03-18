@@ -285,17 +285,25 @@ async function processSlot(slot, subscribers) {
     // Fetch stories for this subscriber's specific topics
     const rawTopicStories = await getCachedStories(expandedTopics, subscriber.city)
 
-    // Fetch story links + titles sent to this subscriber in the last 2 days
-    const { data: recentRows } = await supabase
+    // Fetch recent stories (2-day window) for story deduplication
+    const { data: recentStoryRows } = await supabase
       .from('sent_stories')
       .select('story_link, title')
       .eq('subscriber_id', subscriber.id)
+      .not('story_link', 'like', 'quote::%')
       .gte('sent_at', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
-    const seenLinks = new Set((recentRows || []).map(r => r.story_link).filter(l => !l?.startsWith('quote::')))
-    const seenTitles = new Set((recentRows || []).filter(r => r.title && !r.story_link?.startsWith('quote::')).map(r => r.title.toLowerCase().trim()))
-    const recentTitles = (recentRows || []).map(r => r.title).filter(Boolean)
-    const recentQuotes = (recentRows || [])
-      .filter(r => r.story_link?.startsWith('quote::'))
+    const seenLinks = new Set((recentStoryRows || []).map(r => r.story_link).filter(Boolean))
+    const seenTitles = new Set((recentStoryRows || []).filter(r => r.title).map(r => r.title.toLowerCase().trim()))
+    const recentTitles = (recentStoryRows || []).map(r => r.title).filter(Boolean)
+
+    // Fetch recent quotes (30-day window) so the 25-quote pool cycles before any repeat
+    const { data: recentQuoteRows } = await supabase
+      .from('sent_stories')
+      .select('story_link, title')
+      .eq('subscriber_id', subscriber.id)
+      .like('story_link', 'quote::%')
+      .gte('sent_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+    const recentQuotes = (recentQuoteRows || [])
       .map(r => ({ attribution: r.story_link.replace('quote::', ''), text: r.title || '' }))
 
     // Merge all fetched results into one pool per subscriber top-level topic.
