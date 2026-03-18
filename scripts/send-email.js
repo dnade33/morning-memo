@@ -96,7 +96,8 @@ function buildWelcomeEmail(subscriber) {
                 </tr>
                 <tr>
                   <td style="padding:16px 18px;">
-                    <p style="margin:0;font-family:${sans};font-size:14px;line-height:1.75;color:#a8b8cc;font-weight:300;">Your first Morning Memo will arrive tomorrow at <span style="font-family:${mono};color:#dde2ed;font-weight:700;">${esc(subscriber.delivery_time)}</span>.</p>
+                    <p style="margin:0 0 10px;font-family:${sans};font-size:14px;line-height:1.75;color:#a8b8cc;font-weight:300;">Your first Morning Memo will arrive tomorrow at <span style="font-family:${mono};color:#dde2ed;font-weight:700;">${esc(subscriber.delivery_time)}</span>.</p>
+                    <p style="margin:0;font-family:${sans};font-size:12px;line-height:1.75;color:#6b7fa0;font-weight:300;">If it doesn't appear in your inbox the first day or two, check your spam or junk folder — it may land there until your email client learns to trust us.</p>
                   </td>
                 </tr>
               </table>
