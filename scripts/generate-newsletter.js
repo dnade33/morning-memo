@@ -12,14 +12,209 @@ const QUOTE_STYLES = [
   'Historical', 'Literary', 'Science & Discovery'
 ]
 
-// Quotes Claude Haiku defaults to constantly — banned regardless of sent history
-const PERMANENTLY_BANNED_QUOTE_TEXTS = new Set([
-  'the only way to do great work is to love what you do',
-  'the secret of getting ahead is getting started',
-  'in the middle of difficulty lies opportunity',
-  'life is what happens when you\'re busy making other plans',
-  'the future belongs to those who believe in the beauty of their dreams',
-])
+// Curated quote pool — dedup handled entirely in code, Claude is not involved.
+// ~25 quotes per style ensures months of variety before any repeat.
+const QUOTE_POOL = {
+  'Inspirational': [
+    { text: 'Do what you can, with what you have, where you are.', attribution: 'Theodore Roosevelt' },
+    { text: 'It does not matter how slowly you go as long as you do not stop.', attribution: 'Confucius' },
+    { text: 'You are never too old to set another goal or to dream a new dream.', attribution: 'C.S. Lewis' },
+    { text: 'Start where you are. Use what you have. Do what you can.', attribution: 'Arthur Ashe' },
+    { text: 'The best time to plant a tree was 20 years ago. The second best time is now.', attribution: 'Chinese Proverb' },
+    { text: 'Act as if what you do makes a difference. It does.', attribution: 'William James' },
+    { text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.', attribution: 'Winston Churchill' },
+    { text: 'Everything you\'ve ever wanted is on the other side of fear.', attribution: 'George Addair' },
+    { text: 'The only limit to our realization of tomorrow is our doubts of today.', attribution: 'Franklin D. Roosevelt' },
+    { text: 'You miss 100% of the shots you don\'t take.', attribution: 'Wayne Gretzky' },
+    { text: 'Whether you think you can or you think you can\'t, you\'re right.', attribution: 'Henry Ford' },
+    { text: 'It always seems impossible until it\'s done.', attribution: 'Nelson Mandela' },
+    { text: 'Don\'t watch the clock; do what it does. Keep going.', attribution: 'Sam Levenson' },
+    { text: 'I have not failed. I\'ve just found 10,000 ways that won\'t work.', attribution: 'Thomas Edison' },
+    { text: 'Our greatest glory is not in never falling, but in rising every time we fall.', attribution: 'Confucius' },
+    { text: 'Keep your face always toward the sunshine, and shadows will fall behind you.', attribution: 'Walt Whitman' },
+    { text: 'Life is 10% what happens to you and 90% how you react to it.', attribution: 'Charles R. Swindoll' },
+    { text: 'Spread love everywhere you go. Let no one ever come to you without leaving happier.', attribution: 'Mother Teresa' },
+    { text: 'Do not go where the path may lead; go instead where there is no path and leave a trail.', attribution: 'Ralph Waldo Emerson' },
+    { text: 'You will face many defeats in life, but never let yourself be defeated.', attribution: 'Maya Angelou' },
+    { text: 'The most common way people give up their power is by thinking they don\'t have any.', attribution: 'Alice Walker' },
+    { text: 'Darkness cannot drive out darkness; only light can do that.', attribution: 'Martin Luther King Jr.' },
+    { text: 'Isn\'t it nice to think that tomorrow is a new day with no mistakes in it yet?', attribution: 'L.M. Montgomery' },
+    { text: 'We must accept finite disappointment, but never lose infinite hope.', attribution: 'Martin Luther King Jr.' },
+    { text: 'If you want to lift yourself up, lift up someone else.', attribution: 'Booker T. Washington' },
+  ],
+  'Philosophical': [
+    { text: 'The unexamined life is not worth living.', attribution: 'Socrates' },
+    { text: 'I think, therefore I am.', attribution: 'René Descartes' },
+    { text: 'Man is condemned to be free.', attribution: 'Jean-Paul Sartre' },
+    { text: 'That which does not kill us makes us stronger.', attribution: 'Friedrich Nietzsche' },
+    { text: 'One must imagine Sisyphus happy.', attribution: 'Albert Camus' },
+    { text: 'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', attribution: 'Aristotle' },
+    { text: 'The measure of a man is what he does with power.', attribution: 'Plato' },
+    { text: 'No man ever steps in the same river twice.', attribution: 'Heraclitus' },
+    { text: 'The only true wisdom is in knowing you know nothing.', attribution: 'Socrates' },
+    { text: 'Reality is merely an illusion, albeit a very persistent one.', attribution: 'Albert Einstein' },
+    { text: 'Two things are infinite: the universe and human stupidity; and I\'m not sure about the universe.', attribution: 'Albert Einstein' },
+    { text: 'Yesterday I was clever, so I wanted to change the world. Today I am wise, so I am changing myself.', attribution: 'Rumi' },
+    { text: 'The good life is one inspired by love and guided by knowledge.', attribution: 'Bertrand Russell' },
+    { text: 'The price of anything is the amount of life you exchange for it.', attribution: 'Henry David Thoreau' },
+    { text: 'We don\'t see things as they are, we see them as we are.', attribution: 'Anaïs Nin' },
+    { text: 'A man who dares to waste one hour of time has not discovered the value of life.', attribution: 'Charles Darwin' },
+    { text: 'In three words I can sum up everything I\'ve learned about life: it goes on.', attribution: 'Robert Frost' },
+    { text: 'It is not the strongest of the species that survive, nor the most intelligent, but the one most responsive to change.', attribution: 'Charles Darwin' },
+    { text: 'What we observe is not nature itself, but nature exposed to our method of questioning.', attribution: 'Werner Heisenberg' },
+    { text: 'To live is to suffer; to survive is to find meaning in the suffering.', attribution: 'Friedrich Nietzsche' },
+    { text: 'The function of education is to teach one to think intensively and to think critically.', attribution: 'Martin Luther King Jr.' },
+    { text: 'He who thinks great thoughts often makes great errors.', attribution: 'Martin Heidegger' },
+    { text: 'The pendulum of the mind alternates between sense and nonsense, not between right and wrong.', attribution: 'Carl Jung' },
+    { text: 'Man is the only creature who refuses to be what he is.', attribution: 'Albert Camus' },
+    { text: 'Freedom is nothing but a chance to be better.', attribution: 'Albert Camus' },
+  ],
+  'Stoic': [
+    { text: 'Waste no more time arguing about what a good man should be. Be one.', attribution: 'Marcus Aurelius' },
+    { text: 'The happiness of your life depends upon the quality of your thoughts.', attribution: 'Marcus Aurelius' },
+    { text: 'He who fears death will never do anything worthy of a man who is alive.', attribution: 'Seneca' },
+    { text: 'We suffer more often in imagination than in reality.', attribution: 'Seneca' },
+    { text: 'If it is not right, do not do it; if it is not true, do not say it.', attribution: 'Marcus Aurelius' },
+    { text: 'Begin at once to live, and count each separate day as a separate life.', attribution: 'Seneca' },
+    { text: 'The impediment to action advances action. What stands in the way becomes the way.', attribution: 'Marcus Aurelius' },
+    { text: 'Receive without pride, relinquish without struggle.', attribution: 'Marcus Aurelius' },
+    { text: 'He is a wise man who does not grieve for the things which he has not, but rejoices for those which he has.', attribution: 'Epictetus' },
+    { text: 'Make the best use of what is in your power, and take the rest as it happens.', attribution: 'Epictetus' },
+    { text: 'First say to yourself what you would be; and then do what you have to do.', attribution: 'Epictetus' },
+    { text: 'No great thing is created suddenly.', attribution: 'Epictetus' },
+    { text: 'Seek not the good in external things; seek it in yourself.', attribution: 'Epictetus' },
+    { text: 'Confine yourself to the present.', attribution: 'Marcus Aurelius' },
+    { text: 'The object of life is not to be on the side of the majority, but to escape finding oneself in the ranks of the insane.', attribution: 'Marcus Aurelius' },
+    { text: 'Loss is nothing else but change, and change is Nature\'s delight.', attribution: 'Marcus Aurelius' },
+    { text: 'The soul becomes dyed with the color of its thoughts.', attribution: 'Marcus Aurelius' },
+    { text: 'Dwell on the beauty of life. Watch the stars, and see yourself running with them.', attribution: 'Marcus Aurelius' },
+    { text: 'Very little is needed to make a happy life; it is all within yourself, in your way of thinking.', attribution: 'Marcus Aurelius' },
+    { text: 'You have power over your mind, not outside events. Realize this, and you will find strength.', attribution: 'Marcus Aurelius' },
+    { text: 'It is not that I am brave, but that I choose to be brave.', attribution: 'Epictetus' },
+    { text: 'Wealth consists not in having great possessions, but in having few wants.', attribution: 'Epictetus' },
+    { text: 'Do not indulge in expectations about what you do not control.', attribution: 'Epictetus' },
+    { text: 'How long are you going to wait before you demand the best for yourself?', attribution: 'Epictetus' },
+    { text: 'It\'s not what happens to you, but how you react to it that matters.', attribution: 'Epictetus' },
+  ],
+  'Humor & Wit': [
+    { text: 'The trouble with having an open mind is that people will insist on coming along and trying to put things in it.', attribution: 'Terry Pratchett' },
+    { text: 'I find television very educational. Every time someone turns it on, I go in the other room and read a book.', attribution: 'Groucho Marx' },
+    { text: 'Outside of a dog, a book is man\'s best friend. Inside of a dog, it\'s too dark to read.', attribution: 'Groucho Marx' },
+    { text: 'I always wanted to be somebody, but now I realize I should have been more specific.', attribution: 'Lily Tomlin' },
+    { text: 'Age is an issue of mind over matter. If you don\'t mind, it doesn\'t matter.', attribution: 'Mark Twain' },
+    { text: 'The brain is a wonderful organ; it starts working the moment you get up in the morning and does not stop until you get into a meeting.', attribution: 'Robert Frost' },
+    { text: 'If at first you don\'t succeed, skydiving is not for you.', attribution: 'Steven Wright' },
+    { text: 'People say nothing is impossible, but I do nothing every day.', attribution: 'A.A. Milne' },
+    { text: 'Light travels faster than sound. This is why some people appear bright until you hear them speak.', attribution: 'Alan Dundes' },
+    { text: 'The average dog is a nicer person than the average person.', attribution: 'Andy Rooney' },
+    { text: 'At every party there are two kinds of people — those who want to go home and those who don\'t. The trouble is, they are usually married to each other.', attribution: 'Ann Landers' },
+    { text: 'Always borrow money from a pessimist. He won\'t expect it back.', attribution: 'Oscar Wilde' },
+    { text: 'Do not take life too seriously. You will never get out of it alive.', attribution: 'Elbert Hubbard' },
+    { text: 'I was married by a judge. I should have asked for a jury.', attribution: 'Groucho Marx' },
+    { text: 'A day without sunshine is like, you know, night.', attribution: 'Steve Martin' },
+    { text: 'As you get older, three things happen. The first is your memory goes, and I can\'t remember the other two.', attribution: 'Norman Wisdom' },
+    { text: 'I am so clever that sometimes I don\'t understand a single word of what I am saying.', attribution: 'Oscar Wilde' },
+    { text: 'The secret of a good sermon is to have a good beginning and a good ending, then having the two as close together as possible.', attribution: 'George Burns' },
+    { text: 'Before you judge a man, walk a mile in his shoes. After that, who cares? He\'s a mile away and you\'ve got his shoes.', attribution: 'Billy Connolly' },
+    { text: 'I can resist everything except temptation.', attribution: 'Oscar Wilde' },
+    { text: 'Be yourself; everyone else is already taken.', attribution: 'Oscar Wilde' },
+    { text: 'We are all here on earth to help others; what on earth the others are here for I don\'t know.', attribution: 'W.H. Auden' },
+    { text: 'I never forget a face, but in your case I\'ll be glad to make an exception.', attribution: 'Groucho Marx' },
+    { text: 'A good speech should be like a woman\'s skirt: long enough to cover the subject and short enough to create interest.', attribution: 'Winston Churchill' },
+    { text: 'Opportunity is missed by most people because it is dressed in overalls and looks like work.', attribution: 'Thomas Edison' },
+  ],
+  'Historical': [
+    { text: 'Give me liberty, or give me death!', attribution: 'Patrick Henry' },
+    { text: 'An eye for an eye only ends up making the whole world blind.', attribution: 'Mahatma Gandhi' },
+    { text: 'Be the change you wish to see in the world.', attribution: 'Mahatma Gandhi' },
+    { text: 'Injustice anywhere is a threat to justice everywhere.', attribution: 'Martin Luther King Jr.' },
+    { text: 'Education is the most powerful weapon which you can use to change the world.', attribution: 'Nelson Mandela' },
+    { text: 'History will be kind to me for I intend to write it.', attribution: 'Winston Churchill' },
+    { text: 'Success is walking from failure to failure with no loss of enthusiasm.', attribution: 'Winston Churchill' },
+    { text: 'The ballot is stronger than the bullet.', attribution: 'Abraham Lincoln' },
+    { text: 'Nearly all men can stand adversity, but if you want to test a man\'s character, give him power.', attribution: 'Abraham Lincoln' },
+    { text: 'You can fool all the people some of the time, and some of the people all the time, but you cannot fool all the people all the time.', attribution: 'Abraham Lincoln' },
+    { text: 'I have learned that people will forget what you said, people will forget what you did, but people will never forget how you made them feel.', attribution: 'Maya Angelou' },
+    { text: 'No one can make you feel inferior without your consent.', attribution: 'Eleanor Roosevelt' },
+    { text: 'Do one thing every day that scares you.', attribution: 'Eleanor Roosevelt' },
+    { text: 'Great minds discuss ideas; average minds discuss events; small minds discuss people.', attribution: 'Eleanor Roosevelt' },
+    { text: 'In the long run, we shape our lives, and we shape ourselves. The process never ends until we die.', attribution: 'Eleanor Roosevelt' },
+    { text: 'I am not afraid of storms, for I am learning how to sail my ship.', attribution: 'Louisa May Alcott' },
+    { text: 'Float like a butterfly, sting like a bee.', attribution: 'Muhammad Ali' },
+    { text: 'Ask not what your country can do for you — ask what you can do for your country.', attribution: 'John F. Kennedy' },
+    { text: 'Mankind must put an end to war before war puts an end to mankind.', attribution: 'John F. Kennedy' },
+    { text: 'The time is always right to do what is right.', attribution: 'Martin Luther King Jr.' },
+    { text: 'I am not an Athenian or a Greek, but a citizen of the world.', attribution: 'Socrates' },
+    { text: 'We shall fight on the beaches, we shall fight on the landing grounds, we shall fight in the fields and in the streets.', attribution: 'Winston Churchill' },
+    { text: 'To improve is to change; to be perfect is to change often.', attribution: 'Winston Churchill' },
+    { text: 'The most courageous act is still to think for yourself. Aloud.', attribution: 'Coco Chanel' },
+    { text: 'I am not afraid; I was born to do this.', attribution: 'Joan of Arc' },
+  ],
+  'Literary': [
+    { text: 'Not all those who wander are lost.', attribution: 'J.R.R. Tolkien' },
+    { text: 'It does not do to dwell on dreams and forget to live.', attribution: 'J.K. Rowling' },
+    { text: 'All that is gold does not glitter.', attribution: 'J.R.R. Tolkien' },
+    { text: 'The world is a book, and those who do not travel read only one page.', attribution: 'Saint Augustine' },
+    { text: 'There is nothing either good or bad, but thinking makes it so.', attribution: 'William Shakespeare' },
+    { text: 'All the world\'s a stage, and all the men and women merely players.', attribution: 'William Shakespeare' },
+    { text: 'We know what we are, but know not what we may be.', attribution: 'William Shakespeare' },
+    { text: 'The fault, dear Brutus, is not in our stars, but in ourselves.', attribution: 'William Shakespeare' },
+    { text: 'So we beat on, boats against the current, borne back ceaselessly into the past.', attribution: 'F. Scott Fitzgerald' },
+    { text: 'I took a deep breath and listened to the old brag of my heart: I am, I am, I am.', attribution: 'Sylvia Plath' },
+    { text: 'You never really understand a person until you consider things from his point of view.', attribution: 'Harper Lee' },
+    { text: 'Until I feared I would lose it, I never loved to read. One does not love breathing.', attribution: 'Harper Lee' },
+    { text: 'Good friends, good books, and a sleepy conscience: this is the ideal life.', attribution: 'Mark Twain' },
+    { text: 'Whenever you feel like criticizing anyone, remember that all the people in this world haven\'t had the advantages that you\'ve had.', attribution: 'F. Scott Fitzgerald' },
+    { text: 'It was a bright cold day in April, and the clocks were striking thirteen.', attribution: 'George Orwell' },
+    { text: 'All animals are equal, but some animals are more equal than others.', attribution: 'George Orwell' },
+    { text: 'It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.', attribution: 'Jane Austen' },
+    { text: 'I am not afraid of tomorrow, for I have seen yesterday and I love today.', attribution: 'William Allen White' },
+    { text: 'It is a far, far better thing that I do, than I have ever done.', attribution: 'Charles Dickens' },
+    { text: 'There is no friend as loyal as a book.', attribution: 'Ernest Hemingway' },
+    { text: 'The world breaks everyone, and afterward, some are strong at the broken places.', attribution: 'Ernest Hemingway' },
+    { text: 'If you only read the books that everyone else is reading, you can only think what everyone else is thinking.', attribution: 'Haruki Murakami' },
+    { text: 'A reader lives a thousand lives before he dies. The man who never reads lives only one.', attribution: 'George R.R. Martin' },
+    { text: 'We accept the love we think we deserve.', attribution: 'Stephen Chbosky' },
+    { text: 'You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.', attribution: 'Dr. Seuss' },
+  ],
+  'Science & Discovery': [
+    { text: 'Science is not only compatible with spirituality; it is a profound source of spirituality.', attribution: 'Carl Sagan' },
+    { text: 'The cosmos is within us. We are made of star-stuff.', attribution: 'Carl Sagan' },
+    { text: 'Somewhere, something incredible is waiting to be known.', attribution: 'Carl Sagan' },
+    { text: 'The good thing about science is that it\'s true whether or not you believe in it.', attribution: 'Neil deGrasse Tyson' },
+    { text: 'We are a way for the cosmos to know itself.', attribution: 'Carl Sagan' },
+    { text: 'The most beautiful thing we can experience is the mysterious. It is the source of all true art and science.', attribution: 'Albert Einstein' },
+    { text: 'Imagination is more important than knowledge.', attribution: 'Albert Einstein' },
+    { text: 'If you can\'t explain it simply, you don\'t understand it well enough.', attribution: 'Albert Einstein' },
+    { text: 'Nothing in life is to be feared; it is only to be understood.', attribution: 'Marie Curie' },
+    { text: 'Life is not easy for any of us. But what of that? We must have perseverance and, above all, confidence in ourselves.', attribution: 'Marie Curie' },
+    { text: 'I have no special talent. I am only passionately curious.', attribution: 'Albert Einstein' },
+    { text: 'Science is a way of thinking much more than it is a body of knowledge.', attribution: 'Carl Sagan' },
+    { text: 'Research is seeing what everybody else has seen and thinking what nobody else has thought.', attribution: 'Albert Szent-Györgyi' },
+    { text: 'The first principle is that you must not fool yourself — and you are the easiest person to fool.', attribution: 'Richard Feynman' },
+    { text: 'I would rather have questions that can\'t be answered than answers that can\'t be questioned.', attribution: 'Richard Feynman' },
+    { text: 'Nature uses only the longest threads to weave her patterns, so each small piece of her fabric reveals the organization of the entire tapestry.', attribution: 'Richard Feynman' },
+    { text: 'In questions of science, the authority of a thousand is not worth the humble reasoning of a single individual.', attribution: 'Galileo Galilei' },
+    { text: 'All truths are easy to understand once they are discovered; the point is to discover them.', attribution: 'Galileo Galilei' },
+    { text: 'The universe is not required to be in perfect harmony with human ambition.', attribution: 'Carl Sagan' },
+    { text: 'An experiment is a question which science poses to Nature, and a measurement is the recording of Nature\'s answer.', attribution: 'Max Planck' },
+    { text: 'The important thing is not to stop questioning.', attribution: 'Albert Einstein' },
+    { text: 'What is a scientist after all? It is a curious man looking through a keyhole.', attribution: 'Jacques-Yves Cousteau' },
+    { text: 'The science of today is the technology of tomorrow.', attribution: 'Edward Teller' },
+    { text: 'We shall not cease from exploration, and the end of all our exploring will be to arrive where we started and know the place for the first time.', attribution: 'T.S. Eliot' },
+    { text: 'Physics is like sex: sure, it may give some practical results, but that\'s not why we do it.', attribution: 'Richard Feynman' },
+  ],
+}
+
+// Pick a quote from the pool that hasn't been used recently.
+// Falls back to a random pool quote if all have been used (very unlikely with 25+ per style).
+function pickQuote(style, recentQuotes = []) {
+  const pool = QUOTE_POOL[style] || QUOTE_POOL['Inspirational']
+  const usedTexts = new Set(recentQuotes.map(q => q.text?.toLowerCase().trim()).filter(Boolean))
+  const fresh = pool.filter(q => !usedTexts.has(q.text.toLowerCase().trim()))
+  const candidates = fresh.length > 0 ? fresh : pool
+  return candidates[Math.floor(Math.random() * candidates.length)]
+}
 
 function resolveQuoteStyle(style) {
   if (style === 'Surprise Me') {
@@ -62,7 +257,7 @@ function calculateStoryAllocation(subscriber, topicStories) {
   return allocation
 }
 
-function buildPrompt(subscriber, topicStories, quoteStyle, allocation, recentTitles = [], recentQuotes = []) {
+function buildPrompt(subscriber, topicStories, allocation, recentTitles = []) {
   const topicBlocks = topicStories.map(({ topic, stories }) => {
     const count = allocation[topic] || 1
     const subtopics = subscriber.preferences?.[topic]
@@ -114,10 +309,6 @@ Two sentences. The first greets ${subscriber.first_name} by name — warm and en
 [LINK]paste-the-original-link-url-here[/LINK]
 
 (repeat [TOPIC: ...] blocks for each topic)
-
-[QUOTE]
-"Quote text here."
-— Attribution Name
 
 ═══ STRUCTURE RULES ═══
 - Use the exact markers: [GREETING], [TOPIC: X], [HEADLINE], [/HEADLINE], [LINK], [/LINK], [QUOTE]
@@ -203,10 +394,7 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
 - Never use the phrases "it's worth noting," "importantly," or "it goes without saying"
 - Plain text only — no markdown asterisks, no bullet points
 
-═══ QUOTE RULES ═══
-- Quote style: ${quoteStyle} — strict requirement. The quote MUST match this style regardless of the newsletter topics.
-- Must be a real, well-known quote from a real, named person. No made-up attributions, no publication names.
-- If the style is "Humor & Wit": use a genuinely funny quote — witty one-liners, dry humor, or absurdist observations. Mix it up.${recentQuotes.length > 0 ? `\n- DO NOT reuse any of the following quotes or their authors — both the person and the quote text are banned for today:\n${recentQuotes.map(q => `  • "${q.text}" — ${q.attribution}`).join('\n')}` : ''}`
+`
 }
 
 // ----------------------------------------------------------------
@@ -446,7 +634,7 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = [], r
   const quoteStyle = resolveQuoteStyle(subscriber.quote_style)
   const allocation = calculateStoryAllocation(subscriber, topicStories)
   const cappedTopicStories = topicStories.slice(0, Object.keys(allocation).length)
-  const prompt = buildPrompt(subscriber, cappedTopicStories, quoteStyle, allocation, recentTitles, recentQuotes)
+  const prompt = buildPrompt(subscriber, cappedTopicStories, allocation, recentTitles)
 
   const rawText = await fetchWithRetry(async () => {
     const message = await client.messages.create({
@@ -529,20 +717,8 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = [], r
     .map(t => ({ ...t, stories: t.stories.filter(s => s.link) }))
     .filter(t => t.stories.length > 0)
 
-  // Fallback quote — used if Claude ran out of tokens before writing [QUOTE]
-  if (!parsed.quote) {
-    const fallbacks = {
-      'Inspirational': { text: 'The secret of getting ahead is getting started.', attribution: 'Mark Twain' },
-      'Philosophical': { text: 'The unexamined life is not worth living.', attribution: 'Socrates' },
-      'Stoic': { text: 'You have power over your mind, not outside events. Realize this, and you will find strength.', attribution: 'Marcus Aurelius' },
-      'Humor & Wit': { text: 'I am so clever that sometimes I don\'t understand a single word of what I am saying.', attribution: 'Oscar Wilde' },
-      'Historical': { text: 'In the middle of difficulty lies opportunity.', attribution: 'Albert Einstein' },
-      'Literary': { text: 'Not all those who wander are lost.', attribution: 'J.R.R. Tolkien' },
-      'Science & Discovery': { text: 'The important thing is not to stop questioning. Curiosity has its own reason for existing.', attribution: 'Albert Einstein' },
-    }
-    parsed.quote = fallbacks[quoteStyle] || { text: 'The secret of getting ahead is getting started.', attribution: 'Mark Twain' }
-    logger.warn(`Quote missing from Claude output for ${subscriber.email} — using fallback`)
-  }
+  // Quote is picked entirely in code — no Claude involvement, full dedup guarantee
+  parsed.quote = pickQuote(quoteStyle, recentQuotes)
 
   // Fallback: if parsing found no topics, log and use raw text in a single panel
   if (parsed.topics.length === 0) {
@@ -571,19 +747,6 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = [], r
   const sentStories = parsed.topics
     .flatMap(t => t.stories.map(s => ({ link: s.link, title: originalTitleByLink[s.link] || s.headline })))
     .filter(s => s.link)
-
-  // Code-level quote dedup — strip if Claude returned a permanently banned quote
-  // or one the subscriber already received in the last 2 days.
-  if (parsed.quote) {
-    const returnedAuthor = (parsed.quote.attribution || '').toLowerCase().trim()
-    const returnedText   = (parsed.quote.text || '').toLowerCase().trim()
-    const permanentlyBanned = PERMANENTLY_BANNED_QUOTE_TEXTS.has(returnedText)
-    const recentlyUsed = recentQuotes.some(q =>
-      (q.attribution && returnedAuthor.includes(q.attribution.toLowerCase().trim())) ||
-      (q.text && q.text.toLowerCase().trim() === returnedText)
-    )
-    if (permanentlyBanned || recentlyUsed) parsed.quote = null
-  }
 
   const quoteAttribution = parsed.quote?.attribution || null
   const quoteText = parsed.quote?.text || null
