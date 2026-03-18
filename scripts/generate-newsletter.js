@@ -12,6 +12,15 @@ const QUOTE_STYLES = [
   'Historical', 'Literary', 'Science & Discovery'
 ]
 
+// Quotes Claude Haiku defaults to constantly — banned regardless of sent history
+const PERMANENTLY_BANNED_QUOTE_TEXTS = new Set([
+  'the only way to do great work is to love what you do',
+  'the secret of getting ahead is getting started',
+  'in the middle of difficulty lies opportunity',
+  'life is what happens when you\'re busy making other plans',
+  'the future belongs to those who believe in the beauty of their dreams',
+])
+
 function resolveQuoteStyle(style) {
   if (style === 'Surprise Me') {
     return QUOTE_STYLES[Math.floor(Math.random() * QUOTE_STYLES.length)]
@@ -563,16 +572,17 @@ async function generateNewsletter(subscriber, topicStories, recentTitles = [], r
     .flatMap(t => t.stories.map(s => ({ link: s.link, title: originalTitleByLink[s.link] || s.headline })))
     .filter(s => s.link)
 
-  // Code-level quote dedup — Claude sometimes ignores the prompt ban on recent quotes.
-  // If the returned quote matches a banned author or text, strip it entirely.
-  if (parsed.quote && recentQuotes.length > 0) {
+  // Code-level quote dedup — strip if Claude returned a permanently banned quote
+  // or one the subscriber already received in the last 2 days.
+  if (parsed.quote) {
     const returnedAuthor = (parsed.quote.attribution || '').toLowerCase().trim()
     const returnedText   = (parsed.quote.text || '').toLowerCase().trim()
-    const isBanned = recentQuotes.some(q =>
-      (q.attribution && q.attribution.toLowerCase().trim() === returnedAuthor) ||
+    const permanentlyBanned = PERMANENTLY_BANNED_QUOTE_TEXTS.has(returnedText)
+    const recentlyUsed = recentQuotes.some(q =>
+      (q.attribution && returnedAuthor.includes(q.attribution.toLowerCase().trim())) ||
       (q.text && q.text.toLowerCase().trim() === returnedText)
     )
-    if (isBanned) parsed.quote = null
+    if (permanentlyBanned || recentlyUsed) parsed.quote = null
   }
 
   const quoteAttribution = parsed.quote?.attribution || null
