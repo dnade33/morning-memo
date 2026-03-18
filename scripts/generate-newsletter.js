@@ -344,7 +344,7 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
   WRONG: "Markets fell sharply amid recession fears." / "A majority of Americans oppose military action."
   RIGHT: "The S&P 500 dropped 1.8%." / "62% of Americans oppose military action, according to a new poll."
 
-- NAMES & TITLES: Use a person's full name (first and last) on first reference — never last name only, never a vague description like "a veteran player" when the source names them. Use the title the source assigns — if the source says "President Trump," write "President Trump." Never prepend "former" unless the source states it. Spell out acronyms in full on first use: "Federal Reserve (Fed)."
+- NAMES & TITLES: Copy names exactly as they appear in the source — do not guess, invent, or modify any part of a person's name. If the source gives a full name, use it. If only a last name appears, use only the last name — never fill in a first name from memory or assumption. A wrong name is worse than no name. Use the title the source assigns. Never prepend "former" unless the source states it. Spell out acronyms in full on first use: "Federal Reserve (Fed)."
 
 - NO CLICKBAIT: State the answer directly. If the article names a vegetable, drug, person, decision, or outcome — write it. Never use "one vegetable," "a particular supplement," "makes a decision," or any phrasing that withholds the core fact.
   WRONG: "Kirk Cousins has made his retirement decision as the quarterback landscape shifts."
