@@ -346,8 +346,22 @@ async function processSlot(slot, subscribers) {
 
     // Shuffle topic order so panels appear in a different sequence each day.
     // Local Weather is always pinned to the end.
-    const weatherPanel = topicStories.find(t => t.topic === 'Local Weather')
-    const nonWeather = topicStories.filter(t => t.topic !== 'Local Weather')
+    // Cap sports panels at 3 — if subscriber has more leagues, rotate randomly each day
+    const MAX_SPORTS_PANELS = 3
+    let cappedTopicStories = topicStories
+    const sportsPanels = topicStories.filter(t => SPORTS_TOPIC_KEYS.has(t.topic))
+    if (sportsPanels.length > MAX_SPORTS_PANELS) {
+      for (let i = sportsPanels.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [sportsPanels[i], sportsPanels[j]] = [sportsPanels[j], sportsPanels[i]]
+      }
+      const keptSports = new Set(sportsPanels.slice(0, MAX_SPORTS_PANELS).map(t => t.topic))
+      cappedTopicStories = topicStories.filter(t => !SPORTS_TOPIC_KEYS.has(t.topic) || keptSports.has(t.topic))
+      logger.cron(`Capped sports panels to ${MAX_SPORTS_PANELS} for ${subscriber.email} (had ${sportsPanels.length})`)
+    }
+
+    const weatherPanel = cappedTopicStories.find(t => t.topic === 'Local Weather')
+    const nonWeather = cappedTopicStories.filter(t => t.topic !== 'Local Weather')
     for (let i = nonWeather.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [nonWeather[i], nonWeather[j]] = [nonWeather[j], nonWeather[i]]
