@@ -4,6 +4,8 @@ const { logger } = require('../logger')
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+const SPORTS_TOPIC_KEYS = new Set(['Sports','NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf'])
+
 // ----------------------------------------------------------------
 // Quote style resolver
 // ----------------------------------------------------------------
@@ -242,10 +244,16 @@ function calculateStoryAllocation(subscriber, topicStories) {
 
   if (cappedTopics.length < 6) {
     let remaining = 6 - cappedTopics.length
-    const sorted = [...cappedTopics].sort((a, b) =>
-      (subscriber.preferences?.[b.topic] || []).length -
-      (subscriber.preferences?.[a.topic] || []).length
-    )
+    // Non-sports panels get priority for extra stories so sports never crowds out other topics
+    const nonSports = cappedTopics.filter(t => !SPORTS_TOPIC_KEYS.has(t.topic))
+    const sports    = cappedTopics.filter(t =>  SPORTS_TOPIC_KEYS.has(t.topic))
+    const sorted = [
+      ...nonSports.sort((a, b) =>
+        (subscriber.preferences?.[b.topic] || []).length -
+        (subscriber.preferences?.[a.topic] || []).length
+      ),
+      ...sports
+    ]
     let i = 0
     while (remaining > 0) {
       allocation[sorted[i % sorted.length].topic]++
