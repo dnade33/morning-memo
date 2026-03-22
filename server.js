@@ -13,6 +13,7 @@ const { runCron } = require('./cron')
 const path = require('path')
 
 const app = express()
+app.set('trust proxy', 1) // Railway runs behind a proxy — needed for express-rate-limit
 
 // Restrict CORS to the production domain (and localhost for local dev)
 const allowedOrigins = [
