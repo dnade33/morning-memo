@@ -343,8 +343,9 @@ Every story panel must leave the reader genuinely more informed than the headlin
 Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
 
 ═══ CONTENT RULES ═══
-- SOURCE ACCURACY: Every fact in your summary — statistics, scores, records, dates, names, positions, roster moves, poll percentages, transactions — must come directly from the source provided. Never add supporting facts from your own training data. If the source does not state it, you do not state it. For any story, answer the Who, What, Where, When that the source provides — a summary missing a named person, location, or key figure when the source includes one is not acceptable. For roster/cap/transaction stories, you must name the specific move (who was traded, released, or restructured) — if the source doesn't identify it, skip the story.
+- SOURCE ACCURACY: Every fact in your summary — statistics, scores, records, dates, names, positions, team affiliations, roster moves, poll percentages, transactions — must come directly from the source provided. Never add supporting facts from your own training data. If the source does not state it, you do not state it. Player team affiliations change constantly — always use the team the source assigns to the player, never your training memory. For any story, answer the Who, What, Where, When that the source provides — a summary missing a named person, location, or key figure when the source includes one is not acceptable. For roster/cap/transaction stories, you must name the specific move (who was traded, released, or restructured) — if the source doesn't identify it, skip the story.
   WRONG: "Only Wilt Chamberlain (100 points in 1962) and Kobe Bryant (81 points in 2006) have scored more." — if the source doesn't say this, don't write it.
+  WRONG: "The Lakers' Luka Doncic, the Dallas star, avoided suspension..." — never use a player's former team from training memory.
   WRONG: "The Green Bay Packers gained cap flexibility heading into free agency." — name the specific transaction.
   RIGHT: "The Green Bay Packers freed up $12 million by releasing linebacker De'Vondre Campbell."
 
