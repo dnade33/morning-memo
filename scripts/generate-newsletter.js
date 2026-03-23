@@ -242,10 +242,23 @@ function calculateStoryAllocation(subscriber, topicStories) {
   const cappedTopics = topicStories.slice(0, MAX_STORIES)
   for (const { topic } of cappedTopics) allocation[topic] = 1
 
+  // Hard cap: no more than 3 sports stories total, regardless of panel count.
+  // Extra stories go to non-sports panels only.
+  const MAX_SPORTS_STORIES = 3
+  let sportsTotal = cappedTopics.filter(t => SPORTS_TOPIC_KEYS.has(t.topic)).length
+  if (sportsTotal > MAX_SPORTS_STORIES) {
+    // Too many sports panels each with 1 story — trim the excess
+    let over = sportsTotal - MAX_SPORTS_STORIES
+    for (const { topic } of cappedTopics) {
+      if (over <= 0) break
+      if (SPORTS_TOPIC_KEYS.has(topic)) { allocation[topic] = 0; over-- }
+    }
+  }
+
   if (cappedTopics.length < 6) {
     let remaining = 6 - cappedTopics.length
-    // Extra stories go exclusively to non-sports panels — sports panels are always capped at 1 story.
-    // If the subscriber has no non-sports panels at all, fall back to distributing across all panels.
+    // Extra stories go exclusively to non-sports panels.
+    // If the subscriber has no non-sports panels, fall back to all panels.
     const nonSports = cappedTopics
       .filter(t => !SPORTS_TOPIC_KEYS.has(t.topic))
       .sort((a, b) =>
