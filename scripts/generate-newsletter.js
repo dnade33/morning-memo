@@ -244,19 +244,18 @@ function calculateStoryAllocation(subscriber, topicStories) {
 
   if (cappedTopics.length < 6) {
     let remaining = 6 - cappedTopics.length
-    // Non-sports panels get priority for extra stories so sports never crowds out other topics
-    const nonSports = cappedTopics.filter(t => !SPORTS_TOPIC_KEYS.has(t.topic))
-    const sports    = cappedTopics.filter(t =>  SPORTS_TOPIC_KEYS.has(t.topic))
-    const sorted = [
-      ...nonSports.sort((a, b) =>
+    // Extra stories go exclusively to non-sports panels — sports panels are always capped at 1 story.
+    // If the subscriber has no non-sports panels at all, fall back to distributing across all panels.
+    const nonSports = cappedTopics
+      .filter(t => !SPORTS_TOPIC_KEYS.has(t.topic))
+      .sort((a, b) =>
         (subscriber.preferences?.[b.topic] || []).length -
         (subscriber.preferences?.[a.topic] || []).length
-      ),
-      ...sports
-    ]
+      )
+    const targets = nonSports.length > 0 ? nonSports : cappedTopics
     let i = 0
     while (remaining > 0) {
-      allocation[sorted[i % sorted.length].topic]++
+      allocation[targets[i % targets.length].topic]++
       remaining--
       i++
     }
