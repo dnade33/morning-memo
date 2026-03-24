@@ -344,9 +344,11 @@ async function processSlot(slot, subscribers) {
       return { success: false }
     }
 
+    logger.cron(`topicStories panels for ${subscriber.email}: ${topicStories.map(t => t.topic).join(', ')}`)
+
     // Shuffle topic order so panels appear in a different sequence each day.
     // Local Weather is always pinned to the end.
-    // Cap sports panels at 3 — if subscriber has more leagues, rotate randomly each day
+    // Cap sports panels at 2 — if subscriber has more leagues, rotate randomly each day
     const MAX_SPORTS_PANELS = 2
     let cappedTopicStories = topicStories
     const sportsPanels = topicStories.filter(t => SPORTS_TOPIC_KEYS.has(t.topic))
