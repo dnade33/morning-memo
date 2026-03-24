@@ -278,8 +278,8 @@ function calculateStoryAllocation(subscriber, topicStories) {
 }
 
 function buildPrompt(subscriber, topicStories, allocation, recentTitles = []) {
-  const topicBlocks = topicStories.map(({ topic, stories }) => {
-    const count = allocation[topic] || 1
+  const topicBlocks = topicStories.filter(({ topic }) => (allocation[topic] ?? 1) > 0).map(({ topic, stories }) => {
+    const count = allocation[topic] ?? 1
     const subtopics = subscriber.preferences?.[topic]
     const subtopicLine = subtopics && subtopics.length > 0
       ? `  Subscriber's specific interests within ${topic}: ${subtopics.join(', ')}`
