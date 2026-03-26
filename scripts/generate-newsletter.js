@@ -392,6 +392,10 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
   WRONG: "Good Housekeeping compiled a list of 100+ foods that form the foundation of the Mediterranean diet."
   RIGHT: "The Mediterranean diet centers on olive oil, fatty fish, legumes, nuts, and fresh vegetables — Good Housekeeping's guide breaks down 100+ specific options by category."
 
+- NO PREVIEW/PREDICTION STORIES: Skip any article that is purely speculative, predictive, or a season preview — "who has the most to prove," "teams to watch," "bold predictions," "best bets," "power rankings," "what to expect." These are opinion filler, not news. If the only stories available for a topic are previews or predictions, use the one with the most concrete facts and name specific teams, players, or figures from it — never tease the reader to "click through for the full list."
+  WRONG: "ESPN identified the bounce-back hopefuls and hot-seat coaches who need a strong year."
+  RIGHT: "Ohio State quarterback Will Howard enters 2026 facing pressure to repeat after last season's title run, according to ESPN's annual accountability rankings."
+
 - FINANCE TIME AWARENESS: Be precise about market timing. If a story covers Friday's session, futures reference Monday's open — not "the open."
   WRONG: "The Dow dropped 700 points, with futures pointing to further weakness at the open."
   RIGHT: "The Dow dropped 700 points on Friday, with futures suggesting Monday's open could see further losses."
