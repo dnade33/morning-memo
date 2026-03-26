@@ -249,12 +249,11 @@ function calculateStoryAllocation(subscriber, topicStories) {
   ]
   for (const { topic } of cappedTopics) allocation[topic] = 1
 
-  // Every topic gets at most 2 stories. Distribute extras up to that cap,
-  // sorted by number of subtopics selected (more interests = more stories).
-  // Total stories is capped at MAX_STORIES=8.
-  const MAX_PER_TOPIC = 2
+  // Per-topic cap scales with panel count so we always fill to MAX_STORIES=8:
+  //   1 topic → 8 stories, 2 topics → 4 each, 3 topics → 2-3 each, 4+ → 2 each
   const totalPanels = cappedTopics.length
-  const targetTotal = Math.min(Math.max(totalPanels, 6), MAX_STORIES)
+  const MAX_PER_TOPIC = Math.max(2, Math.floor(MAX_STORIES / totalPanels))
+  const targetTotal = MAX_STORIES
   let remaining = targetTotal - totalPanels
 
   const sorted = [...cappedTopics].sort((a, b) =>
