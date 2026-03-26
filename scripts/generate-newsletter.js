@@ -4,7 +4,6 @@ const { logger } = require('../logger')
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const SPORTS_TOPIC_KEYS = new Set(['Sports','NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf'])
 
 // ----------------------------------------------------------------
 // Quote style resolver
@@ -250,36 +249,29 @@ function calculateStoryAllocation(subscriber, topicStories) {
   ]
   for (const { topic } of cappedTopics) allocation[topic] = 1
 
-  // Hard cap: no more than 3 sports stories total, regardless of panel count.
-  // Extra stories go to non-sports panels only.
-  const MAX_SPORTS_STORIES = 3
-  let sportsTotal = cappedTopics.filter(t => SPORTS_TOPIC_KEYS.has(t.topic)).length
-  if (sportsTotal > MAX_SPORTS_STORIES) {
-    // Too many sports panels each with 1 story — trim the excess
-    let over = sportsTotal - MAX_SPORTS_STORIES
-    for (const { topic } of cappedTopics) {
-      if (over <= 0) break
-      if (SPORTS_TOPIC_KEYS.has(topic)) { allocation[topic] = 0; over-- }
-    }
-  }
+  // Every topic gets at most 2 stories. Distribute extras up to that cap,
+  // sorted by number of subtopics selected (more interests = more stories).
+  // Total stories is capped at MAX_STORIES=8.
+  const MAX_PER_TOPIC = 2
+  const totalPanels = cappedTopics.length
+  const targetTotal = Math.min(Math.max(totalPanels, 6), MAX_STORIES)
+  let remaining = targetTotal - totalPanels
 
-  if (cappedTopics.length < 6) {
-    let remaining = 6 - cappedTopics.length
-    // Extra stories go exclusively to non-sports panels.
-    // If the subscriber has no non-sports panels, fall back to all panels.
-    const nonSports = cappedTopics
-      .filter(t => !SPORTS_TOPIC_KEYS.has(t.topic))
-      .sort((a, b) =>
-        (subscriber.preferences?.[b.topic] || []).length -
-        (subscriber.preferences?.[a.topic] || []).length
-      )
-    const targets = nonSports.length > 0 ? nonSports : cappedTopics
-    let i = 0
-    while (remaining > 0) {
-      allocation[targets[i % targets.length].topic]++
+  const sorted = [...cappedTopics].sort((a, b) =>
+    (subscriber.preferences?.[b.topic] || []).length -
+    (subscriber.preferences?.[a.topic] || []).length
+  )
+
+  let i = 0
+  while (remaining > 0) {
+    const { topic } = sorted[i % sorted.length]
+    if (allocation[topic] < MAX_PER_TOPIC) {
+      allocation[topic]++
       remaining--
-      i++
     }
+    i++
+    // Safety: if all topics are already at max, stop
+    if (i > sorted.length * MAX_PER_TOPIC) break
   }
 
   return allocation
