@@ -238,8 +238,16 @@ function calculateStoryAllocation(subscriber, topicStories) {
   const MAX_STORIES = 8
   const allocation = {}
 
-  // If more panels than max, only include the first MAX_STORIES panels
-  const cappedTopics = topicStories.slice(0, MAX_STORIES)
+  // Local Weather is always guaranteed a slot — pull it out before capping,
+  // then add it back at the end so it never gets sliced off.
+  const weatherEntry = topicStories.find(t => t.topic === 'Local Weather')
+  const nonWeatherTopics = topicStories.filter(t => t.topic !== 'Local Weather')
+
+  // If more panels than max, only include the first MAX_STORIES non-weather panels
+  const cappedTopics = [
+    ...nonWeatherTopics.slice(0, MAX_STORIES),
+    ...(weatherEntry ? [weatherEntry] : [])
+  ]
   for (const { topic } of cappedTopics) allocation[topic] = 1
 
   // Hard cap: no more than 3 sports stories total, regardless of panel count.
