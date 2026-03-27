@@ -261,10 +261,16 @@ function calculateStoryAllocation(subscriber, topicStories) {
     (subscriber.preferences?.[a.topic] || []).length
   )
 
+  // Sports hard cap: never more than 2 stories regardless of dynamic allocation.
+  const MAX_SPORTS_STORIES = 2
+  const SPORTS_KEYS = new Set(['Sports','NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf'])
+
   let i = 0
   while (remaining > 0) {
     const { topic } = sorted[i % sorted.length]
-    if (allocation[topic] < MAX_PER_TOPIC) {
+    const isSports = SPORTS_KEYS.has(topic)
+    const cap = isSports ? Math.min(MAX_PER_TOPIC, MAX_SPORTS_STORIES) : MAX_PER_TOPIC
+    if (allocation[topic] < cap) {
       allocation[topic]++
       remaining--
     }
