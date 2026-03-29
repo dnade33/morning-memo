@@ -391,9 +391,11 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
   WRONG: "Italy Stuns USA 8-6 in World Baseball Classic" placed in World News.
   WRONG: A celebrity wedding in the History panel because the venue was "medieval-themed."
 
-- SPORTS: Do not open summaries with the sport name ("In NBA basketball..." or "NFL football saw...") — the panel header already says it. Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. When covering a record or streak, state the specific number.
+- SPORTS: Do not open summaries with the sport name ("In NBA basketball..." or "NFL football saw...") — the panel header already says it. Always name both teams. Always include the final score for game recaps. Never say "the team" or "they" — use the team name. When covering a record or streak, state the specific number. Never modify the date of a game — use the exact date from the source. If the source does not include a final score, skip the story entirely.
   WRONG: "Shai Gilgeous-Alexander tied a record set by Wilt Chamberlain over 60 years ago."
   RIGHT: "Shai Gilgeous-Alexander extended his streak of consecutive 20-point games to 53, tying Wilt Chamberlain's 1962 record."
+  WRONG: "The game story and full highlights are available through MLB.com." — never send the reader elsewhere with no substance. If the source has no real detail, skip it.
+  WRONG: "The Washington Nationals defeated the Chicago Cubs on Saturday, March 28" — if the source says Thursday March 26, do not change the date.
 
 - NAME THE FINDING: Any story covering a study, discovery, decision, treatment, outcome, or list must state the actual content. Never describe that information exists without giving it. This applies to every topic.
   WRONG: "Researchers found that ocean pressure supports marine life through mechanisms scientists did not previously understand."
