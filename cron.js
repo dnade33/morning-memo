@@ -130,11 +130,11 @@ async function processSlot(slot, subscribers) {
       .limit(1)
     if (sentTodayErr) {
       logger.error(`Guard query failed for ${subscriber.email} — skipping to be safe`, sentTodayErr)
-      return
+      return { success: false }
     }
     if (sentToday && sentToday.length > 0) {
       logger.cron(`Already sent today — skipping ${subscriber.email}`)
-      return
+      return { success: true }
     }
 
     // Fetch subtopics covered for this subscriber in the last 36 hours
