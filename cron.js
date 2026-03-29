@@ -265,6 +265,23 @@ async function processSlot(slot, subscribers) {
         })
       }
 
+      // ── Sports league selected directly as a top-level topic ────────────
+      // e.g. subscriber.topics = ["NBA", "MLB", ...] instead of ["Sports"]
+      // Treat it identically to a league under Sports — merge into Sports panel.
+      const DIRECT_SPORT_LEAGUES = new Set(['NFL','NBA','MLB','NHL','College Football','College Basketball','Soccer / MLS','Golf'])
+      if (DIRECT_SPORT_LEAGUES.has(topic)) {
+        const safeId = topic.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+        const teams = subscriber.preferences?.[`sub-sports-leagues-${safeId}`]
+        if (teams && teams.length > 0) {
+          return teams.map(t => {
+            topicOriginMap[`${topic}::${t}`] = 'Sports'
+            return `${topic}::${t}`
+          })
+        }
+        topicOriginMap[topic] = 'Sports'
+        return [topic]
+      }
+
       // ── Generic two-level expansion (Science, Health, History, etc.) ──
       // Any topic where the subscriber picked subtopics gets targeted
       // Google News searches instead of a broad RSS feed.
