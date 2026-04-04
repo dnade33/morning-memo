@@ -339,6 +339,7 @@ Two sentences. The first greets ${subscriber.first_name} by name — warm and en
 (repeat [TOPIC: ...] blocks for each topic)
 
 ═══ STRUCTURE RULES ═══
+- NO INTERNAL REASONING IN OUTPUT: Never write your thinking, corrections, or editorial notes inside the newsletter. Do not write "Wait —", "This story belongs in...", "Replacing with...", or any meta-commentary. If you need to skip or swap a story, do it silently. The subscriber sees everything you write.
 - Use the exact markers: [GREETING], [TOPIC: X], [HEADLINE], [/HEADLINE], [LINK], [/LINK], [QUOTE]
 - [TOPIC: X] must use the exact topic name from the prompt. Never use a subtopic or story title as the topic name.
 - After each story summary, copy the original Link URL into [LINK]...[/LINK]. Omit the marker if no link was provided.
