@@ -152,6 +152,26 @@ function isReferenceArticle(title, link) {
 }
 
 // ----------------------------------------------------------------
+// Sports game recap filter — drops recap articles with no score.
+// A score looks like "114-98", "3-1", "W 108-103", etc.
+// Only applied to sports league feeds, not general sports content.
+// ----------------------------------------------------------------
+const GAME_RECAP_TITLE_PATTERNS = [
+  /\b(defeat|defeats|beat|beats|beats|tops|tops|blanks|edges|outlasts|holds off|pulls off|clinches|overcomes|crushes|rolls|routs|downs)\b/i,
+  /\b(win|wins|loss|loses|falls|falls to|rallies|rallies past|upsets|stunned|knocked out)\b/i,
+]
+
+const SCORE_PATTERN = /\b\d{1,3}[-–]\d{1,3}\b/
+
+function isSportsRecapWithoutScore(title, summary, isSportsFeed) {
+  if (!isSportsFeed) return false
+  const text = `${title} ${summary}`
+  const looksLikeRecap = GAME_RECAP_TITLE_PATTERNS.some(re => re.test(title))
+  if (!looksLikeRecap) return false
+  return !SCORE_PATTERN.test(text)
+}
+
+// ----------------------------------------------------------------
 // In-memory cache — cleared between cron time slots
 // ----------------------------------------------------------------
 const feedCache = {}
@@ -182,7 +202,7 @@ async function fetchWithRetry(fn, retries = 3) {
 // Fetch + cache a single RSS feed URL
 // Returns array of { title, summary, link, date }
 // ----------------------------------------------------------------
-async function getCachedFeed(url) {
+async function getCachedFeed(url, isSportsFeed = false) {
   if (feedCache[url]) return feedCache[url]
 
   const stories = await fetchWithRetry(async () => {
@@ -197,6 +217,7 @@ async function getCachedFeed(url) {
       .filter(s => isFreshArticle(s.date))
       .filter(s => !isReferenceArticle(s.title, s.link))
       .filter(s => !isVagueHeadline(s.title))
+      .filter(s => !isSportsRecapWithoutScore(s.title, s.summary, isSportsFeed))
       .filter(s => s.summary && s.summary.trim().length >= 80)
       .slice(0, 5)
   })
@@ -359,7 +380,7 @@ async function getCachedStories(topics, city) {
       const [league, team] = topic.split('::')
       const url = getTeamFeedUrl(team, league)
       try {
-        const stories = (await getCachedFeed(url)).filter(s => isFreshArticle(s.date, MAX_SPORTS_ARTICLE_AGE_MS))
+        const stories = (await getCachedFeed(url, true)).filter(s => isFreshArticle(s.date, MAX_SPORTS_ARTICLE_AGE_MS))
         results.push({ topic, stories })
       } catch (err) {
         logger.warn(`Team feed fetch failed for ${team} (${league})`, err.message)
@@ -376,7 +397,7 @@ async function getCachedStories(topics, city) {
 
     const isSportsTopic = SPORTS_TOPIC_KEYS.has(topic)
     try {
-      const allStories = await getCachedFeed(url)
+      const allStories = await getCachedFeed(url, isSportsTopic)
       const stories = isSportsTopic
         ? allStories.filter(s => isFreshArticle(s.date, MAX_SPORTS_ARTICLE_AGE_MS))
         : allStories
