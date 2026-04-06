@@ -377,9 +377,9 @@ Every summary must leave the reader genuinely more informed than the headline al
   WRONG: "The Green Bay Packers gained cap flexibility heading into free agency." — name the specific transaction.
   RIGHT: "The Green Bay Packers freed up $12 million by releasing linebacker De'Vondre Campbell."
 
-- NUMBERS: Always include the specific number when one exists in the source. Finance stories must include at least one figure (%, price, rate, or dollar amount). Poll/survey stories must state the exact percentage — never "a majority" or "most Americans." Sports records and streaks must state the specific count.
-  WRONG: "Markets fell sharply amid recession fears." / "A majority of Americans oppose military action."
-  RIGHT: "The S&P 500 dropped 1.8%." / "62% of Americans oppose military action, according to a new poll."
+- NUMBERS: Always include the specific number when one exists in the source. Finance stories must include at least one figure (%, price, rate, or dollar amount). Poll/survey stories must state the exact percentage — never "a majority" or "most Americans." Sports records, streaks, and droughts must state the specific count — never "an extended absence" or "years without." If the source doesn't provide the number, skip the story.
+  WRONG: "Markets fell sharply amid recession fears." / "A majority of Americans oppose military action." / "The Sabres' extended playoff drought has now surpassed the Jets'."
+  RIGHT: "The S&P 500 dropped 1.8%." / "62% of Americans oppose military action." / "The Sabres have missed the playoffs for 14 consecutive seasons, surpassing the Jets' 13-year drought."
 
 - NAMES & TITLES: Copy names exactly as they appear in the source — do not guess, invent, or modify any part of a person's name. If the source gives a full name, use it. If only a last name appears, use only the last name — never fill in a first name from memory or assumption. A wrong name is worse than no name. Use the title the source assigns. Never prepend "former" unless the source states it. Spell out acronyms in full on first use: "Federal Reserve (Fed)."
 
