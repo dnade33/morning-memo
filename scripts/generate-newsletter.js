@@ -348,28 +348,27 @@ Two sentences. The first greets ${subscriber.first_name} by name — warm and en
 - All stories for a topic go under one single [TOPIC: X] block — never split a topic into multiple blocks.
 - The [QUOTE] section is mandatory and must ALWAYS appear at the end.
 
-═══ VALUE RULE ═══
-Every summary must leave the reader genuinely more informed than the headline alone did. Start one level deeper — explain why it matters, what the number is, what happens next. Never restate the headline. If the source is too thin to support a real 2-3 sentence summary, skip it and use a different story from the pool.
+═══ SUMMARY QUALITY ═══
+Every summary must leave the reader genuinely more informed than the headline alone did. If someone reads only your summary and never clicks the link, they must walk away knowing something real. Start one level deeper — the specific number, the named actor, the actual outcome, what happens next. Never restate the headline. 3 sentences maximum. Not 4. Not 5. 3.
   WRONG: "The Fed raised interest rates again as inflation concerns persist."
   RIGHT: "The Fed's quarter-point hike brings the benchmark rate to 5.5%, its highest level since 2001 — aimed at cooling stubborn services inflation, but mortgage rates are expected to climb further in response."
 
-- NO SOURCE ATTRIBUTION: Never cite where the story came from inside the summary. Do not write "according to ESPN's game recap", "according to Reuters", "per the AP", "the Associated Press reports", "ESPN reports", or any variation. The reader knows it came from a news source. Just state the facts directly.
-  WRONG: "The Phoenix Suns defeated the Chicago Bulls 120-110 on Sunday, according to ESPN's game recap."
+- STATE THE ANSWER: If the headline names a finding, decision, or outcome — or poses a question — the summary must deliver it. Never describe that information exists without giving it. Never withhold the core fact. If the source never actually answers its own headline, skip the story entirely.
+  WRONG: "Researchers found that ocean pressure supports marine life through mechanisms scientists did not previously understand."
+  RIGHT: "Researchers found that deep-sea pressure drives chemosynthesis in piezophilic bacteria, sustaining ecosystems without sunlight."
+  WRONG: "Kirk Cousins has made his retirement decision as the quarterback landscape shifts."
+  RIGHT: "Kirk Cousins announced his retirement after 12 NFL seasons, ending his career with a 102–93 record as a starter."
+  WRONG summary for "Here's What Could Determine a Recovery": "The ongoing conflict has been a significant driver of recent market swings, creating uncertainty..." — this answers nothing. Skip the story.
+
+- NO SOURCE ATTRIBUTION: Never cite where the story came from. Not "according to ESPN", "per Reuters", "the AP reports", or any variation. State the facts directly.
+  WRONG: "The Phoenix Suns defeated the Chicago Bulls 120-110, according to ESPN's game recap."
   RIGHT: "The Phoenix Suns defeated the Chicago Bulls 120-110 on Sunday, April 5."
 
-- NEVER ANONYMIZE NAMED ACTORS: If the source names a specific country, organization, person, company, or entity, use that name in your summary. Never replace a proper name with a vague descriptor. "A third-party mediator" when the source says Pakistan is a failure. "A major tech company" when the source says Google is a failure. "An international body" when the source says the UN is a failure. Use the name.
-  WRONG: "A third-party mediator has delivered a ceasefire proposal to both Tehran and Washington."
+- NEVER ANONYMIZE NAMED ACTORS: If the source names a country, organization, person, or company — use that name. Never swap a proper name for a vague descriptor.
+  WRONG: "A third-party mediator has delivered a ceasefire proposal to Tehran and Washington."
   RIGHT: "Pakistan has delivered a ceasefire proposal to both Tehran and Washington, calling for an immediate halt to hostilities."
 
-Headlines must answer "what happened?" — not "what is this about?"
-  WRONG: "Medicaid and the politics of health care and elections."
-  RIGHT: "House Republicans Propose $880B Medicaid Cut Ahead of 2026 Midterms"
-
-═══ CARDINAL RULE ═══
-Every story panel must leave the reader genuinely more informed than the headline alone did. If someone reads only your summary and never clicks the link, they must still walk away knowing something real. A summary that merely restates the headline in different words has failed.
-
-═══ LENGTH RULE ═══
-Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
+- THIN STORIES: If the source is too thin to support a genuine 2–3 sentence summary — essentially a headline reworded into one sentence — skip it and use a different story from the pool. Never pad a stub.
 
 ═══ CONTENT RULES ═══
 - SOURCE ACCURACY: Every fact in your summary — statistics, scores, records, dates, names, positions, team affiliations, roster moves, poll percentages, transactions — must come directly from the source provided. Never add supporting facts from your own training data. If the source does not state it, you do not state it. Player team affiliations change constantly — always use the team the source assigns to the player, never your training memory. For any story, answer the Who, What, Where, When that the source provides — a summary missing a named person, location, or key figure when the source includes one is not acceptable. For roster/cap/transaction stories, you must name the specific move (who was traded, released, or restructured) — if the source doesn't identify it, skip the story.
@@ -384,15 +383,9 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
 
 - NAMES & TITLES: Copy names exactly as they appear in the source — do not guess, invent, or modify any part of a person's name. If the source gives a full name, use it. If only a last name appears, use only the last name — never fill in a first name from memory or assumption. A wrong name is worse than no name. Use the title the source assigns. Never prepend "former" unless the source states it. Spell out acronyms in full on first use: "Federal Reserve (Fed)."
 
-- NO CLICKBAIT: State the answer directly. If the article names a vegetable, drug, person, decision, or outcome — write it. Never use "one vegetable," "a particular supplement," "makes a decision," or any phrasing that withholds the core fact.
-  WRONG: "Kirk Cousins has made his retirement decision as the quarterback landscape shifts."
-  RIGHT: "Kirk Cousins has announced his retirement, ending a 12-year NFL career."
-
 - ONE STORY, ONE EVENT: Each entry covers exactly one event. Never combine unrelated stories into one headline or summary. Never cover the same event twice in the same newsletter — if two source articles cover the same game or development, pick the one with more substance and skip the other.
   WRONG: "USA advances in World Baseball Classic as tensions ease over Middle East ceasefire." — two unrelated events.
   WRONG: "Kirk Cousins retires as one surprise NFC contender emerges as a free-agent destination." — unrelated second story bolted on.
-
-- THIN STORIES: If the source material is too thin to support a genuine 2–3 sentence summary — essentially just a headline reworded into one sentence — skip it entirely and use a different story from the pool. Never pad a stub into fake substance.
 
 - NO REPEATS: If a story covers the same ongoing event, court case, or policy dispute as any story in the "Already sent" list above, skip it and use a different story from the pool.
 
@@ -410,17 +403,6 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
   WRONG: "For the full box score and stat breakdown, the game recap has the complete picture." — this tells the reader nothing. Skip the story entirely.
   WRONG: "The game story and full highlights are available through MLB.com." — same violation. Skip it.
   WRONG: "The Washington Nationals defeated the Chicago Cubs on Saturday, March 28" — if the source says Thursday March 26, do not change the date.
-
-- NAME THE FINDING: Any story covering a study, discovery, decision, treatment, outcome, or list must state the actual content. Never describe that information exists without giving it. This applies to every topic.
-  WRONG: "Researchers found that ocean pressure supports marine life through mechanisms scientists did not previously understand."
-  RIGHT: "Researchers found that deep-sea pressure drives chemosynthesis in piezophilic bacteria, sustaining ecosystems without sunlight."
-  WRONG: "Good Housekeeping compiled a list of 100+ foods that form the foundation of the Mediterranean diet."
-
-- ANSWER THE HEADLINE: If a headline poses a question or promises an explanation (e.g. "Here's What Could Determine a Recovery", "What's Behind the Surge", "The Key Factor Driving X"), your summary MUST answer it — name the specific factors, numbers, or causes. A summary that only restates the uncertainty or repeats the headline in different words is a VALUE RULE violation. If the source article never actually answers its own headline, skip the story entirely and use a different one.
-  WRONG headline: "The Iran War Is Rattling Stock Markets — Here's What Could Determine a Recovery"
-  WRONG summary: "The ongoing conflict has been a significant driver of recent market swings, creating uncertainty that is making it harder for investors to gauge near-term direction." — this answers nothing.
-  RIGHT summary: "Oil prices have surged 18% since the conflict began, pushing the S&P 500 down 7% from its peak. Analysts say a recovery depends on three factors: whether the Strait of Hormuz stays open to shipping, whether the Fed pauses rate hikes, and whether energy stocks absorb the shock without broader selloff contagion."
-  RIGHT: "The Mediterranean diet centers on olive oil, fatty fish, legumes, nuts, and fresh vegetables — Good Housekeeping's guide breaks down 100+ specific options by category."
 
 - NO PREVIEW/PREDICTION STORIES: Skip any article that is purely speculative, predictive, or a season preview — "who has the most to prove," "teams to watch," "bold predictions," "best bets," "power rankings," "what to expect." These are opinion filler, not news. If the only stories available for a topic are previews or predictions, use the one with the most concrete facts and name specific teams, players, or figures from it — never tease the reader to "click through for the full list."
   WRONG: "ESPN identified the bounce-back hopefuls and hot-seat coaches who need a strong year."
