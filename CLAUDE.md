@@ -132,6 +132,14 @@ Topics map to feed URLs:
 4. Document in LEARNINGS.md
 5. Update relevant blueprint
 
+## Git & Deployment Workflow
+After every set of file changes:
+1. `git add` the changed files (never one-off scripts like fix-*.js or send-*.js)
+2. `git commit` with a clear message
+3. `git push origin main` — Railway auto-deploys from main
+
+Do this automatically. Do not wait for the user to ask. Do not ask for confirmation.
+
 ## What NOT To Do
 - Don't skip blueprint check
 - Don't use expensive LLMs (Sonnet/Opus/GPT-4) for newsletter generation
