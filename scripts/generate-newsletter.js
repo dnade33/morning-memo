@@ -353,6 +353,14 @@ Every summary must leave the reader genuinely more informed than the headline al
   WRONG: "The Fed raised interest rates again as inflation concerns persist."
   RIGHT: "The Fed's quarter-point hike brings the benchmark rate to 5.5%, its highest level since 2001 — aimed at cooling stubborn services inflation, but mortgage rates are expected to climb further in response."
 
+- NO SOURCE ATTRIBUTION: Never cite where the story came from inside the summary. Do not write "according to ESPN's game recap", "according to Reuters", "per the AP", "the Associated Press reports", "ESPN reports", or any variation. The reader knows it came from a news source. Just state the facts directly.
+  WRONG: "The Phoenix Suns defeated the Chicago Bulls 120-110 on Sunday, according to ESPN's game recap."
+  RIGHT: "The Phoenix Suns defeated the Chicago Bulls 120-110 on Sunday, April 5."
+
+- NEVER ANONYMIZE NAMED ACTORS: If the source names a specific country, organization, person, company, or entity, use that name in your summary. Never replace a proper name with a vague descriptor. "A third-party mediator" when the source says Pakistan is a failure. "A major tech company" when the source says Google is a failure. "An international body" when the source says the UN is a failure. Use the name.
+  WRONG: "A third-party mediator has delivered a ceasefire proposal to both Tehran and Washington."
+  RIGHT: "Pakistan has delivered a ceasefire proposal to both Tehran and Washington, calling for an immediate halt to hostilities."
+
 Headlines must answer "what happened?" — not "what is this about?"
   WRONG: "Medicaid and the politics of health care and elections."
   RIGHT: "House Republicans Propose $880B Medicaid Cut Ahead of 2026 Midterms"
@@ -388,6 +396,10 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
 
 - NO REPEATS: If a story covers the same ongoing event, court case, or policy dispute as any story in the "Already sent" list above, skip it and use a different story from the pool.
 
+- NATIONAL/BROAD RELEVANCE: For Politics, Finance, World News, Technology, Science, Health, History, Arts & Culture, Books & Ideas, and Food & Travel panels — only include stories with broad national or international relevance. Do not include stories that are exclusively about a specific county, small city, local school board, or regional jurisdiction unless the story explicitly has national implications or represents a documented national trend. A story about "Knox County elections" or "Springfield City Council" does not belong in a Politics panel for a general audience — skip it and use a broader story.
+  WRONG: "Four Knox County Elections Decided by 25 Votes or Fewer" — hyper-local, no national implications.
+  RIGHT: "Dozens of State Legislative Races Decided by Under 100 Votes, Reshaping Control of Key Chambers" — same theme, national scope.
+
 - TOPIC PLACEMENT: A story belongs in a panel only if it is substantively about that topic — not merely adjacent, themed, or incidentally mentioned. Sports stories (games, scores, trades, athletes, leagues) belong exclusively in the Sports panel. If the subscriber has no Sports panel, skip sports stories entirely.
   WRONG: "Italy Stuns USA 8-6 in World Baseball Classic" placed in World News.
   WRONG: A celebrity wedding in the History panel because the venue was "medieval-themed."
@@ -403,6 +415,11 @@ Every story summary is capped at 3 sentences. Not 4. Not 5. 3.
   WRONG: "Researchers found that ocean pressure supports marine life through mechanisms scientists did not previously understand."
   RIGHT: "Researchers found that deep-sea pressure drives chemosynthesis in piezophilic bacteria, sustaining ecosystems without sunlight."
   WRONG: "Good Housekeeping compiled a list of 100+ foods that form the foundation of the Mediterranean diet."
+
+- ANSWER THE HEADLINE: If a headline poses a question or promises an explanation (e.g. "Here's What Could Determine a Recovery", "What's Behind the Surge", "The Key Factor Driving X"), your summary MUST answer it — name the specific factors, numbers, or causes. A summary that only restates the uncertainty or repeats the headline in different words is a VALUE RULE violation. If the source article never actually answers its own headline, skip the story entirely and use a different one.
+  WRONG headline: "The Iran War Is Rattling Stock Markets — Here's What Could Determine a Recovery"
+  WRONG summary: "The ongoing conflict has been a significant driver of recent market swings, creating uncertainty that is making it harder for investors to gauge near-term direction." — this answers nothing.
+  RIGHT summary: "Oil prices have surged 18% since the conflict began, pushing the S&P 500 down 7% from its peak. Analysts say a recovery depends on three factors: whether the Strait of Hormuz stays open to shipping, whether the Fed pauses rate hikes, and whether energy stocks absorb the shock without broader selloff contagion."
   RIGHT: "The Mediterranean diet centers on olive oil, fatty fish, legumes, nuts, and fresh vegetables — Good Housekeeping's guide breaks down 100+ specific options by category."
 
 - NO PREVIEW/PREDICTION STORIES: Skip any article that is purely speculative, predictive, or a season preview — "who has the most to prove," "teams to watch," "bold predictions," "best bets," "power rankings," "what to expect." These are opinion filler, not news. If the only stories available for a topic are previews or predictions, use the one with the most concrete facts and name specific teams, players, or figures from it — never tease the reader to "click through for the full list."
@@ -510,13 +527,6 @@ function esc(str) {
 // ----------------------------------------------------------------
 // Build Mission Control terminal email HTML
 // ----------------------------------------------------------------
-const TOPIC_EMOJIS = {
-  'Sports': '⚽', 'NFL': '🏈', 'NBA': '🏀', 'MLB': '⚾', 'NHL': '🏒',
-  'College Football': '🏈', 'College Basketball': '🏀', 'Soccer / MLS': '⚽', 'Golf': '⛳',
-  'World News': '🌍', 'Politics': '🏛️', 'Finance': '📈', 'Technology': '💻',
-  'Science': '🔬', 'Health': '🫀', 'Arts & Culture': '🎨', 'Food & Travel': '🍽️',
-  'History': '🏛', 'Books & Ideas': '📚', 'Local Weather': '🌤️'
-}
 
 function buildMissionControlEmail(parsed, formattedDate, prefToken = null) {
   const mono = `'JetBrains Mono','IBM Plex Mono','Courier New',monospace`

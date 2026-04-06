@@ -91,6 +91,15 @@ const VAGUE_TITLE_PATTERNS = [
   /\b(could|may|might) (change|reshape|revolutionize|transform) (the way|how|what) (we|scientists|researchers)\b/i,
   /\bscientists (still )?don'?t (fully )?understand\b/i,
   /\bnew (clues?|evidence|insight) (into|about|on) (the )?(mystery|secret|puzzle|question) of\b/i,
+  // Headline-promises-answer-withholds-it: "Here's What Could Determine...", "What Could Drive...", etc.
+  /\bhere's what (could|may|might|will|would) (determine|drive|decide|shape|define|affect|impact)\b/i,
+  /\bwhat (could|may|might|will|would) (determine|drive|decide|shape|define|affect|impact) (a |the )?(recovery|outcome|result|future|direction|path|next)\b/i,
+  // "What You Need to Know" — structurally never adds information beyond restating the headline
+  /\bwhat you (need|should) (to )?know\b/i,
+  // "The Key Question Is..." / "The Big Question..." — teases without answering
+  /\bthe (key|big|central|real|burning|crucial|ultimate) question (is|facing|for|about|behind|now)\b/i,
+  // "Could X Happen?" / "Will X?" clickbait speculation pieces
+  /^(could|will|is|are|has|have|does|did|can|should|would) .{3,40}\?$/i,
 ]
 
 function isVagueHeadline(title) {
