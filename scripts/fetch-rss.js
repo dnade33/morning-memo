@@ -105,6 +105,10 @@ const VAGUE_TITLE_PATTERNS = [
   /\bmock draft\b/i,
   /\bdraft (board|capital|strategy|approach|options|decision|pick|needs?)\b/i,
   /\b(key|big|critical|important) (decision|choice|question|need) ahead of\b/i,
+  // Finance speculation — "potential outperformers", "stocks to watch", "best buys" without naming them
+  /\b(potential|possible|likely) (outperformer|winner|loser|buy|pick|performer)s?\b/i,
+  /\b(stocks?|funds?|etfs?) to (watch|buy|avoid|consider|own)\b/i,
+  /\bhighlighted as (a )?(potential|possible|top|strong)\b/i,
 ]
 
 function isVagueHeadline(title) {
