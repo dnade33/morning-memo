@@ -100,6 +100,11 @@ const VAGUE_TITLE_PATTERNS = [
   /\bthe (key|big|central|real|burning|crucial|ultimate) question (is|facing|for|about|behind|now)\b/i,
   // "Could X Happen?" / "Will X?" clickbait speculation pieces
   /^(could|will|is|are|has|have|does|did|can|should|would) .{3,40}\?$/i,
+  // Draft preview speculation — "Key Decision Ahead of Draft", "Options at WR", mock draft pieces
+  /\bahead of (the )?(2\d{3} )?(nfl|nba|mlb|nhl|college)? ?draft\b/i,
+  /\bmock draft\b/i,
+  /\bdraft (board|capital|strategy|approach|options|decision|pick|needs?)\b/i,
+  /\b(key|big|critical|important) (decision|choice|question|need) ahead of\b/i,
 ]
 
 function isVagueHeadline(title) {
