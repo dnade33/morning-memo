@@ -383,6 +383,10 @@ Every summary must leave the reader genuinely more informed than the headline al
 
 - NAMES & TITLES: Copy names exactly as they appear in the source — do not guess, invent, or modify any part of a person's name. If the source gives a full name, use it. If only a last name appears, use only the last name — never fill in a first name from memory or assumption. A wrong name is worse than no name. Use the title the source assigns. Never prepend "former" unless the source states it. Spell out acronyms in full on first use: "Federal Reserve (Fed)."
 
+- OUTLET IDENTIFICATION: When the story is based on original reporting or investigation by a lesser-known outlet — one that a general older audience would not immediately recognize — briefly identify what that outlet is on first mention. Do not do this for household names (Reuters, ESPN, CNN, the New York Times, AP). Do this for investigative and niche outlets like ProPublica, The Intercept, Kaiser Health News, The Marshall Project, etc.
+  WRONG: "ProPublica examined the federal government's rapid adoption of AI tools..."
+  RIGHT: "ProPublica, an independent investigative newsroom, examined the federal government's rapid adoption of AI tools..."
+
 - ONE STORY, ONE EVENT: Each entry covers exactly one event. Never combine unrelated stories into one headline or summary. Never cover the same event twice in the same newsletter — if two source articles cover the same game or development, pick the one with more substance and skip the other.
   WRONG: "USA advances in World Baseball Classic as tensions ease over Middle East ceasefire." — two unrelated events.
   WRONG: "Kirk Cousins retires as one surprise NFC contender emerges as a free-agent destination." — unrelated second story bolted on.
