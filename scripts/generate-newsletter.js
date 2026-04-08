@@ -641,13 +641,15 @@ function buildMissionControlEmail(parsed, formattedDate, prefToken = null) {
 // ----------------------------------------------------------------
 // Retry helper (exponential backoff)
 // ----------------------------------------------------------------
-async function fetchWithRetry(fn, retries = 3) {
+async function fetchWithRetry(fn, retries = 5) {
   for (let i = 0; i < retries; i++) {
     try {
       return await fn()
     } catch (e) {
       if (i === retries - 1) throw e
-      const delay = 1000 * Math.pow(2, i)
+      // 529 overloaded: use longer backoff (15s, 30s, 60s, 120s)
+      const isOverloaded = e.message && e.message.includes('529')
+      const delay = isOverloaded ? 15000 * Math.pow(2, i) : 1000 * Math.pow(2, i)
       logger.warn(`[RETRY] Claude attempt ${i + 1} failed, retrying in ${delay}ms`, e.message)
       await new Promise(r => setTimeout(r, delay))
     }
