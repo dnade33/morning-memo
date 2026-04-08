@@ -117,6 +117,29 @@ function isVagueHeadline(title) {
 }
 
 // ----------------------------------------------------------------
+// Teaser summary filter — blocks articles where the key information
+// (stock names, company names, specific picks) is promised in the
+// headline but explicitly withheld from the summary, redirecting
+// readers to the full article. Common in finance content farms.
+// ----------------------------------------------------------------
+const TEASER_SUMMARY_PATTERNS = [
+  // "The three stocks are detailed in the full analysis/article/report"
+  /\b(stocks?|funds?|etfs?|companies|picks?|names?|tickers?)\b.{0,60}\b(detailed|listed|named|revealed|found|identified)\b.{0,40}\b(full\s+(analysis|article|report|story|piece)|article below)\b/i,
+  // "are detailed in the full analysis" (catches the exact failing case)
+  /\bdetailed in the full\b/i,
+  /\bnamed in the full\b/i,
+  /\brevealed in the full\b/i,
+  /\blisted in the full\b/i,
+  // "the specific stocks/picks/names are in the article/analysis"
+  /\bspecific (stocks?|picks?|names?|funds?|tickers?|companies|holdings?)\b.{0,80}\b(in the (full )?(article|analysis|report|story)|below)\b/i,
+]
+
+function isTeaserSummary(summary) {
+  if (!summary) return false
+  return TEASER_SUMMARY_PATTERNS.some(re => re.test(summary))
+}
+
+// ----------------------------------------------------------------
 // Listicle / roundup filter — blocks "Top N…", "10 Best…", year-end
 // roundups, and other list-format articles that produce vague summaries.
 // These are structurally incapable of yielding specific news coverage.
@@ -235,6 +258,7 @@ async function getCachedFeed(url, isSportsFeed = false) {
       .filter(s => isFreshArticle(s.date))
       .filter(s => !isReferenceArticle(s.title, s.link))
       .filter(s => !isVagueHeadline(s.title))
+      .filter(s => !isTeaserSummary(s.summary))
       .filter(s => !isSportsRecapWithoutScore(s.title, s.summary, isSportsFeed))
       .filter(s => s.summary && s.summary.trim().length >= 80)
       .slice(0, 5)
