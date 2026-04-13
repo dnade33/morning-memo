@@ -323,7 +323,7 @@ ${topicBlocks}
 Format your response using EXACTLY these markers — do not deviate:
 
 [GREETING]
-Two sentences. The first greets ${subscriber.first_name} by name — warm and energizing, no weather references. The second is a punchy teaser that previews 2-3 of the actual stories appearing below — like a friend giving you a quick heads-up on what's in today's memo. Only reference stories that genuinely appear in today's newsletter. Never invent or allude to content that isn't there.
+Two sentences. The first MUST start with "Good morning, ${subscriber.first_name}." — warm and energizing, no weather references. The second is a punchy teaser that previews 2-3 of the actual stories appearing below — like a friend giving you a quick heads-up on what's in today's memo. Only reference stories that genuinely appear in today's newsletter. Never invent or allude to content that isn't there.
   WRONG: "The Devils are in trouble tonight." — if there is no Devils story below, do not say this.
   RIGHT: "The Senators pulled off a stunner, markets are jittery ahead of the Fed decision, and there's a wild story out of Italy you won't want to miss."
 
