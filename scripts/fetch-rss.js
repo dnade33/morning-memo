@@ -140,6 +140,21 @@ function isTeaserSummary(summary) {
 }
 
 // ----------------------------------------------------------------
+// Earnings/results paywall filter — drops financial results stories
+// whose summary contains no actual figures. An earnings article with
+// no revenue, EPS, or percentage data in the snippet is paywalled
+// and will produce a content-free summary regardless of prompting.
+// ----------------------------------------------------------------
+const EARNINGS_TITLE_PATTERN = /\b(first|second|third|fourth|q[1-4]|full.?year|annual|fiscal).{0,20}\b(quarter|year|earnings?|results?|revenue|financials?|report)\b|\bearnings?\s+(report|beat|miss|results?)\b|\bposts?\s+(earnings?|results?|revenue|financial results?)\b|\bfinancial\s+results?\b/i
+
+const FINANCIAL_FIGURE_PATTERN = /\$[\d,.]+\s*(billion|million|thousand|[BMK])\b|\d+[\.,]\d+\s*%|\b(eps|earnings per share|revenue|net (income|loss)|operating (income|loss))\s+(of|was|were|rose|fell|grew|declined)\s+\$?[\d,.]+|\b(beat|missed?|surpassed?|exceeded?)\s+(estimates?|expectations?|consensus|forecast)/i
+
+function isEarningsWithoutFigures(title, summary) {
+  if (!EARNINGS_TITLE_PATTERN.test(title)) return false
+  return !FINANCIAL_FIGURE_PATTERN.test(summary)
+}
+
+// ----------------------------------------------------------------
 // Listicle / roundup filter — blocks "Top N…", "10 Best…", year-end
 // roundups, and other list-format articles that produce vague summaries.
 // These are structurally incapable of yielding specific news coverage.
@@ -259,6 +274,7 @@ async function getCachedFeed(url, isSportsFeed = false) {
       .filter(s => !isReferenceArticle(s.title, s.link))
       .filter(s => !isVagueHeadline(s.title))
       .filter(s => !isTeaserSummary(s.summary))
+      .filter(s => !isEarningsWithoutFigures(s.title, s.summary))
       .filter(s => !isSportsRecapWithoutScore(s.title, s.summary, isSportsFeed))
       .filter(s => s.summary && s.summary.trim().length >= 80)
       .slice(0, 5)
